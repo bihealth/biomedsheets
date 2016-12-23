@@ -1,0 +1,112 @@
+{
+    "id": "https://omics.cubi.bihealth.org/experiments/33",
+    "title": "Tumor/Normal Study Example",
+    "description": "Example biomedical sheet for standard rare disease study",
+
+    "extra_info_defs": {
+        "bio_entity": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/taxon" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/hpoTerms" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/sex" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/fatherPk" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/motherPk" }
+        ],
+        "ngs_library": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/libraryType" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/libraryName" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/panelName" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/librarySizeMean" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/librarySizeSD" }
+        ]
+    },
+
+    "bio_entities": {
+        "BIH_001": {  // index
+            "pk": "123001",
+            "extra_ids": [
+                "http://patients.hospital.de/PAT12345"
+            ],
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_9606",  // Homo sapiens
+                "orphanetTerm": "ORPHANET:93258",  // Pfeiffer syndrome
+                "hpoTerms": [
+                    "HP:0003196", "HP:0009602", "HP:0009601", "HP:0010109"
+                ],
+                "sex": "male",
+                "mother_pk": "123002",
+                "father_pk": "123003"
+            },
+            "bio_samples": {
+                "N1": {  // BIH_001-N1
+                    "pk": "234001",
+                    "test_samples": {
+                        "DNA1": {   // BIH_001-N1-DNA1
+                            "pk": "345001",
+                            "ngs_libraries": {
+                                "WES1": {  // BIH_001-N1-DNA1-WES1
+                                    "pk": "567001",
+                                    "extra_info": {
+                                        "libraryType": "WES",
+                                        "kitType": "Agilent_SureSelect_Human_All_Exon_V6"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BIH_002": {  // father
+            "pk": "123002",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_9606",  // Homo sapiens
+                "sex": "male"
+            },
+            "bio_samples": {
+                "N1": {  // BIH_002-N1
+                    "pk": "234002",
+                    "test_samples": {
+                        "DNA1": {   // BIH_002-N1-DNA1
+                            "pk": "345002",
+                            "ngs_libraries": {
+                                "WES1": {  // BIH_002-N1-DNA1-WES1
+                                    "pk": "567002",
+                                    "extra_info": {
+                                        "libraryType": "WES",
+                                        "kitType": "Agilent_SureSelect_Human_All_Exon_V6"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BIH_003": {  // mother
+            "pk": "123003",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_9606",  // Homo sapiens
+                "sex": "female"
+            },
+            "bio_samples": {
+                "N1": {  // BIH_003-N1
+                    "pk": "234003",
+                    "test_samples": {
+                        "DNA1": {   // BIH_003-N1-DNA1
+                            "pk": "345003",
+                            "ngs_libraries": {
+                                "WES1": {  // BIH_003-N1-DNA1-WES1
+                                    "pk": "567003",
+                                    "extra_info": {
+                                        "libraryType": "WES",
+                                        "kitType": "Agilent_SureSelect_Human_All_Exon_V6"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

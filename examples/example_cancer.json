@@ -1,0 +1,131 @@
+{
+    "id": "https://omics.cubi.bihealth.org/experiments/33",
+    "title": "Tumor/Normal Study Example",
+    "description": "Example biomedical sheet for standard tumor/normal study",
+
+    "extra_info_defs": {
+        "bio_entity": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/taxon" }
+        ],
+        "bio_sample": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/uberonCellSource" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/icd10Entry" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/icd10Version" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/isCancer" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/tnmStage" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/preservationType" }
+        ],
+        "test_sample": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/extractionType" }
+        ],
+        "ngs_library": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/libraryType" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/libraryName" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/panelName" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/librarySizeMean" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/librarySizeSD" }
+        ]
+    },
+
+    "bio_entities": {
+        "BIH_001": {
+            "pk": "123001",
+            "extra_ids": [
+                "http://cancer-registry.hospital.de/PAT12345",
+                "http://virtual-cuts.pathology.hospital.de/SMPL000021"
+            ],
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bio_samples": {
+                "N1": {  // BIH_001-N1
+                    "pk": "234001",
+                    "extra_info": {
+                        "uberonCellSource": "UBERON:0000178",  // blood
+                        "isCancer": false
+                    },
+                    "test_samples": {
+                        "DNA1": {   // BIH_001-N1-DNA1
+                            "pk": "345001",
+                            "extra_info": { "extractionType": "DNA" },
+                            "ngs_libraries": {
+                                "WES1": {  // BIH_001-N1-DNA1-WES1
+                                    "pk": "567001",
+                                    "extra_info": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "T1": {  // BIH_001-T1
+                    "pk": "234002",
+                    "extra_info": {
+                        "uberonCellSource": "UBERON:0006866",  // colon
+                        "isCancer": true,
+                        "icd10Entry": "C18.9",  // colorectal cancer
+                        "icd10Version": 2016,
+                        "tnmStage": "T3_N1_M0",
+                        "preservationType": "FFPE"
+                    },
+                    "test_samples": {
+                        "DNA1": {  // BIH_001-T1-DNA1
+                            "pk": "345002",
+                            "extra_info": { "extractionType": "DNA" },
+                            "ngs_libraries": {
+                                "WES1": { // BIH_001-T1-DNA1-WES1
+                                    "pk": "567002",
+                                    "extra_info": {
+                                        "libraryType": "WES",
+                                        "kitType": "Agilent_SureSelect_Human_All_Exon_V6",
+                                        "kitVersion": "V6"
+                                    }
+                                }
+                            }
+                        },
+                        "RNA1": {  // BIH_001-T1-RNA1
+                            "pk": "345003",
+                            "extra_info": { "extractionType": "RNA" },
+                            "ngs_libraries": {
+                                "RNAseq1": { // BIH_001-T1-RNA1-RNAseq1
+                                    "pk": "567004",
+                                    "extra_info": {
+                                        "libraryType": "mRNA-seq",
+                                        "kitType": "other",
+                                        "kitName": "TruSeq Stranded mRNA Library Prep Kit"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "M1": {  // BIH_001-M1
+                    "pk": "234003",
+                    "extra_info": {
+                        "uberonCellSource": "UBERON:0002048",  // lung
+                        "isCancer": true,
+                        "icd10Entry": "C7B.09",  // secondary neoplasm
+                        "icd10Version": 2016,
+                        "tnmStage": "T3_N1_M1",
+                        "preservationType": "fresh-frozen"
+                    },
+                    "test_samples": {
+                        "DNA1": {  // BIH_001-T1-DNA1
+                            "pk": "345004",
+                            "extra_info": { "extractionType": "DNA" },
+                            "ngs_libraries": {
+                                "WES1": { // BIH_001-T1-DNA1-WES1
+                                    "pk": "567005",
+                                    "extra_info": {
+                                        "libraryType": "WES",
+                                        "kitType": "Agilent_SureSelect_Human_All_Exon_V6",
+                                        "kitVersion": "V6"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

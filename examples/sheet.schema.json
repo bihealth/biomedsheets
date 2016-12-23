@@ -1,0 +1,159 @@
+{
+    "id": "http://biosheets.github.io/base-schema#",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "description": "Schema for describing BioMed Sheet objects",
+
+    "type": "object",
+
+    // TODO: need a way to (1) mark entries as filtered out and
+    //       (2) for marking entries are primary
+
+    "required": [ "id" ],
+
+    "additionalProperties": false,
+
+    "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "bio_entities": {
+            "type": "object",
+            "patternProperties": {
+                "^.*$": { "$ref": "#/definitions/bio_entity" }
+            },
+            "additionalProperties": false,
+            "default": {}
+        },
+        "extra_info_defs": {
+            "type": "object",
+            "properties": {
+                "bio_entity": { "$ref": "#/definitions/extra_info_def" },
+                "bio_sample": { "$ref": "#/definitions/extra_info_def" },
+                "test_sample": { "$ref": "#/definitions/extra_info_def" },
+                "ngs_library": { "$ref": "#/definitions/extra_info_def" }
+            }
+        }
+    },
+
+    "definitions": {
+        "bio_entity": {
+            "type": "object",
+            "required": [ "pk" ],
+            "additionalProperties": false,
+            "properties": {
+                "pk": { "type": "string" },
+                "extra_ids": { "$ref": "#/definitions/extra_ids" },
+                "bio_samples": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^.*$": { "$ref": "#/definitions/bio_sample" }
+                    },
+                    "additionalProperties": false,
+                    "default": {}
+                },
+                "ignore": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "extra_info": {
+                    "type": "object"
+                }
+            }
+        },
+        "bio_sample": {
+            "type": "object",
+            "required": [ "pk" ],
+            "additionalProperties": false,
+            "properties": {
+                "pk": { "type": "string" },
+                "extra_ids": { "$ref": "#/definitions/extra_ids" },
+                "test_samples": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^.*$": { "$ref": "#/definitions/test_sample" }
+                    },
+                    "additionalProperties": false,
+                    "default": {}
+                },
+                "ignore": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "extra_info": {
+                    "type": "object"
+                }
+            }
+        },
+        "test_sample": {
+            "type": "object",
+            "required": [ "pk" ],
+            "additionalProperties": false,
+            "properties": {
+                "pk": { "type": "string" },
+                "extra_ids": { "$ref": "#/definitions/extra_ids" },
+                "ngs_libraries": {
+                    "type": "array",
+                    "items": { "$ref": "#/definitions/ngs_library" },
+                    "uniqueItems": true,
+                    "default": []
+                },
+                "ignore": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "extra_info": {
+                    "type": "object"
+                }
+            }
+        },
+        "ngs_library": {
+            "type": "object",
+            "required": [ "pk" ],
+            "additionalProperties": false,
+            "properties": {
+                "pk": { "type": "string" },
+                "extra_ids": { "$ref": "#/definitions/extra_ids" },
+                "ignore": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "extra_info": {
+                    "type": "object"
+                }
+            }
+        },
+        "extra_info_def": {
+            "type": "object",
+            "required": [ "key", "type" ],
+            "properties": {
+                "key": { "type": "string" },
+                "docs": { "type": "string" },
+                "type": {
+                    "enum": [
+                        "boolean", "string", "integer", "number", "enum",
+                        "object", "array"
+                    ]
+                },
+                "entry": {
+                    "enum": [
+                        "boolean", "string", "integer", "number"
+                    ]
+                },
+                "unit": { "type": "string" },
+                "minimum": { "type": "number" },
+                "maximum": { "type": "number" },
+                "pattern": { "type": "string" },
+                "choices": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                }
+            }
+        },
+        "extra_ids": {
+            "type": "array",
+            "items": { "type": "string" },
+            "uniqueItems": true,
+            "default": []
+        }
+    }
+}

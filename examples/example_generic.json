@@ -1,0 +1,171 @@
+{
+    "id": "https://omics.cubi.bihealth.org/experiments/33",
+    "title": "Generic Study Example",
+    "description": "Example biomedical sheet for generic study",
+
+    "extra_info_defs": {
+        "bio_entity": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/replicate" },
+            { "$ref": "file://file_types.json#/extra_info_defs/template/taxon" },
+            {
+                "docs": "Group of the specimen",
+                "key": "group",
+                "type": "enum",
+                "choices": [ "control", "case1", "case2", "case3" ]
+            }
+        ],
+        "bio_sample": [
+            {
+                "docs": "Date of sample FACS processing",
+                "key": "facsDate",
+                "type": "string",
+                "pattern": "^[0-9]{4}-[1-9][0-9]-[1-9][0-9]$"
+            },
+            {
+                "docs": "Treatments of sample",
+                "key": "treatments",
+                "type": "enum",
+                "choices": [ "fresh", "frozen", "other" ]
+            },
+            {
+                "docs": "Medium of the sample",
+                "key": "medium",
+                "type": "enum",
+                "choices": [ "water", "ethanol" ]
+            },
+            {
+                "docs": "Cell type in this experiment",
+                "key": "cellType",
+                "type": "enum",
+                "choices": [ "lymphocyte", "monocyte", "basophil", "neutrophil" ]
+            }
+        ],
+        "ngs_library": [
+            { "$ref": "file://file_types.json#/extra_info_defs/template/kitType" },
+            {
+                "docs": "Concentration of the library",
+                "key": "concentration",
+                "type": "number",
+                "unit": "ng/ul"
+            }
+        ]
+    },
+
+    "bio_entities": {
+        "BIO_001": {
+            "pk": "1",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_10090",  // Mus musculus
+                "replicate": 1,
+                "group": "control"
+            },
+            "bio_samples": {
+                "N1": {
+                    "pk": "2",
+                    "extra_info": {
+                        "facsDate": "2013-11-11",
+                        "treatmens": "frozen",
+                        "medium": "water",
+                        "cellType": "lymphocyte"
+                    },
+                    "test_samples": {
+                        "RNA1": {
+                            "pk": "3",
+                            "ngs_libraries": {
+                                "pk": "4",
+                                "kitType": "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
+                                "concentration": 33.3
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BIO_002": {
+            "pk": "2",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_10090",  // Mus musculus
+                "replicate": 2,
+                "group": "control"
+            },
+            "bio_samples": {
+                "N1": {
+                    "pk": "3",
+                    "extra_info": {
+                        "facsDate": "2013-11-12",
+                        "treatmens": "frozen",
+                        "medium": "water",
+                        "cellType": "lymphocyte"
+                    },
+                    "test_samples": {
+                        "RNA1": {
+                            "pk": "4",
+                            "ngs_libraries": {
+                                "pk": "5",
+                                "kitType": "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
+                                "concentration": 27.5
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BIO_003": {
+            "pk": "3",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_10090",  // Mus musculus
+                "replicate": 1,
+                "group": "case1"
+            },
+            "bio_samples": {
+                "N1": {
+                    "pk": "4",
+                    "extra_info": {
+                        "facsDate": "2013-11-11",
+                        "treatmens": "fresh",
+                        "medium": "ethanol",
+                        "cellType": "monocyte"
+                    },
+                    "test_samples": {
+                        "RNA1": {
+                            "pk": "5",
+                            "ngs_libraries": {
+                                "pk": "6",
+                                "kitType": "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
+                                "concentration": 13.4
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BIO_004": {
+            "pk": "4",
+            "extra_info": {
+                "ncbiTaxon": "NCBITaxon_9606",  // Homo sapiens
+                "group": "case2"
+            },
+            "bio_samples": {
+                "N1": {
+                    "pk": "5",
+                    "extra_info": {
+                        "facsDate": "2012-11-13",
+                        "treatmens": "frozen",
+                        "medium": "water",
+                        "cellType": "lymphocyte"
+                    },
+                    "test_samples": {
+                        "RNA1": {
+                            "pk": "6",
+                            "ngs_libraries": {
+                                "pk": "7",
+                                "kitType": "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
+                                "concentration": 42
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

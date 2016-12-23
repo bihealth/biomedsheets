@@ -1,0 +1,194 @@
+{
+    "id": "https://omics.cubi.bihealth.org/meta/field_types-0.1.json",
+    "title": "Example experiment Batch 3",
+    "description": "Batch 3 of Example experiment",
+    "version": "0.1",
+
+    "extra_info_defs": {
+        "template": {
+            // all
+
+            "replicate": {
+                "docs": "Integer counter for describing replicates",
+                "key": "replicate",
+                "type": "integer",
+                "unique_in_list": true,
+                "minimum": 1
+            },
+
+            "date": {
+                "docs": "Type for dates",
+                "key": "date",
+                "type": "string",
+                "pattern": "^[0-9]{4}-[1-9][0-9]-[1-9][0-9]$"
+            },
+
+            // BioEntity
+
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            },
+
+            "hpoTerms": {
+                "docs": "HPO terms for individual",
+                "key": "hpoTerms",
+                "type": "array",
+                "entry": "string",
+                "pattern": "^HPO:[0-9]+$"
+            },
+
+            "orphanetTerm": {
+                "docs": "Orphanet term for individual",
+                "key": "orphanetTerm",
+                "type": "array",
+                "entry": "string",
+                "pattern": "^ORPHANET:[0-9]+$"
+            },
+
+            "fatherPk": {
+                "docs": "Primary key of mother",
+                "key": "fatherPk",
+                "type": "string"
+            },
+
+            "motherPk": {
+                "docs": "Primary key of mother",
+                "key": "motherPk",
+                "type": "string"
+            },
+
+            "sex": {
+                "docs": "Biological sex of individual",
+                "key": "sex",
+                "type": "enum",
+                "choices": [ "male", "female", "unknown" ]
+            },
+
+            // BioEntity and BioSample
+
+            "icd10Entry": {
+                "docs": "Reference to ICD-10",
+                "key": "icd10",
+                "type": "string",
+                "pattern": "^[A-Z][0-9][0-9].[0-9]+$"
+            },
+            "icd10Version": {
+                "docs": "Version of ICD-10, year of release",
+                "key": "icd10Version",
+                "type": "integer"
+            },
+
+            // BioSample
+
+            "uberonCellSource": {
+                "docs": "Reference to UBERON ontology",
+                "key": "cellSource",
+                "type": "string",
+                "pattern": "^UBERON:[0-9]+$"
+            },
+
+            "tnmStage": {  // TODO: pattern needs refinement
+                "docs": "Tumor stage in TNM system",
+                "key": "tnmStage",
+                "type": "string",
+                "pattern": "^.*$"
+            },
+
+            "isCancer": {
+                "docs": "Boolean flag for distinguishing cancer/normal samples",
+                "key": "isCancer",
+                "type": "boolean"
+            },
+
+            "preservationType": {
+                "docs": "Flag for encoding preservation state FFPE vs. fresh frozen",
+                "key": "preservationType",
+                "type": "enum",
+                "choices": [ "FFPE", "fresh-frozen", "other" ]
+            },
+
+            // TestSample
+
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA"
+                ]
+            },
+
+            // NGSLibrary
+
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+
+            "libraryName": {
+                "docs": "Free-text key for specifying the library type",
+                "key": "libraryName",
+                "type": "string"
+            },
+
+            "panelName": {
+                "docs": "Free-text key for specifying the panel used for sequencing",
+                "key": "panelType",
+                "type": "string"
+            },
+
+            "kitType": {
+                "docs": "Known kits for library generation",
+                "key": "kitType",
+                "type": "enum",
+                "choices": [
+                    "Agilent_SureSelect_Human_All_Exon_V6",
+                    "Illumina_TruSeq_DNA_PCR_Free_Library_Preparation_Kit",
+                    "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
+                    "Illumina_TruSeq_Exome",
+                    "other"
+                ]
+            },
+
+            "kitName": {
+                "docs": "Free-text kit description",
+                "key": "kitName",
+                "type": "string"
+            },
+
+            "kitVersion": {
+                "docs": "Version of the kit used",
+                "key": "kitVersion",
+                "type": "string"
+            },
+
+            "librarySizeMean": {
+                "docs": "Mean library size for HTS library",
+                "key": "librarySizeMean",
+                "type": "integer",
+                "unit": "bp",
+                "minimum": 1
+            },
+            "librarySizeSD": {
+                "docs": "Library size SD for HTS library",
+                "key": "librarySizeSD",
+                "type": "integer",
+                "unit": "bp",
+                "minimum": 1
+            }
+        }
+    }
+}
