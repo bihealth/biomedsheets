@@ -4,15 +4,14 @@
     "description": "Batch 3 of Example experiment",
     "version": "0.1",
 
-    "extra_info_defs": {
+    "extraInfoDefs": {
         "template": {
-            // all
+            "__for all": null,
 
             "replicate": {
                 "docs": "Integer counter for describing replicates",
                 "key": "replicate",
                 "type": "integer",
-                "unique_in_list": true,
                 "minimum": 1
             },
 
@@ -23,7 +22,7 @@
                 "pattern": "^[0-9]{4}-[1-9][0-9]-[1-9][0-9]$"
             },
 
-            // BioEntity
+            "__Bio Entity": null,
 
             "ncbiTaxon": {
                 "docs": "Reference to NCBI taxonomy",
@@ -67,7 +66,7 @@
                 "choices": [ "male", "female", "unknown" ]
             },
 
-            // BioEntity and BioSample
+            "__BioEntity and BioSample": null,
 
             "icd10Entry": {
                 "docs": "Reference to ICD-10",
@@ -81,7 +80,7 @@
                 "type": "integer"
             },
 
-            // BioSample
+            "__BioSample": null,
 
             "uberonCellSource": {
                 "docs": "Reference to UBERON ontology",
@@ -90,7 +89,8 @@
                 "pattern": "^UBERON:[0-9]+$"
             },
 
-            "tnmStage": {  // TODO: pattern needs refinement
+            "tnmStage": {
+                "__TODO": "pattern needs refinement",
                 "docs": "Tumor stage in TNM system",
                 "key": "tnmStage",
                 "type": "string",
@@ -110,7 +110,7 @@
                 "choices": [ "FFPE", "fresh-frozen", "other" ]
             },
 
-            // TestSample
+            "__TestSample": null,
 
             "extractionType": {
                 "docs": "Describes extracted",
@@ -122,7 +122,7 @@
                 ]
             },
 
-            // NGSLibrary
+            "__NGSLibrary": null,
 
             "libraryType": {
                 "docs": "Rough classificiation of the library type",

@@ -5,9 +5,6 @@
 
     "type": "object",
 
-    // TODO: need a way to (1) mark entries as filtered out and
-    //       (2) for marking entries are primary
-
     "required": [ "id" ],
 
     "additionalProperties": false,
@@ -16,37 +13,37 @@
         "id": { "type": "string" },
         "title": { "type": "string" },
         "description": { "type": "string" },
-        "bio_entities": {
+        "bioEntities": {
             "type": "object",
             "patternProperties": {
-                "^.*$": { "$ref": "#/definitions/bio_entity" }
+                "^.*$": { "$ref": "#/definitions/bioEntity" }
             },
             "additionalProperties": false,
             "default": {}
         },
-        "extra_info_defs": {
+        "extraInfoDefs": {
             "type": "object",
             "properties": {
-                "bio_entity": { "$ref": "#/definitions/extra_info_def" },
-                "bio_sample": { "$ref": "#/definitions/extra_info_def" },
-                "test_sample": { "$ref": "#/definitions/extra_info_def" },
-                "ngs_library": { "$ref": "#/definitions/extra_info_def" }
+                "bioEntity": { "$ref": "#/definitions/extraInfoDef" },
+                "bioSample": { "$ref": "#/definitions/extraInfoDef" },
+                "testSample": { "$ref": "#/definitions/extraInfoDef" },
+                "ngsLibrary": { "$ref": "#/definitions/extraInfoDef" }
             }
         }
     },
 
     "definitions": {
-        "bio_entity": {
+        "bioEntity": {
             "type": "object",
             "required": [ "pk" ],
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
-                "extra_ids": { "$ref": "#/definitions/extra_ids" },
-                "bio_samples": {
+                "extraIds": { "$ref": "#/definitions/extraIds" },
+                "bioSamples": {
                     "type": "object",
                     "patternProperties": {
-                        "^.*$": { "$ref": "#/definitions/bio_sample" }
+                        "^.*$": { "$ref": "#/definitions/bioSample" }
                     },
                     "additionalProperties": false,
                     "default": {}
@@ -55,22 +52,22 @@
                     "type": "boolean",
                     "default": false
                 },
-                "extra_info": {
+                "extraInfo": {
                     "type": "object"
                 }
             }
         },
-        "bio_sample": {
+        "bioSample": {
             "type": "object",
             "required": [ "pk" ],
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
-                "extra_ids": { "$ref": "#/definitions/extra_ids" },
-                "test_samples": {
+                "extraIds": { "$ref": "#/definitions/extraIds" },
+                "testSamples": {
                     "type": "object",
                     "patternProperties": {
-                        "^.*$": { "$ref": "#/definitions/test_sample" }
+                        "^.*$": { "$ref": "#/definitions/testSample" }
                     },
                     "additionalProperties": false,
                     "default": {}
@@ -79,21 +76,23 @@
                     "type": "boolean",
                     "default": false
                 },
-                "extra_info": {
+                "extraInfo": {
                     "type": "object"
                 }
             }
         },
-        "test_sample": {
+        "testSample": {
             "type": "object",
             "required": [ "pk" ],
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
-                "extra_ids": { "$ref": "#/definitions/extra_ids" },
-                "ngs_libraries": {
-                    "type": "array",
-                    "items": { "$ref": "#/definitions/ngs_library" },
+                "extraIds": { "$ref": "#/definitions/extraIds" },
+                "ngsLibraries": {
+                    "type": "object",
+                    "patternProperties": {
+                        "^.*$": { "$ref": "#/definitions/ngsLibrary" }
+                    },
                     "uniqueItems": true,
                     "default": []
                 },
@@ -101,32 +100,31 @@
                     "type": "boolean",
                     "default": false
                 },
-                "extra_info": {
+                "extraInfo": {
                     "type": "object"
                 }
             }
         },
-        "ngs_library": {
+        "ngsLibrary": {
             "type": "object",
             "required": [ "pk" ],
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
-                "extra_ids": { "$ref": "#/definitions/extra_ids" },
+                "extraIds": { "$ref": "#/definitions/extraIds" },
                 "ignore": {
                     "type": "boolean",
                     "default": false
                 },
-                "extra_info": {
+                "extraInfo": {
                     "type": "object"
                 }
             }
         },
-        "extra_info_def": {
+        "extraInfoDef": {
             "type": "object",
-            "required": [ "key", "type" ],
+            "required": [ "type" ],
             "properties": {
-                "key": { "type": "string" },
                 "docs": { "type": "string" },
                 "type": {
                     "enum": [
@@ -149,7 +147,7 @@
                 }
             }
         },
-        "extra_ids": {
+        "extraIds": {
             "type": "array",
             "items": { "type": "string" },
             "uniqueItems": true,

@@ -1,2 +1,13 @@
 *~
 .*.sw?
+
+.cache/
+
+*.egg-info
+
+__pycache__
+
+coverage.xml
+.coverage
+
+.vscode
