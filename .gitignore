@@ -11,3 +11,5 @@ coverage.xml
 .coverage
 
 .vscode
+
+/*.xlsx

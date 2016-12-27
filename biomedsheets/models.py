@@ -14,8 +14,8 @@ KEY_NGS_LIBRARY = 'ngs_library'
 KEY_MS_PROTEIN_POOL = 'ms_protein_pool'
 
 #: Frozen set of valid ``TestSample`` child types
-TEST_SAMPLE_CHILDREN = frozenset(
-    KEY_NGS_LIBRARY, KEY_MS_PROTEIN_POOL)
+TEST_SAMPLE_CHILDREN = frozenset((
+    KEY_NGS_LIBRARY, KEY_MS_PROTEIN_POOL))
 
 
 class BioMedSheetsBaseException(Exception):

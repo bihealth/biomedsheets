@@ -118,7 +118,8 @@
                 "type": "enum",
                 "choices": [
                     "DNA",
-                    "RNA"
+                    "RNA",
+                    "other"
                 ]
             },
 
@@ -155,7 +156,7 @@
                 "key": "kitType",
                 "type": "enum",
                 "choices": [
-                    "Agilent_SureSelect_Human_All_Exon_V6",
+                    "Agilent_SureSelect_Human_All_Exon",
                     "Illumina_TruSeq_DNA_PCR_Free_Library_Preparation_Kit",
                     "Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit",
                     "Illumina_TruSeq_Exome",

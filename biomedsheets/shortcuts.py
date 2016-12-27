@@ -26,6 +26,15 @@ from . import models
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
+#: Token for identifying a rare disease sequencing experiment
+RARE_DISEASE = 'rare_disease'
+#: Token for identifying a cancer matched tumor/normal study
+CANCER_MATCHED = 'cancer_matched'
+#: Token for identifying a generic experiment
+GENERIC_EXPERIMENT = 'generic_experiment'
+#: Known sheet types with shortcuts
+SHEET_TYPES = (RARE_DISEASE, CANCER_MATCHED, GENERIC_EXPERIMENT)
+
 # TODO: the major thing here that is missing in the pre-selection of the
 #       part after TestSample, e.g., WES/RNA-seq/WGS library or HPLC-MS
 

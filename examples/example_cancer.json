@@ -23,7 +23,9 @@
             "libraryName": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/libraryName" },
             "panelName": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/panelName" },
             "librarySizeMean": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/librarySizeMean" },
-            "librarySizeSD": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/librarySizeSD" }
+            "librarySizeSD": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/librarySizeSD" },
+            "kitType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/kitType" },
+            "kitVersion": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/kitVersion" }
         }
     },
 

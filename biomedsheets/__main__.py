@@ -16,6 +16,9 @@ import sys
 from .io import SheetSchema, json_loads_ordered
 from .ref_resolver import RefResolver
 from .validation import SchemaValidator
+from .shortcuts import (
+    SHEET_TYPES, RARE_DISEASE, CANCER_MATCHED, GENERIC_EXPERIMENT)
+from . import xlsx_sheets
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -26,6 +29,13 @@ class AppBase:
     def __init__(self, args):
         #: Parsed command line arguments
         self.args = args
+
+
+class SheetAppBase(AppBase):
+    """Base class for working with sheets"""
+
+    def __init__(self, args):
+        super().__init__(args)
         #: SheetSchema from bundled json
         self.sheet_schema = self.load_sheet_schema()
         #: Sample sheet JSON
@@ -68,7 +78,7 @@ class AppBase:
         return resolver.resolve('file://' + self.args.input, sheet_json)
 
 
-class ValidateApp(AppBase):
+class ValidateApp(SheetAppBase):
     """App sub class for validation sub command"""
 
     def run(self):
@@ -83,7 +93,7 @@ class ValidateApp(AppBase):
             print('Sheet passed validation, congratulation!', file=sys.stderr)
 
 
-class ExpandApp(AppBase):
+class ExpandApp(SheetAppBase):
     """App sub class for expanding "$ref" JSON pointers"""
 
     def run(self):
@@ -91,11 +101,24 @@ class ExpandApp(AppBase):
         print('', file=self.args.output)
 
 
+class XLSXCreateApp(AppBase):
+    """App sub class for fresh creation of Excel sample sheet"""
+
+    def run(self):
+        CREATORS = {
+            RARE_DISEASE: xlsx_sheets.RareDisaseSheetCreator,
+            CANCER_MATCHED: xlsx_sheets.CancerMatchedSheetCreator,
+            GENERIC_EXPERIMENT: xlsx_sheets.GenericExperimentSheetCreator,
+        }
+        return CREATORS[self.args.experiment_type]().run(self.args.output)
+
+
 def run(args):
     """Program entry point after parsing command line arguments"""
     APPS = {
         'validate': ValidateApp,
         'expand': ExpandApp,
+        'xlsx-create': XLSXCreateApp,
     }
     return APPS[args.subparser](args).run()
 
@@ -125,6 +148,15 @@ def main(argv=None):
         '-o', '--output', type=argparse.FileType('wt'), default=sys.stdout,
         help='Path to output file, defaults to stdout')
 
+    parser_xlsx_create = subparsers.add_parser(
+        'xlsx-create', help='Create XLSX sheet for schema')
+    parser_xlsx_create.add_argument(
+        '-t', '--experiment-type', type=str, choices=SHEET_TYPES,
+        required=True, help='Type of XLSX sheet to created')
+    parser_xlsx_create.add_argument(
+        '-o', '--output', type=str, required=True,
+        help='Path to XLSX sheet to create')
+
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
     formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
@@ -132,6 +164,9 @@ def main(argv=None):
     logging.getLogger('').addHandler(console)
 
     args = parser.parse_args(argv)
+    if not args.subparser:
+        parser.print_usage()
+        return 1
     return run(args)
 
 
