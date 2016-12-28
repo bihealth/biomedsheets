@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 """Extensions for requests module"""
 
-import errno
 import io
 import locale
-import os
 import pkg_resources
-import stat
 
 from requests.adapters import BaseAdapter
-from requests.compat import urlparse, unquote
+from requests.compat import urlparse
 from requests import Response, codes
 
 

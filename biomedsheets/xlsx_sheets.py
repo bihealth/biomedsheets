@@ -3,14 +3,28 @@
 sheets
 """
 
-import sys
+import re
 
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.datavalidation import DataValidation
-from openpyxl.comments import Comment
+
+from . import models
 
 
-class RareDisaseSheetCreator:
+class SetupColumnSizesMixin:
+
+    def _setup_column_sizes(self, ws, space=2):
+        dims = {}
+        for row in ws.rows:
+            for cell in row:
+                if cell.value:
+                    dims[cell.column] = max((dims.get(cell.column, 0),
+                                            len(cell.value)))
+        for col, value in dims.items():
+            ws.column_dimensions[col].width = dims[col] + space
+
+
+class RareDisaseSheetCreator(SetupColumnSizesMixin):
     """Create rare disease XLSX sheet"""
 
     def run(self, output_path):
@@ -43,16 +57,6 @@ class RareDisaseSheetCreator:
             'KIT TYPE',
             'KIT VERSION',
         ))
-
-    def _setup_column_sizes(self, ws):
-        dims = {}
-        for row in ws.rows:
-            for cell in row:
-                if cell.value:
-                    dims[cell.column] = max((dims.get(cell.column, 0),
-                                            len(cell.value)))
-        for col, value in dims.items():
-            ws.column_dimensions[col].width = dims[col]
 
     def _setup_validation(self, ws):
         """Setup data validation, creates list cells"""
@@ -110,7 +114,7 @@ class RareDisaseSheetCreator:
                    'Agilent_SureSelect_Human_All_Exon', 'V6'))
 
 
-class CancerMatchedSheetCreator:
+class CancerMatchedSheetCreator(SetupColumnSizesMixin):
     """Create cancer matched tumor/normal sheet"""
 
     def run(self, output_path):
@@ -144,16 +148,6 @@ class CancerMatchedSheetCreator:
             'KIT TYPE',
             'KIT VERSION'
         ))
-
-    def _setup_column_sizes(self, ws):
-        dims = {}
-        for row in ws.rows:
-            for cell in row:
-                if cell.value:
-                    dims[cell.column] = max(
-                        (dims.get(cell.column, 0), len(cell.value)))
-        for col, value in dims.items():
-            ws.column_dimensions[col].width = dims[col]
 
     def _setup_validation(self, ws):
         """Setup data validation, creates list cells"""
@@ -224,7 +218,7 @@ class CancerMatchedSheetCreator:
                    'Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit', '1'))
 
 
-class GenericExperimentSheetCreator:
+class GenericExperimentSheetCreator(SetupColumnSizesMixin):
 
     def run(self, output_path):
         """Create empty sheet for generic experiments to ``path``"""
@@ -251,16 +245,6 @@ class GenericExperimentSheetCreator:
             'KIT TYPE',
             'KIT VERSION',
         ))
-
-    def _setup_column_sizes(self, ws):
-        dims = {}
-        for row in ws.rows:
-            for cell in row:
-                if cell.value:
-                    dims[cell.column] = max(
-                        (dims.get(cell.column, 0), len(cell.value)))
-        for col, value in dims.items():
-            ws.column_dimensions[col].width = dims[col]
 
     def _setup_validation(self, ws):
         """Setup data validation, creates list cells"""
@@ -300,3 +284,175 @@ class GenericExperimentSheetCreator:
         ws.append(('X004', 'X004-S1', 'X004-S1-RNA1', 'X001-S1-RNA1-RNAseq1',
                    'mRNA-seq',
                    'Illumina_TruSeq_Stranded_mRNA_Library_Prep_Kit', '1'))
+
+
+class SheetIOBase:
+    """Base class for XLSX reader and writer"""
+
+    def __init__(self, sheet):
+        #: models.Sheet to write
+        self.sheet = sheet
+        #: Shortcut to sheet's JSON data
+        self.json_data = self.sheet.json_data
+        #: Shortcut to extraInfoDefs dict of JSON data
+        self.extra_info_defs = self.json_data.get('extraInfoDefs', {})
+
+    def _bio_entity_headers(self):
+        """Return headers for bio entities"""
+        result = ['pk', 'secondary_id']
+        result += list(self.extra_info_defs.get('bioEntity', {}).keys())
+        return result
+
+    def _bio_sample_headers(self):
+        """Return headers for bio samples"""
+        result = ['pk', 'secondary_id']
+        result += list(self.extra_info_defs.get('bioSample', {}).keys())
+        return result
+
+    def _test_sample_headers(self):
+        """Return headers for test samples"""
+        result = ['pk', 'secondary_id']
+        result += list(self.extra_info_defs.get('testSample', {}).keys())
+        return result
+
+    def _ngs_library_headers(self):
+        """There must be at least one 'ngsLibraries' entry exist or
+        'ngsLibrary' is set in the 'extraInfoDefs' section for any header
+        output
+        """
+        if self.extra_info_defs.get('ngsLibrary') is None:
+            return []
+        else:
+            result = ['pk', 'secondary_id']
+            result += list(self.extra_info_defs.get('ngsLibrary', {}).keys())
+            return result
+
+    def _ms_protein_pool_headers(self):
+        """There must be at least one 'msProteinPools' entry exist or
+        'msProteinPool' is set in the 'extraInfoDefs' section for any header
+        output
+        """
+        if self.extra_info_defs.get('msProteinPool') is None:
+            return []
+        else:
+            result = ['pk', 'secondary_id']
+            result += list(self.extra_info_defs['msProteinPool'].keys())
+            return result
+
+
+class SheetWriter(SheetIOBase, SetupColumnSizesMixin):
+    """Writing of models.Sheet objects to XLSX"""
+
+    def write(self, output_path):
+        """Write out sheet to XLSX file"""
+        wb = Workbook()
+        ws = wb.active
+        self._setup_sheet(ws)
+        wb.save(output_path)
+
+    def _setup_sheet(self, ws):
+        """Setup openpyxl Worksheet ``ws``"""
+        self._add_header(ws)
+        self._setup_validation(ws)
+        self._add_rows(ws)
+        self._setup_column_sizes(ws)
+        ws.freeze_panes = ws['A2']
+
+    def _add_header(self, ws):
+        """Adds header to the worksheet ``ws``"""
+
+        def fn(s):
+            """Local helper function for camelCase -> CAMEL CASE"""
+            s = re.sub(r'([a-z])([A-Z])', r'\1_\2', s)
+            return re.sub('[^a-zA-Z0-9]', ' ', s).upper()
+
+        header = []
+        header += ['DONOR ' + fn(s) for s in self._bio_entity_headers()]
+        header += ['BIO SAMPLE ' + fn(s) for s in self._bio_sample_headers()]
+        header += ['TEST SAMPLE ' + fn(s) for s in self._test_sample_headers()]
+        header += ['NGS LIB ' + fn(s) for s in self._ngs_library_headers()]
+        header += [
+            'MS POOL ' + fn(s) for s in self._ms_protein_pool_headers()]
+        ws.append(header)
+
+    def _setup_validation(self, ws):
+        """Setup validation for the sheet (validation for being in a list
+        triggers dropdown lists)
+        """
+        pass
+
+    def _add_rows(self, ws):
+        """Add rows for all data in ``self.sheet``"""
+        for bio_entity in self.sheet.bio_entities.values():
+            for row in self._bio_entity_rows(bio_entity):
+                ws.append(list(map(str, row)))
+
+    def _bio_entity_rows(self, bio_entity):
+        keys = self.extra_info_defs.get('bioEntity', {}).keys()
+        cells = [bio_entity.pk, bio_entity.secondary_id]
+        cells += [bio_entity.extra_infos.get(key, '') for key in keys]
+        for bio_sample in bio_entity.bio_samples.values():
+            yield from self._bio_sample_rows(bio_sample, cells)
+
+    def _bio_sample_rows(self, bio_sample, base):
+        keys = self.extra_info_defs.get('bioSample', {}).keys()
+        cells = [bio_sample.pk, bio_sample.secondary_id]
+        cells += [bio_sample.extra_infos.get(key, '') for key in keys]
+        for test_sample in bio_sample.test_samples.values():
+            yield from self._test_sample_rows(
+                test_sample, base + cells)
+    
+    def _test_sample_rows(self, test_sample, base):
+        keys = self.extra_info_defs.get('testSample', {}).keys()
+        cells = [test_sample.pk, test_sample.secondary_id]
+        cells += [test_sample.extra_infos.get(key, '') for key in keys]
+        for ngs_library in test_sample.ngs_libraries.values():
+            yield from self._ngs_library_rows(
+                ngs_library, base + cells)
+        for ms_protein_pool in test_sample.ms_protein_pools.values():
+            base += [''] * len(self._ngs_library_headers())  # add spacers
+            yield from self._ms_protein_pool_rows(
+                ms_protein_pool, base + cells)
+
+    def _ngs_library_rows(self, ngs_library, base):
+        keys = self.extra_info_defs.get('ngsLibrary', {}).keys()
+        cells = [ngs_library.pk, ngs_library.secondary_id]
+        cells += [ngs_library.extra_infos.get(key, '') for key in keys]
+        yield base + cells
+
+    def _ms_protein_pool_rows(self, ms_protein_pool, base):
+        keys = self.extra_info_defs.get('msProteinPool', {}).keys()
+        cells = [ms_protein_pool.pk, ms_protein_pool.secondary_id]
+        cells += [ms_protein_pool.extra_infos.get(key, '') for key in keys]
+        yield base + cells
+
+
+class SheetLoader(SheetIOBase):
+    """Code for reading XLSX sheets
+
+    For this to work, loader has to be initialized with a JSON sheet that
+    carries all of the information.
+    """
+
+    def __init__(self, sheet):
+        #: ``models.Sheet`` to use for data type information etc
+        self.sheet = sheet
+
+    def load(self, xlsx_path):
+        """Load XLSX from file at ``xlsx_path`` and return models.Sheet
+        instance
+        """
+        # Load XLSX from the given path
+        wb = load_workbook(xlsx_path, read_only=True)
+        # Match columns in XLSX and JSON to each other
+        col_infos = self._get_col_infos(wb.active)
+        # Load the entities from XLSX file
+        return self._load_sheet(wb.active, col_infos)
+
+    def _get_col_infos(self, ws):
+        """Match columns from Worksheet ``ws`` to JSON properties"""
+        raise NotImplementedError('Implement me!')
+
+    def _load_sheet(self, ws, col_infos):
+        """Load the information from the Worksheet ``ws``"""
+        raise NotImplementedError('Implement me!')

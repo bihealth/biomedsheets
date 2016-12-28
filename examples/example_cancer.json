@@ -25,7 +25,10 @@
             "librarySizeMean": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/librarySizeMean" },
             "librarySizeSD": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/librarySizeSD" },
             "kitType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/kitType" },
+            "kitName": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/kitName" },
             "kitVersion": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/kitVersion" }
+        },
+        "msProteinPool": {
         }
     },
 

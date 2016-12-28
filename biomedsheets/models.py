@@ -2,7 +2,10 @@
 """Python classes for representing the generic part of BioMedical sheets
 """
 
+from collections import OrderedDict
+
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+
 
 #: Key for storing disabled flag for entities
 KEY_DISABLED = 'disabled'
@@ -62,7 +65,7 @@ class CrawlMixin:
 
     def _merge_sub_entries(self, *dicts):
         # Check for conflicts in secondary ids
-        duplicates = {}
+        duplicates = set()
         for d1 in dicts:
             for d2 in dicts:
                 if d1 is not d2:
@@ -82,16 +85,18 @@ class Sheet(CrawlMixin):
     """Container for multiple :pyclass:`BioEntity` objects
     """
 
-    def __init__(self, identifier, title, description=None,
-                 bio_entities=None):
+    def __init__(self, identifier, title, json_data, description=None,
+                 bio_entities=None, dict_type=OrderedDict):
         #: Identifier URI of the sheet, cannot be changed after construction
         self.identifier = identifier
         #: Title of the sheet, can be changed after construction
         self.title = title
+        #: The underlying data from JSON
+        self.json_data = json_data
         #: Description of the sheet
         self.description = description
         #: List of ``BioEntity`` objects described in the sheet
-        self.bio_entities = dict(bio_entities) or []
+        self.bio_entities = dict_type(bio_entities or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.sub_entries = self.bio_entities
 
@@ -103,24 +108,27 @@ class SheetEntry:
     properties dict
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None):
+    def __init__(self, pk, secondary_id,  extra_ids=None, extra_infos=None,
+                 dict_type=OrderedDict):
         #: Primary key of the bio entity, globally unique
         self.pk = pk
         #: ``str`` with secondary id of the bio entity, unique in the sheet
         self.secondary_id = secondary_id
-        #: Additional properties, ``dict``-like object
-        self.additional_properties = additional_properties or {}
+        #: Extra IDs
+        self.extra_ids = list(extra_ids or [])
+        #: Extra info, ``dict``-like object
+        self.extra_infos = dict_type(extra_infos or [])
 
 
 class BioEntity(SheetEntry, CrawlMixin):
     """Represent one biological specimen
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None,
-                 bio_samples=None):
-        super().__init__(pk, secondary_id, additional_properties)
+    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+                 bio_samples=None, dict_type=OrderedDict):
+        super().__init__(pk, secondary_id, extra_ids, extra_infos)
         #: List of ``BioSample`` objects described for the ``BioEntity``
-        self.bio_samples = dict(bio_samples) or []
+        self.bio_samples = dict_type(bio_samples or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.bio_samples = self.bio_samples
 
@@ -129,11 +137,11 @@ class BioSample(SheetEntry, CrawlMixin):
     """Represent one sample taken from a biological entity/specimen
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None,
-                 test_samples=None):
-        super().__init__(pk, secondary_id, additional_properties)
+    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+                 test_samples=None, dict_type=OrderedDict):
+        super().__init__(pk, secondary_id, extra_ids, extra_infos)
         #: List of ``TestSample`` objects described for the ``BioSample``
-        self.test_samples = dict(test_samples) or []
+        self.test_samples = dict_type(test_samples or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.test_samples = self.test_samples
 
@@ -142,13 +150,14 @@ class TestSample(SheetEntry, CrawlMixin):
     """Represent a technical sample from biological sample, e.g., DNA or RNA
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None,
-                 ngs_libraries=None, ms_protein_pools=None):
-        super().__init__(pk, secondary_id, additional_properties)
+    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+                 ngs_libraries=None, ms_protein_pools=None,
+                 dict_type=OrderedDict):
+        super().__init__(pk, secondary_id, extra_ids, extra_infos)
         #: List of ``NGSLibrary`` objects described for the ``TestSample``
-        self.ngs_libraries = dict(ngs_libraries) or []
+        self.ngs_libraries = dict_type(ngs_libraries or [])
         #: List of ``MSProteinPools`` objects described for the ``TestSample``
-        self.ms_protein_pools = dict(ms_protein_pools) or []
+        self.ms_protein_pools = dict_type(ms_protein_pools)
         # ``sub_entries`` shortcut, check for duplicates
         self.sub_entries = self._merge_sub_entries(
             self.ngs_libraries, self.ms_protein_pools)
@@ -158,13 +167,15 @@ class NGSLibrary(SheetEntry):
     """Represent one NGSLibrary generated from a test sample
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None):
-        super().__init__(pk, secondary_id, additional_properties)
+    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+                 dict_type=OrderedDict):
+        super().__init__(pk, secondary_id, extra_ids, extra_infos)
 
 
 class MSProteinPool(SheetEntry):
     """Represent one Mass-spec protein pool
     """
 
-    def __init__(self, pk, secondary_id, additional_properties=None):
-        super().__init__(pk, secondary_id, additional_properties)
+    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+                 dict_type=OrderedDict):
+        super().__init__(pk, secondary_id, extra_ids, extra_infos)

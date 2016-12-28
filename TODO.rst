@@ -7,4 +7,11 @@ TODO Items
 - One TestSample child of any kind can be marked as primary, all others must be marked as secondary
 - Fall back to PyOrderedDict
 - Allow URIs for ``--input`` 
+- ``--input`` should be ``--input-json`` to differentiate between --input-json and --input-xlsx consistently
 - Better error message on file not found
+- Perform BioMed validation in addition to JSON-schema validation
+- Cache ExtraInfoBuilder instances
+- Add hidden columns with primary key for reidentification of records
+- Spider for any NGS libraries and MS protein pools in XLSX header generation
+- xlsx_sheets.SheetWriter._setup_validation() does nothing
+- proper mapping to XLSX values in SheetWriter (number vs string vs. list)

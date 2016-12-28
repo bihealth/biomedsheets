@@ -13,7 +13,7 @@ import os
 import pkg_resources
 import sys
 
-from .io import SheetSchema, json_loads_ordered
+from .io import SheetSchema, json_loads_ordered, SheetBuilder
 from .ref_resolver import RefResolver
 from .validation import SchemaValidator
 from .shortcuts import (
@@ -38,6 +38,8 @@ class SheetAppBase(AppBase):
         super().__init__(args)
         #: SheetSchema from bundled json
         self.sheet_schema = self.load_sheet_schema()
+        #: Validator for BioMed JSON schemas
+        self.validator = SchemaValidator(self.sheet_schema)
         #: Sample sheet JSON
         self.sheet_json = self.load_sheet_json()
         #: Resolved JSON
@@ -45,7 +47,7 @@ class SheetAppBase(AppBase):
 
     def run(self):
         """Execute the command"""
-        raise NotImplementedError('Implement me!')
+        raise NotImplementedError('Abstract method called: override me!')
 
     def load_sheet_schema(self):
         """Load the bundled SheetSchema"""
@@ -77,17 +79,19 @@ class SheetAppBase(AppBase):
             dict_class=collections.OrderedDict)
         return resolver.resolve('file://' + self.args.input, sheet_json)
 
+    def validate_and_print_errors(self):
+        errors = self.validator.validate(self.resolved_json)
+        if errors:
+            print('The following validation errors occured', file=sys.stderr)
+            for error in errors:
+                print(' - {}'.format(error), file=sys.stderr)
+        return errors
 
 class ValidateApp(SheetAppBase):
     """App sub class for validation sub command"""
 
     def run(self):
-        validator = SchemaValidator(self.sheet_schema)
-        errors = validator.validate(self.resolved_json)
-        if errors:
-            print('The following validation errors occured', file=sys.stderr)
-            for error in errors:
-                print(' - {}'.format(error), file=sys.stderr)
+        if self.validate_and_print_errors():
             return 1
         else:
             print('Sheet passed validation, congratulation!', file=sys.stderr)
@@ -99,6 +103,42 @@ class ExpandApp(SheetAppBase):
     def run(self):
         json.dump(self.resolved_json, self.args.output, indent='  ')
         print('', file=self.args.output)
+
+
+class JSONToXLSXApp(SheetAppBase):
+    """App sub class for converting JSON to XLSX sheet"""
+
+    def run(self):
+        # Check whether JSON data is valid and break from function otherwise
+        if self.validate_and_print_errors():
+            return 1
+        # Build models.Sheet from JSON and write out to XLSX
+        print('Building BioMed Sheet...', file=sys.stderr)
+        sheet = SheetBuilder(self.resolved_json).run()
+        print('Write sheet to XLSX...', file=sys.stderr)
+        writer = xlsx_sheets.SheetWriter(sheet)
+        writer.write(self.args.output)
+
+
+class XLSXToJSONApp(SheetAppBase):
+    """App sub class for filling XLSX into a JSON sheet (write to another
+    JSON output sheet)
+    """
+
+    def run(self):
+        # Check whether JSON data is valid and break from function otherwise
+        if self.validate_and_print_errors():
+            return 1
+        # Build models.Sheet from JSON for the overall structure
+        print('Building BioMed Sheet...', file=sys.stderr)
+        tpl_sheet = SheetBuilder(self.resolved_json).run()
+        # Load XLSX file, using sheet for type definitions etc., and write
+        # out sheet again
+        print('Loading sheet from XLSX file...', file=sys.stderr)
+        sheet = xlsx_sheets.SheetLoader(tpl_sheet).load(self.input_xlsx)
+        print('Write sheet to XLSX...', file=sys.stderr)
+        writer = xlsx_sheets.SheetWriter(sheet)
+        writer.write(self.args.output)
 
 
 class XLSXCreateApp(AppBase):
@@ -119,6 +159,8 @@ def run(args):
         'validate': ValidateApp,
         'expand': ExpandApp,
         'xlsx-create': XLSXCreateApp,
+        'json-xlsx': JSONToXLSXApp,
+        'xlsx-json': XLSXToJSONApp,
     }
     return APPS[args.subparser](args).run()
 
@@ -156,6 +198,30 @@ def main(argv=None):
     parser_xlsx_create.add_argument(
         '-o', '--output', type=str, required=True,
         help='Path to XLSX sheet to create')
+
+    parser_json_xlsx = subparsers.add_parser(
+        'json-xlsx', help='Create XLSX from JSON schema')
+    parser_json_xlsx.add_argument(
+        '-i', '--input', type=str, required=True,
+        help='Path to BioMed Sheet (JSON or YAML) file')
+    parser_json_xlsx.add_argument(
+        '-o', '--output', type=str, required=True,
+        help='Path to XLSX sheet to create')
+
+    parser_xlsx_json = subparsers.add_parser(
+        'xlsx-json',
+        help=('Write data from XLSX in structure given by one JSON file '
+              'into another JSON file'))
+    parser_xlsx_json.add_argument(
+        '-i', '--input', type=str, required=True,
+        help='Path to BioMed Sheet (JSON or YAML) file')
+    parser_xlsx_json.add_argument(
+        '-x', '--input-xlsx', type=str, required=True,
+        help=('Path to BioMed Sheet XLSX file created by "xlsx-create" '
+              'command'))
+    parser_xlsx_json.add_argument(
+        '-o', '--output', type=str, required=True,
+        help='Path to JSON sheet to write to')
 
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
