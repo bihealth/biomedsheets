@@ -13,3 +13,5 @@ coverage.xml
 .vscode
 
 /*.xlsx
+
+docs/build

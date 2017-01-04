@@ -1,0 +1,55 @@
+{
+    "id": "https://omics.cubi.bihealth.org/experiments/33",
+    "title": "Tumor/Normal Study Example",
+    "description": "Example biomedical sheet for standard tumor/normal study",
+
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            }
+        },
+        "bioSample": {
+            "uberonCellSource": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/uberonCellSource" }
+        },
+        "testSample": {},
+        "ngsLibrary": {},
+        "msProteinPool": {}
+    },
+
+    "bioEntities": {
+        "BIH_001": {
+            "pk": "123001",
+            "extraIds": [
+                "http://cancer-registry.hospital.de/PAT12345",
+                "http://virtual-cuts.pathology.hospital.de/SMPL000021"
+            ],
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": "234001",
+                    "extraInfo": {
+                        "uberonCellSource": "UBERON:0000178"
+                    },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": "345001",
+                            "extraInfo": { "extractionType": "DNA" },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": "567001",
+                                    "extraInfo": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

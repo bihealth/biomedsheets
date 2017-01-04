@@ -485,14 +485,16 @@ class CancerBioSample:
                 'Could not find an DNA NGS library for TestSample {}'.format(
                     self.dna_test_sample.test_sample))
         else:
-            return next(iter(self.dna_test_sample.test_sample.ngs_libraries))
+            return NGSLibraryShortcut(self.dna_test_sample, next(iter(
+                self.dna_test_sample.test_sample.ngs_libraries.values())))
 
     def _get_primary_rna_ngs_library(self):
         """Get primary RNA NGS library from self.rna_test_sample, if any
         """
         if (self.rna_test_sample and
                 self.rna_test_sample.test_sample.ngs_libraries):
-            return next(iter(self.rna_test_sample.test_sample.ngs_libraries))
+            return NGSLibraryShortcut(self.rna_test_sample, next(iter(
+                self.rna_test_sample.test_sample.ngs_libraries.values())))
         else:
             return None
 

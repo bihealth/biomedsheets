@@ -82,7 +82,7 @@ class CrawlMixin:
 
 
 class Sheet(CrawlMixin):
-    """Container for multiple :pyclass:`BioEntity` objects
+    """Container for multiple :class:`BioEntity` objects
     """
 
     def __init__(self, identifier, title, json_data, description=None,
