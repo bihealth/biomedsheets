@@ -39,6 +39,7 @@
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
+                "disabled": { "type": "boolean", "default": false },
                 "extraIds": { "$ref": "#/definitions/extraIds" },
                 "bioSamples": {
                     "type": "object",
@@ -63,6 +64,7 @@
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
+                "disabled": { "type": "boolean", "default": false },
                 "extraIds": { "$ref": "#/definitions/extraIds" },
                 "testSamples": {
                     "type": "object",
@@ -87,6 +89,7 @@
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
+                "disabled": { "type": "boolean", "default": false },
                 "extraIds": { "$ref": "#/definitions/extraIds" },
                 "ngsLibraries": {
                     "type": "object",
@@ -111,6 +114,7 @@
             "additionalProperties": false,
             "properties": {
                 "pk": { "type": "string" },
+                "disabled": { "type": "boolean", "default": false },
                 "extraIds": { "$ref": "#/definitions/extraIds" },
                 "ignore": {
                     "type": "boolean",

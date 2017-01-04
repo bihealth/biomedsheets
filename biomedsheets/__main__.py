@@ -10,8 +10,9 @@ import collections
 import json
 import logging
 import os
-import pkg_resources
 import sys
+
+import pkg_resources
 
 from .io import SheetSchema, json_loads_ordered, SheetBuilder
 from .ref_resolver import RefResolver
@@ -62,7 +63,7 @@ class SheetAppBase(AppBase):
         try:
             with open(self.args.input, 'rt') as f:
                 return json_loads_ordered(f.read())
-        except FileNotFoundError as e:
+        except FileNotFoundError:
             raise  # re-raise
 
     def get_lib_dirs(self):
@@ -86,6 +87,7 @@ class SheetAppBase(AppBase):
             for error in errors:
                 print(' - {}'.format(error), file=sys.stderr)
         return errors
+
 
 class ValidateApp(SheetAppBase):
     """App sub class for validation sub command"""

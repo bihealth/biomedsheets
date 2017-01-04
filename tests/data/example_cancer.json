@@ -1,0 +1,94 @@
+{
+    "id": "https://omics.cubi.bihealth.org/experiments/33",
+    "title": "Tumor/Normal Study Example",
+    "description": "Example biomedical sheet for standard tumor/normal study",
+
+    "extraInfoDefs": {
+        "bioSample": {
+            "isCancer": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/isCancer" }
+        },
+        "testSample": {
+            "extractionType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/extractionType" }
+        },
+        "ngsLibrary": {
+            "libraryType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/libraryType" }
+        }
+    },
+
+    "bioEntities": {
+        "EX_001": {
+            "pk": "1",
+            "bioSamples": {
+                "N1": {
+                    "pk": "2",
+                    "extraInfo": { "isCancer": false },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": "3",
+                            "extraInfo": { "extractionType": "DNA" },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": "4",
+                                    "extraInfo": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": "5",
+                    "extraInfo": { "isCancer": true },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": "6",
+                            "extraInfo": { "extractionType": "DNA" },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": "7",
+                                    "extraInfo": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "EX_002": {
+            "pk": "8",
+            "bioSamples": {
+                "N1": {
+                    "pk": "9",
+                    "extraInfo": { "isCancer": false },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": "10",
+                            "extraInfo": { "extractionType": "DNA" },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": "11",
+                                    "extraInfo": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": "12",
+                    "extraInfo": { "isCancer": true },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": "13",
+                            "extraInfo": { "extractionType": "DNA" },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": "14",
+                                    "extraInfo": { "libraryType": "WES" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

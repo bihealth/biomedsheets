@@ -100,6 +100,14 @@ class Sheet(CrawlMixin):
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.sub_entries = self.bio_entities
 
+    def __repr__(self):
+        return 'Sheet({})'.format(', '.join(map(str, [
+            self.identifier, self.title, self.json_data, self.description,
+            self.bio_entities, self.sub_entries])))
+
+    def __str__(self):
+        return repr(self)
+
 
 class SheetEntry:
     """Base class for the different ``Sheet`` entries
@@ -108,10 +116,12 @@ class SheetEntry:
     properties dict
     """
 
-    def __init__(self, pk, secondary_id,  extra_ids=None, extra_infos=None,
-                 dict_type=OrderedDict):
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
+                 extra_infos=None, dict_type=OrderedDict):
         #: Primary key of the bio entity, globally unique
         self.pk = pk
+        #: Flag for explicit disabling of objects
+        self.disabled = disabled
         #: ``str`` with secondary id of the bio entity, unique in the sheet
         self.secondary_id = secondary_id
         #: Extra IDs
@@ -119,41 +129,62 @@ class SheetEntry:
         #: Extra info, ``dict``-like object
         self.extra_infos = dict_type(extra_infos or [])
 
+    @property
+    def enabled(self):
+        """Inverse of ``self.enabled``"""
+        return not self.disabled
+
 
 class BioEntity(SheetEntry, CrawlMixin):
     """Represent one biological specimen
     """
 
-    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
-                 bio_samples=None, dict_type=OrderedDict):
-        super().__init__(pk, secondary_id, extra_ids, extra_infos)
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
+                 extra_infos=None, bio_samples=None, dict_type=OrderedDict):
+        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
         #: List of ``BioSample`` objects described for the ``BioEntity``
         self.bio_samples = dict_type(bio_samples or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.bio_samples = self.bio_samples
+
+    def __repr__(self):
+        return 'BioEntity({})'.format(', '.join(map(str, [
+            self.pk, self.disabled, self.secondary_id, self.extra_ids,
+            self.extra_infos, self.bio_samples])))
+
+    def __str__(self):
+        return repr(self)
 
 
 class BioSample(SheetEntry, CrawlMixin):
     """Represent one sample taken from a biological entity/specimen
     """
 
-    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
-                 test_samples=None, dict_type=OrderedDict):
-        super().__init__(pk, secondary_id, extra_ids, extra_infos)
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
+                 extra_infos=None, test_samples=None, dict_type=OrderedDict):
+        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
         #: List of ``TestSample`` objects described for the ``BioSample``
         self.test_samples = dict_type(test_samples or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.test_samples = self.test_samples
+
+    def __repr__(self):
+        return 'BioSample({})'.format(', '.join(map(str, [
+            self.pk, self.disabled, self.secondary_id, self.extra_ids,
+            self.extra_infos, self.test_samples])))
+
+    def __str__(self):
+        return repr(self)
 
 
 class TestSample(SheetEntry, CrawlMixin):
     """Represent a technical sample from biological sample, e.g., DNA or RNA
     """
 
-    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
-                 ngs_libraries=None, ms_protein_pools=None,
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
+                 extra_infos=None, ngs_libraries=None, ms_protein_pools=None,
                  dict_type=OrderedDict):
-        super().__init__(pk, secondary_id, extra_ids, extra_infos)
+        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
         #: List of ``NGSLibrary`` objects described for the ``TestSample``
         self.ngs_libraries = dict_type(ngs_libraries or [])
         #: List of ``MSProteinPools`` objects described for the ``TestSample``
@@ -162,20 +193,44 @@ class TestSample(SheetEntry, CrawlMixin):
         self.sub_entries = self._merge_sub_entries(
             self.ngs_libraries, self.ms_protein_pools)
 
+    def __repr__(self):
+        return 'TestSample({})'.format(', '.join(map(str, [
+            self.pk, self.disabled, self.secondary_id, self.extra_ids,
+            self.extra_infos, self.ngs_libraries, self.ms_protein_pools])))
+
+    def __str__(self):
+        return repr(self)
+
 
 class NGSLibrary(SheetEntry):
     """Represent one NGSLibrary generated from a test sample
     """
 
-    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
-                 dict_type=OrderedDict):
-        super().__init__(pk, secondary_id, extra_ids, extra_infos)
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
+                 extra_infos=None, dict_type=OrderedDict):
+        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+
+    def __repr__(self):
+        return 'NGSLibrary({})'.format(', '.join(map(str, [
+            self.pk, self.disabled, self.secondary_id, self.extra_ids,
+            self.extra_infos])))
+
+    def __str__(self):
+        return repr(self)
 
 
 class MSProteinPool(SheetEntry):
     """Represent one Mass-spec protein pool
     """
 
-    def __init__(self, pk, secondary_id, extra_ids=None, extra_infos=None,
+    def __init__(self, pk, disabled, secondary_id, extra_ids=None, extra_infos=None,
                  dict_type=OrderedDict):
-        super().__init__(pk, secondary_id, extra_ids, extra_infos)
+        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+
+    def __repr__(self):
+        return 'MSProteinPool({})'.format(', '.join(map(str, [
+            self.pk, self.disabled, self.secondary_id, self.extra_ids,
+            self.extra_infos])))
+
+    def __str__(self):
+        return repr(self)

@@ -16,7 +16,7 @@ requirements = [
     'pyyaml==3.12',
     'jsonpath-rw==1.4.0',
     'requests==2.12.4',
-    'requests-file==1.4.1',
+    'requests-file==1.4.1'
 ]
 
 test_requirements = [
@@ -40,13 +40,12 @@ setup(
     },
     package_data={
         'biomedsheets': ['data/*.json'],
-    }
+    },
     entry_points={
         'console_scripts': [
             'biomedsheets = biomedsheets.__main__:main',
         ]
     },
-    package_dir={'biomedsheets': 'biomedsheets'},
     include_package_data=True,
     install_requires=requirements,
     license='MIT license',

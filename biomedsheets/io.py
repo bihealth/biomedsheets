@@ -88,6 +88,7 @@ class SheetBuilder:
         for secondary_id, value in bio_entities_json.items():
             bio_entity = models.BioEntity(
                 pk=value['pk'],
+                disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
@@ -112,6 +113,7 @@ class SheetBuilder:
         for secondary_id, value in bio_samples_json.items():
             bio_sample = models.BioSample(
                 pk=value['pk'],
+                disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
@@ -130,6 +132,7 @@ class SheetBuilder:
         for secondary_id, value in test_samples_json.items():
             test_sample = models.TestSample(
                 pk=value['pk'],
+                disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
@@ -154,6 +157,7 @@ class SheetBuilder:
         for secondary_id, value in ngs_libraries_json.items():
             ngs_library = models.NGSLibrary(
                 pk=value['pk'],
+                disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
@@ -170,6 +174,7 @@ class SheetBuilder:
         for secondary_id, value in ms_protein_pools_json.items():
             ms_protein_pool = models.MSProteinPool(
                 pk=value['pk'],
+                disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
