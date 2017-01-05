@@ -15,7 +15,7 @@ The “core” schema is shown in yellow while the NGS-specific part is shown in
     Tables used in the BioMed Sheet data schema.
 
 **BioEntity** describes biological entities (or specimens or donors).
-This might be a human patient, a mouse, a cell cell culture, etc.
+This might be a human patient, a mouse, a cell culture, etc.
 **BioSample** describes one biological sample taken from the biological entity.
 This might be a blood sample, saliva swab, part of a primary tumor biopsy, part of a metathesis biopsy etc.
 **TestSample** describes a further processing of a BioSample, e.g., extracted DNA, RNA, etc. from a tumor biopsy.
@@ -37,3 +37,20 @@ FlowCell represents one flow cell run on a specific machine while LibraryOnFlowC
 
 Using this schema, possible flow cell--specific or lane-specific biases can later be incorporated into an analysis.
 In terms of mapping to files, each LibraryOnFlowCell then corresponds to one compressed FASTQ file in the case of single-end reads and two compressed FASTQ files in the case of paired reads (at least for bcl2fastq v2, it might correspond to a multiple when using v1).
+
+----------------------------------
+Sample Sheets vs. Database Schemas
+----------------------------------
+
+One important point here is the relation and separation between sample sheets and database schemas.
+
+The aim of the sample sheets is to provide a useful computer-readable description of an experiment for processing the data with Bioinformatics workflows or further downstream analyses (e.g. in R or using Jupyter notebooks).
+This document describes a concept for such schemas and an implementation using JSON for the file format.
+
+Of course, sample sheets could also be stored in a RDBMS (e.g., Postgres), with a suitable database schema.
+Often such databases would be part of a LIMS system.
+A sample sheet could serve as a poor Bioinformatician's LIMS system, if only some meta information for samples and their relation is to be tracked.
+However, the more complex part of such a LIMS system or even a hospital information management system are mostly not of direct relevance to the Bioinformatics analysis.
+
+Rather, the data from a laboratory or hospital IT system can be used to generate biomedical sample sheets.
+BioMed sample sheets further allow linking back from the bio entities, bio samples, test samples, ngs libraries to such systems by storing lists of URLs for each of the previous entities.

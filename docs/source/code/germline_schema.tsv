@@ -1,0 +1,12 @@
+[Metadata]
+schema          germline_variants
+schema_version  v1
+title           Example germline study
+description     The [Data] section is similar to a PEDigree file
+
+[Data]
+patientName fatherName  motherName  sex affected    folderName  hpoTerms
+12-345      12-346      12-347      M   Y           12-345      HP:0009946,HP:0009899
+12-348      12-346      12-347      M   N           12-348
+12-346      .           .           M   N           .
+12-347      .           .           F   N           12-347

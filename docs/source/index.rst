@@ -19,28 +19,46 @@ The project consists of
 - a Python library for access of the JSON sheets, and
 - a Python library for simplified access of the JSON sheets for the important cases of matched tumor/normal studies and rare disease studies with pedigree relationships.
 
-.. toctree::
-   :caption: Overview
-   :maxdepth: 1
-   :titlesonly:
-   :hidden:
+--------------
+Open Questions
+--------------
 
-   introduction
-   high_level_overview
-   table_fields
-   json_sheet_schema
-   examples
-   faq
+- Keep or drop globally unique PKs from the file names?
+  Random pks make everything very hard to use as files, add complexity to shortcut schemas.
+  Sequential pks at least keep a temporal order.
 
 .. toctree::
-   :caption: API
-   :maxdepth: 1
-   :titlesonly:
-   :hidden:
+    :caption: Overview
+    :maxdepth: 1
+    :titlesonly:
+    :hidden:
 
-   api_shortcuts
-   api_io
-   api_models
+    introduction
+    high_level_overview
+    table_fields
+    json_sheet_schema
+    examples
+    faq
+
+.. toctree::
+    :caption: Schemas & Workflows
+    :maxdepth: 1
+    :titlesonly:
+    :hidden:
+
+    workflow_assumptions
+    schema_cancer
+    schema_germline
+
+.. toctree::
+    :caption: API
+    :maxdepth: 1
+    :titlesonly:
+    :hidden:
+
+    api_shortcuts
+    api_io
+    api_models
 
 
 .. Generated pages, should not appear
