@@ -75,8 +75,8 @@ class SheetBuilder:
             title=self.json_data.get('title', ''),
             description=self.json_data.get('description', ''),
             bio_entities=self._build_bio_entities(
-                self.json_data.get('extraInfoDefs', {}),
-                self.json_data.get('bioEntities', {}),
+                self.json_data.get('extraInfoDefs', dict_type()),
+                self.json_data.get('bioEntities', dict_type()),
                 dict_type),
             json_data=self.json_data,
             dict_type=dict_type)
@@ -92,11 +92,13 @@ class SheetBuilder:
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', {}),
-                    extra_infos_def=extra_infos_defs.get('bioEntity', {}),
+                    extra_infos=value.get('extraInfo', dict_type()),
+                    extra_infos_def=extra_infos_defs.get(
+                        'bioEntity', dict_type()),
                     dict_type=dict_type),
                 bio_samples=self._build_bio_samples(
-                    extra_infos_defs, value.get('bioSamples', {}), dict_type),
+                    extra_infos_defs, value.get(
+                        'bioSamples', dict_type()), dict_type),
                 dict_type=dict_type)
             yield (secondary_id, bio_entity)
 
@@ -117,11 +119,13 @@ class SheetBuilder:
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', {}),
-                    extra_infos_def=extra_infos_defs.get('bioSample', {}),
+                    extra_infos=value.get('extraInfo', dict_type()),
+                    extra_infos_def=extra_infos_defs.get(
+                        'bioSample', dict_type()),
                     dict_type=dict_type),
                 test_samples=self._build_test_samples(
-                    extra_infos_defs, value.get('testSamples', {}), dict_type),
+                    extra_infos_defs, value.get('testSamples', dict_type()),
+                    dict_type),
                 dict_type=dict_type)
             yield (secondary_id, bio_sample)
 
@@ -136,16 +140,19 @@ class SheetBuilder:
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', {}),
-                    extra_infos_def=extra_infos_defs.get('testSample', {}),
+                    extra_infos=value.get('extraInfo', dict_type()),
+                    extra_infos_def=extra_infos_defs.get(
+                        'testSample', dict_type()),
                     dict_type=dict_type),
                 ngs_libraries=self._build_ngs_libraries(
                     extra_infos_defs=extra_infos_defs,
-                    ngs_libraries_json=value.get('ngsLibraries', {}),
+                    ngs_libraries_json=value.get(
+                        'ngsLibraries', dict_type()),
                     dict_type=dict_type),
                 ms_protein_pools=self._build_ms_protein_pools(
                     extra_infos_defs=extra_infos_defs,
-                    ms_protein_pools_json=value.get('msProteinPools', {}),
+                    ms_protein_pools_json=value.get(
+                        'msProteinPools', dict_type()),
                     dict_type=dict_type),
                 dict_type=dict_type)
             yield (secondary_id, test_sample)
@@ -161,8 +168,9 @@ class SheetBuilder:
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', {}),
-                    extra_infos_def=extra_infos_defs.get('ngsLibrary', {}),
+                    extra_infos=value.get('extraInfo', dict_type()),
+                    extra_infos_def=extra_infos_defs.get(
+                        'ngsLibrary', dict_type()),
                     dict_type=dict_type),
                 dict_type=dict_type)
             yield (secondary_id, ngs_library)
@@ -178,8 +186,9 @@ class SheetBuilder:
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
                 extra_infos=self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', {}),
-                    extra_infos_def=extra_infos_defs.get('msProteinPool', {}),
+                    extra_infos=value.get('extraInfo', dict_type()),
+                    extra_infos_def=extra_infos_defs.get(
+                        'msProteinPool', dict_type()),
                     dict_type=dict_type),
                 dict_type=dict_type)
             yield (secondary_id, ms_protein_pool)
