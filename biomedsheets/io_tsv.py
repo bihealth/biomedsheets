@@ -108,7 +108,7 @@ class CancerTSVSheetException(TSVSheetException):
 class CancerTSVReader:
     """Helper class for reading cancer TSV file
 
-    Prefer using ``read_cancer_tsv()`` for shortcut
+    Prefer using ``read_cancer_tsv_*()`` for shortcut
     """
 
     def __init__(self, f, fname=None):
@@ -116,8 +116,8 @@ class CancerTSVReader:
         self.fname = fname or '<unknown>'
         self.next_pk = 1
 
-    def read(self):
-        """Read from file-like object ``f``, use file name in case of
+    def read_json_data(self):
+        """Read from file-like object ``self.f``, use file name in case of
         problems
 
         :raises:CancerTSVSheetException in case of problems
@@ -142,7 +142,11 @@ class CancerTSVReader:
                  'file {}. Must be {{{}}} but is {{{}}}').format(
                     self.fname, ', '.join(CANCER_TSV_HEADER),
                     body[0].replace('\t', ', ')))
-        return self._create_sheet(proc_header, body)
+        return self._create_sheet_json(proc_header, body)
+
+    def read_sheet(self):
+        """Read into JSON and construct ``models.Sheet``"""
+        return io.SheetBuilder(self.read_json_data()).run()
 
     def _split_lines(self, lines):
         """Split string array lines into header and body"""
@@ -166,7 +170,7 @@ class CancerTSVReader:
                 result[key] = value
         return result
 
-    def _create_sheet(self, header_dict, body):
+    def _create_sheet_json(self, header_dict, body):
         """Create models.Sheet object from header dictionary and body lines
         """
         names = body[0].split('\t')  # idx to name
@@ -202,19 +206,21 @@ class CancerTSVReader:
             records.append(mapping)
         # TODO: we should perform more validation here in the future
         # Create the sheet from records
-        return self._create_sheet_from_records(header_dict, records)
+        return self._create_sheet_json_from_records(header_dict, records)
     
-    def _create_sheet_from_records(self, header_dict, records):
+    def _create_sheet_json_from_records(self, header_dict, records):
         """Create a new models.Sheet object from TSV records"""
         furl = 'file://{}'.format(self.fname)
-        resolver = ref_resolver.RefResolver()
+        resolver = ref_resolver.RefResolver(dict_class=OrderedDict)
         extraDefs = resolver.resolve(furl, CANCER_EXTRA_INFO_DEFS)
-        json_data = OrderedDict(
-            identifier=furl,
-            title=header_dict.get(KEY_TITLE, DEFAULT_TITLE),
-            description=header_dict.get(KEY_DESCRIPTION, DEFAULT_DESCRIPTION),
-            extraInfoDefs=extraDefs,
-            bioEntities=OrderedDict())
+        json_data = OrderedDict([
+            ('identifier', furl),
+            ('title', header_dict.get(KEY_TITLE, DEFAULT_TITLE)),
+            ('description',
+             header_dict.get(KEY_DESCRIPTION, DEFAULT_DESCRIPTION)),
+            ('extraInfoDefs', extraDefs),
+            ('bioEntities', OrderedDict()),
+        ])
         patient_records = OrderedDict()
         for record in records:
             patient_records.setdefault(record['patientName'], [])
@@ -222,7 +228,7 @@ class CancerTSVReader:
         for patient_name, entry in patient_records.items():
             json_data['bioEntities'][patient_name] = \
                 self._build_bio_entity_json(patient_name, entry)
-        return io.SheetBuilder(json_data).run()
+        return json_data
 
     def _build_bio_entity_json(self, patient_name, records):
         """Build JSON for bio_entities entry"""
@@ -274,12 +280,21 @@ class CancerTSVReader:
                 ('libraryType', record['libraryType']),
             ])),
         ])
+        self.next_pk += 1
         return result
 
 
-def read_cancer_tsv(f, fname=None):
+def read_cancer_tsv_sheet(f, fname=None):
     """Read compact cancer TSV format from file-like object ``f``
     
     :return: models.Sheet
     """
-    return CancerTSVReader(f, fname).read()
+    return CancerTSVReader(f, fname).read_sheet()
+
+
+def read_cancer_tsv_json_data(f, fname=None):
+    """Read compact cancer TSV format from file-like object ``f``
+    
+    :return: ``dict``
+    """
+    return CancerTSVReader(f, fname).read_json_data()

@@ -4,6 +4,7 @@
 
 import collections
 import io
+import json
 import os
 import pytest
 import textwrap
@@ -53,9 +54,368 @@ def tsv_sheet_cancer_no_header():
     return f
 
 
+# Expected value for the cancer sheet JSON with header
+EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
+{
+    "identifier": "file://<unknown>",
+    "title": "Cancer Sample Sheet",
+    "description": "Sample Sheet constructed from cancer matched samples compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            }
+        },
+        "bioSample": {
+            "isCancer": {
+                "docs": "Boolean flag for distinguishing cancer/normal samples",
+                "key": "isCancer",
+                "type": "boolean"
+            }
+        },
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "P001": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 2,
+                    "extraInfo": {
+                        "isCancer": false
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "folderName": "P001-N1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": 4,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 5,
+                            "extraInfo": {
+                                "folderName": "P001-T1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "mRNA-seq1": {
+                            "pk": 6,
+                            "extraInfo": {
+                                "folderName": "P001-T1-RNA1-mRNAseq1",
+                                "libraryType": "mRNA-seq"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "P002": {
+            "pk": 7,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 8,
+                    "extraInfo": {
+                        "isCancer": false
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 9,
+                            "extraInfo": {
+                                "folderName": "P001-N1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": 10,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 11,
+                            "extraInfo": {
+                                "folderName": "P001-T1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "WES2": {
+                            "pk": 12,
+                            "extraInfo": {
+                                "folderName": "P001-T1-RNA1-RNAseq1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T2": {
+                    "pk": 13,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 14,
+                            "extraInfo": {
+                                "folderName": "P001-T2-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "mRNA-seq1": {
+                            "pk": 15,
+                            "extraInfo": {
+                                "folderName": "P001-T2-RNA1-mRNAseq1",
+                                "libraryType": "mRNA-seq"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}""".lstrip()
+
+# Expected value for the cancer sheet JSON without header
+EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
+{
+    "identifier": "file://<unknown>",
+    "title": "Cancer Sample Sheet",
+    "description": "Sample Sheet constructed from cancer matched samples compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            }
+        },
+        "bioSample": {
+            "isCancer": {
+                "docs": "Boolean flag for distinguishing cancer/normal samples",
+                "key": "isCancer",
+                "type": "boolean"
+            }
+        },
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "P001": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 2,
+                    "extraInfo": {
+                        "isCancer": false
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "folderName": "P001-N1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": 4,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 5,
+                            "extraInfo": {
+                                "folderName": "P001-T1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "mRNA-seq1": {
+                            "pk": 6,
+                            "extraInfo": {
+                                "folderName": "P001-T1-RNA1-mRNAseq1",
+                                "libraryType": "mRNA-seq"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "P002": {
+            "pk": 7,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 8,
+                    "extraInfo": {
+                        "isCancer": false
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 9,
+                            "extraInfo": {
+                                "folderName": "P001-N1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": 10,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 11,
+                            "extraInfo": {
+                                "folderName": "P001-T1-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "WES2": {
+                            "pk": 12,
+                            "extraInfo": {
+                                "folderName": "P001-T1-RNA1-RNAseq1",
+                                "libraryType": "WES"
+                            }
+                        }
+                    }
+                },
+                "T2": {
+                    "pk": 13,
+                    "extraInfo": {
+                        "isCancer": true
+                    },
+                    "ngs_libraries": {
+                        "WES1": {
+                            "pk": 14,
+                            "extraInfo": {
+                                "folderName": "P001-T2-DNA1-WES1",
+                                "libraryType": "WES"
+                            }
+                        },
+                        "mRNA-seq1": {
+                            "pk": 15,
+                            "extraInfo": {
+                                "folderName": "P001-T2-RNA1-mRNAseq1",
+                                "libraryType": "mRNA-seq"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}""".lstrip()
+
+
 def test_read_cancer_sheet_header(tsv_sheet_cancer_header):
-    sheet = io_tsv.read_cancer_tsv(tsv_sheet_cancer_header)
+    sheet = io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_header)
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
+        sheet.json_data, indent='    ')
 
 
-def tsv_sheet_cancer_no_header(tsv_sheet_cancer_no_header):
-    sheet = io_tsv.read_cancer_tsv(tsv_sheet_cancer_no_header)
+def test_read_cancer_sheet_no_header(tsv_sheet_cancer_no_header):
+    sheet = io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_no_header)
+    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(
+        sheet.json_data, indent='    ')
+
+
+def test_read_cancer_json_header(tsv_sheet_cancer_header):
+    sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_header)
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
+        sheet_struc, indent='    ')
+
+
+def test_read_cancer_json_no_header(tsv_sheet_cancer_no_header):
+    sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
+    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(
+        sheet_struc, indent='    ')
