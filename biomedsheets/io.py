@@ -53,7 +53,7 @@ class ExtraInfoBuilder:
 
     def _build_array(self, value):
         """Handle array entry type"""
-        func = self.builders[self.definitions['entry']]
+        func = self.builders[self.definition['entry']]
         return list(map(self.build, func))
 
 
@@ -91,14 +91,14 @@ class SheetBuilder:
                 disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
-                extra_infos=self._build_extra_infos(
+                extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
                     extra_infos_def=extra_infos_defs.get(
                         'bioEntity', dict_type()),
-                    dict_type=dict_type),
-                bio_samples=self._build_bio_samples(
+                    dict_type=dict_type)),
+                bio_samples=dict_type(self._build_bio_samples(
                     extra_infos_defs, value.get(
-                        'bioSamples', dict_type()), dict_type),
+                        'bioSamples', dict_type()), dict_type)),
                 dict_type=dict_type)
             yield (secondary_id, bio_entity)
 
@@ -118,14 +118,14 @@ class SheetBuilder:
                 disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
-                extra_infos=self._build_extra_infos(
+                extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
                     extra_infos_def=extra_infos_defs.get(
                         'bioSample', dict_type()),
-                    dict_type=dict_type),
-                test_samples=self._build_test_samples(
+                    dict_type=dict_type)),
+                test_samples=dict_type(self._build_test_samples(
                     extra_infos_defs, value.get('testSamples', dict_type()),
-                    dict_type),
+                    dict_type)),
                 dict_type=dict_type)
             yield (secondary_id, bio_sample)
 
@@ -139,21 +139,21 @@ class SheetBuilder:
                 disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
-                extra_infos=self._build_extra_infos(
+                extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
                     extra_infos_def=extra_infos_defs.get(
                         'testSample', dict_type()),
-                    dict_type=dict_type),
-                ngs_libraries=self._build_ngs_libraries(
+                    dict_type=dict_type)),
+                ngs_libraries=dict_type(self._build_ngs_libraries(
                     extra_infos_defs=extra_infos_defs,
                     ngs_libraries_json=value.get(
                         'ngsLibraries', dict_type()),
-                    dict_type=dict_type),
-                ms_protein_pools=self._build_ms_protein_pools(
+                    dict_type=dict_type)),
+                ms_protein_pools=dict_type(self._build_ms_protein_pools(
                     extra_infos_defs=extra_infos_defs,
                     ms_protein_pools_json=value.get(
                         'msProteinPools', dict_type()),
-                    dict_type=dict_type),
+                    dict_type=dict_type)),
                 dict_type=dict_type)
             yield (secondary_id, test_sample)
 
@@ -167,11 +167,11 @@ class SheetBuilder:
                 disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
-                extra_infos=self._build_extra_infos(
+                extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
                     extra_infos_def=extra_infos_defs.get(
                         'ngsLibrary', dict_type()),
-                    dict_type=dict_type),
+                    dict_type=dict_type)),
                 dict_type=dict_type)
             yield (secondary_id, ngs_library)
 
@@ -185,10 +185,10 @@ class SheetBuilder:
                 disabled=value.get('disabled', False),
                 secondary_id=secondary_id,
                 extra_ids=value.get('extraIds', []),
-                extra_infos=self._build_extra_infos(
+                extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
                     extra_infos_def=extra_infos_defs.get(
                         'msProteinPool', dict_type()),
-                    dict_type=dict_type),
+                    dict_type=dict_type)),
                 dict_type=dict_type)
             yield (secondary_id, ms_protein_pool)

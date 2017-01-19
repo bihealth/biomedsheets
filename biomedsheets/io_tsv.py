@@ -27,15 +27,15 @@ CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isCancer',
 
 #: Known library types
 LIBRARY_TYPES = (
-    'WES', 'WGS', 'Panel-seq', 'mRNA-seq', 'total_RNA-seq')
+    'WES', 'WGS', 'Panel_seq', 'mRNA_seq', 'total_RNA_seq')
 
 #: Map library type to extraction type
 LIBRARY_TO_EXTRACTION = {
     'WES': 'DNA',
     'WGS': 'DNA',
-    'Panel-seq': 'DNA',
-    'mRNA-seq': 'RNA',
-    'total RNA-seq': 'RNA',
+    'Panel_seq': 'DNA',
+    'mRNA_seq': 'RNA',
+    'total_RNA_seq': 'RNA',
 }
 
 #: Known extraction types
@@ -140,8 +140,8 @@ class CancerTSVReader:
             raise CancerTSVSheetException(
                 ('Empty or invalid data column names in cancer TSV sheet '
                  'file {}. Must be {{{}}} but is {{{}}}').format(
-                    self.fname, ', '.join(CANCER_TSV_HEADER),
-                    body[0].replace('\t', ', ')))
+                     self.fname, ', '.join(CANCER_TSV_HEADER),
+                     body[0].replace('\t', ', ')))
         return self._create_sheet_json(proc_header, body)
 
     def read_sheet(self):
@@ -174,7 +174,6 @@ class CancerTSVReader:
         """Create models.Sheet object from header dictionary and body lines
         """
         names = body[0].split('\t')  # idx to name
-        idxs = dict(enumerate(names))  # name to idx
         # Build validated list of records
         records = []
         for lineno, line in enumerate(body[1:]):
@@ -207,7 +206,7 @@ class CancerTSVReader:
         # TODO: we should perform more validation here in the future
         # Create the sheet from records
         return self._create_sheet_json_from_records(header_dict, records)
-    
+
     def _create_sheet_json_from_records(self, header_dict, records):
         """Create a new models.Sheet object from TSV records"""
         furl = 'file://{}'.format(self.fname)
@@ -250,7 +249,10 @@ class CancerTSVReader:
         return result
 
     def _build_bio_sample_json(self, sample_name, records):
-        """Build JSON for bio_samples entry"""
+        """Build JSON for bio_samples entry
+
+        A test sample entry will be implicitely added.
+        """
         if len(set(r['isCancer'] for r in records)) != 1:
             raise CancerTSVSheetException(
                 'Inconsistent "isCancer" flag for records')
@@ -259,17 +261,32 @@ class CancerTSVReader:
             ('extraInfo', OrderedDict([
                 ('isCancer', records[0]['isCancer']),
             ])),
-            ('ngs_libraries', OrderedDict()),
+            ('testSamples', OrderedDict()),
         ])
         self.next_pk += 1
-        counters = dict((x, 1) for x in LIBRARY_TYPES)
+        counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
+        counters_lib = dict((x, 1) for x in LIBRARY_TYPES)
         for record in records:
-            name = '{}{}'.format(record['libraryType'],
-                                 counters[record['libraryType']])
-            counters[record['libraryType']] += 1
-            result['ngs_libraries'][name] = self._build_ngs_library_json(
-                name, record)
+            extraction_type = LIBRARY_TO_EXTRACTION[record['libraryType']]
+            test_sample_name = '{}{}'.format(
+                extraction_type, counters_ext[extraction_type])
+            lib_name = '{}{}'.format(record['libraryType'],
+                                     counters_lib[record['libraryType']])
+            counters_ext[extraction_type] += 1
+            counters_lib[record['libraryType']] += 1
+            pk = self.next_pk
+            self.next_pk += 1
+            result['testSamples'][test_sample_name] = OrderedDict([
+                ('pk', pk),
+                ('extraInfo', OrderedDict([
+                    ('extractionType', extraction_type),
+                ])),
+                ('ngsLibraries', OrderedDict([
+                    (lib_name, self._build_ngs_library_json(lib_name, record)),
+                ]))
+            ])
         return result
+
 
     def _build_ngs_library_json(self, library_name, record):
         """Build JSON for ngs_libraries entry"""
@@ -286,7 +303,7 @@ class CancerTSVReader:
 
 def read_cancer_tsv_sheet(f, fname=None):
     """Read compact cancer TSV format from file-like object ``f``
-    
+
     :return: models.Sheet
     """
     return CancerTSVReader(f, fname).read_sheet()
@@ -294,7 +311,7 @@ def read_cancer_tsv_sheet(f, fname=None):
 
 def read_cancer_tsv_json_data(f, fname=None):
     """Read compact cancer TSV format from file-like object ``f``
-    
+
     :return: ``dict``
     """
     return CancerTSVReader(f, fname).read_json_data()

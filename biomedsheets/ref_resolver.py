@@ -10,6 +10,12 @@ import requests
 from requests.exceptions import HTTPError
 import requests_file
 
+try:
+    import yaml
+    YAML_AVAILABLE = True
+except ImportError:
+    YAML_AVAILABLE = False
+
 from . import requests_resource
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -26,7 +32,7 @@ class RefResolver:
     dicts and lists with copies.
     """
 
-    def __init__(self, lookup_paths=None, dict_class=dict):
+    def __init__(self, lookup_paths=None, dict_class=dict, verbose=False):
         self.cache = {}
         self.dict_class = dict_class
         self.lookup_paths = list(lookup_paths or [])
@@ -35,6 +41,7 @@ class RefResolver:
         self.session.mount('resource://', requests_resource.ResourceAdapter())
         #: whether or not to resolve relative paths using cwd
         self.rel_cwd_paths = True
+        self.verbose = verbose  # TODO: use logging instead
 
     def resolve(self, doc_uri, obj):
         """Entry point for resolving JSON pointers
@@ -75,15 +82,16 @@ class RefResolver:
 
     def _load_ref(self, doc_uri, doc, ref_uri):
         """Resolve "$ref" URI ``uri``"""
-        print('Resolving $ref URI {}'.format(ref_uri), file=sys.stderr)
+        if self.verbose:
+            print('Resolving $ref URI {}'.format(ref_uri), file=sys.stderr)
         parsed_ref_uri = self._parse_ref_uri(ref_uri)
         ref_file = parsed_ref_uri.netloc + parsed_ref_uri.path
         if not ref_file:  # must be relative to current doc
             pass  # is already in cache
         elif ref_file not in self.cache:
-            self.cache[ref_file] = self._load_for_cache(
+            self.cache[ref_uri] = self._load_for_cache(
                 doc_uri, doc, parsed_ref_uri)
-        ref_json = self.cache[ref_file]
+        ref_json = self.cache[ref_uri]
         expr = jsonpath_rw.parse(
             '$' + '.'.join(parsed_ref_uri.fragment.split('/')))
         for match in expr.find(ref_json):
@@ -115,12 +123,28 @@ class RefResolver:
         """Load fragment from file URI without cache"""
         remote_uri = '{}://{}/{}'.format(
             parsed_uri.scheme, parsed_uri.netloc, parsed_uri.path)
-        print('Loading URI {}'.format(remote_uri), file=sys.stderr)
+        if self.verbose:
+            print('Loading URI {}'.format(remote_uri), file=sys.stderr)
         response = self.session.get(remote_uri)
         try:
             response.raise_for_status()
         except HTTPError as e:
             raise RefResolutionException(
                 'Could not load file {}'.format(parsed_uri.geturl()))
-        remote_json = response.json(object_pairs_hook=self.dict_class)
+        remote_json = self._load_json(response)
         return remote_json
+
+    def _load_json(self, response):
+        if YAML_AVAILABLE:
+            # From http://stackoverflow.com/a/21912744/84349
+            class OrderedLoader(yaml.Loader):
+                pass
+            def construct_mapping(loader, node):
+                loader.flatten_mapping(node)
+                return self.dict_class(loader.construct_pairs(node))
+            OrderedLoader.add_constructor(
+                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
+                construct_mapping)
+            return yaml.load(response.text, OrderedLoader)
+        else:
+            return response.json(object_pairs_hook=self.dict_class)

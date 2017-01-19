@@ -4,6 +4,8 @@
 
 from collections import OrderedDict
 
+from . import NAME_PATTERN
+
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 
@@ -59,7 +61,7 @@ class CrawlMixin:
                 'Could not find sub entry with secondary ID {}'.format(
                     next))
         if rest:
-            return self.sub_entries.crawl(rest)
+            return self.sub_entries[next].crawl(rest)
         else:
             return self.sub_entries[next]
 
@@ -130,6 +132,16 @@ class SheetEntry:
         self.extra_infos = dict_type(extra_infos or [])
 
     @property
+    def full_path(self):
+        """Return full path from BioEntity to this entry"""
+        raise NotImplementedError('Override me!')
+
+    @property
+    def name(self):
+        """Abstract function for returning name"""
+        return NAME_PATTERN.format(secondary_id=self.full_path, pk=self.pk)
+
+    @property
     def enabled(self):
         """Inverse of ``self.enabled``"""
         return not self.disabled
@@ -144,8 +156,15 @@ class BioEntity(SheetEntry, CrawlMixin):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
         #: List of ``BioSample`` objects described for the ``BioEntity``
         self.bio_samples = dict_type(bio_samples or [])
+        # Assign owner pointer in bio samples to self
+        for bio_sample in self.bio_samples.values():
+            bio_sample.bio_entity = self
         #: Create ``sub_entries`` shortcut for ``crawl()``
-        self.bio_samples = self.bio_samples
+        self.sub_entries = self.bio_samples
+
+    @property
+    def full_path(self):
+        return self.secondary_id
 
     def __repr__(self):
         return 'BioEntity({})'.format(', '.join(map(str, [
@@ -161,12 +180,22 @@ class BioSample(SheetEntry, CrawlMixin):
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, test_samples=None, dict_type=OrderedDict):
+                 extra_infos=None, test_samples=None, dict_type=OrderedDict,
+                 bio_entity=None):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+        #: Containing BioEntity
+        self.bio_entity = bio_entity
         #: List of ``TestSample`` objects described for the ``BioSample``
         self.test_samples = dict_type(test_samples or [])
+        # Assign owner pointer in test samples to self
+        for test_sample in self.test_samples.values():
+            test_sample.bio_sample = self
         #: Create ``sub_entries`` shortcut for ``crawl()``
-        self.test_samples = self.test_samples
+        self.sub_entries = self.test_samples
+
+    @property
+    def full_path(self):
+        return '-'.join((self.bio_entity.full_path, self.secondary_id))
 
     def __repr__(self):
         return 'BioSample({})'.format(', '.join(map(str, [
@@ -183,15 +212,27 @@ class TestSample(SheetEntry, CrawlMixin):
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
                  extra_infos=None, ngs_libraries=None, ms_protein_pools=None,
-                 dict_type=OrderedDict):
+                 dict_type=OrderedDict, bio_sample=None):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+        #: Containing BioSample
+        self.bio_sample = bio_sample
         #: List of ``NGSLibrary`` objects described for the ``TestSample``
         self.ngs_libraries = dict_type(ngs_libraries or [])
+        # Assign owner pointer in NGS libraries to self
+        for ngs_library in self.ngs_libraries.values():
+            ngs_library.test_sample = self
         #: List of ``MSProteinPools`` objects described for the ``TestSample``
         self.ms_protein_pools = dict_type(ms_protein_pools)
+        # Assign owner pointer in MS protein pools to self
+        for ms_protein_pool in self.ms_protein_pools.values():
+            ms_protein_pool.test_sample = self
         # ``sub_entries`` shortcut, check for duplicates
         self.sub_entries = self._merge_sub_entries(
             self.ngs_libraries, self.ms_protein_pools)
+
+    @property
+    def full_path(self):
+        return '-'.join((self.bio_sample.full_path, self.secondary_id))
 
     def __repr__(self):
         return 'TestSample({})'.format(', '.join(map(str, [
@@ -207,8 +248,14 @@ class NGSLibrary(SheetEntry):
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, dict_type=OrderedDict):
+                 extra_infos=None, dict_type=OrderedDict, test_sample=None):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+        #: Owning TestSample
+        self.test_sample = test_sample
+
+    @property
+    def full_path(self):
+        return '-'.join((self.test_sample.full_path, self.secondary_id))
 
     def __repr__(self):
         return 'NGSLibrary({})'.format(', '.join(map(str, [
@@ -224,8 +271,14 @@ class MSProteinPool(SheetEntry):
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None, extra_infos=None,
-                 dict_type=OrderedDict):
+                 dict_type=OrderedDict, test_sample=None):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos)
+        #: Owning TestSample
+        self.test_sample = test_sample
+
+    @property
+    def full_path(self):
+        return '-'.join((self.test_sample.full_path, self.secondary_id))
 
     def __repr__(self):
         return 'MSProteinPool({})'.format(', '.join(map(str, [
