@@ -2,6 +2,8 @@
 """Shortcuts for cancer sample sheets
 """
 
+from collections import OrderedDict
+
 from .base import (
     NAME_PATTERN, EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA)
 from .base import (
@@ -25,10 +27,13 @@ class CancerCaseSheet(ShortcutSampleSheet):
         super().__init__(sheet)
         #: List of donors in the sample sheet
         self.donors = list(self._iter_donors())
-        #: List of primary matched tumor/normal sample pairs in the sample sheet
+        #: List of primary matched tumor/normal sample pairs in the sheet
         self.primary_sample_pairs = list(self._iter_sample_pairs(True))
         #: List of all matched tumor/normal sample pairs in the sample sheet
         self.all_sample_pairs = list(self._iter_sample_pairs(False))
+        #: Mapping of all sample pairs by tumor bio sample name
+        self.all_sample_pairs_by_tumor_sample = OrderedDict(
+            (pair.tumor_sample.name, pair) for pair in self.all_sample_pairs)
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
