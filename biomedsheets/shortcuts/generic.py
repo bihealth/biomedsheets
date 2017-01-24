@@ -4,6 +4,7 @@
 
 from collections import OrderedDict
 
+from .base import (ShortcutMixin)
 from .base import (ShortcutSampleSheet)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -16,6 +17,10 @@ class GenericSampleSheet(ShortcutSampleSheet):
         super().__init__(sheet)
         #: Generic wrapper BioEntity objects
         self.bio_entities = OrderedDict(self._build_bio_entities())
+        #: List of all NGS libraries
+        self.all_ngs_libraries = []
+        #: List of the primary NGS libraries for each bio sample
+        self.primary_ngs_libraries = []
         # Build the shortcuts
         self._build_shortcuts()
 
@@ -26,14 +31,12 @@ class GenericSampleSheet(ShortcutSampleSheet):
 
     def _build_shortcuts(self):
         # Build self.{all,primary}_ngs_libraries
-        self.all_ngs_libraries = []
-        self.primary_ngs_libraries = []
         for bio_entity in self.bio_entities.values():
             for bio_sample in bio_entity.bio_samples.values():
+                primary = True
                 for test_sample in bio_sample.test_samples.values():
-                    primary = True
                     for ngs_library in (
-                            test_sample.test_sample.ngs_libraries.values()):
+                            test_sample.ngs_libraries.values()):
                         if ngs_library.disabled:
                             continue
                         self.all_ngs_libraries.append(ngs_library)
@@ -42,62 +45,33 @@ class GenericSampleSheet(ShortcutSampleSheet):
                             primary = False
 
 
-class GenericMixin:
-    """Mixin with helper functions"""
+class GenericNGSLibrary(ShortcutMixin):
+    """Shortcut wrapper for NGS library in generic sample sheet"""
 
-    @property
-    def disabled(self):
-        """Return whether the entry has been disabled"""
-        return bool(self.wrapped.disabled)
-
-    @property
-    def enabled(self):
-        """Return whether the entry has been enabled"""
-        return not self.disabled
-
-
-class GenericBioEntity(GenericMixin):
-    """Shortcut wrapper for bio entity in generic sample sheet"""
-
-    def __init__(self, sheet, bio_entity):
-        #: Parent GenericSampleSheet
-        self.sheet = sheet
-        #: Wrapped BioEntity
-        self.bio_entity = bio_entity
-        #: Shortcut BioSample objects
-        self.bio_samples = OrderedDict(self._build_bio_samples())
-
-    def _build_bio_samples(self):
-        """Build GenericBioSample objects for ``self.bio_entity.bio_samples``
-        """
-        for name, bio_sample in self.bio_entity.bio_samples.items():
-            yield name, GenericBioSample(self, bio_sample)
+    def __init__(self, shortcut_test_sample, ngs_library):
+        #: Parent GenericTestSample
+        self.test_sample = shortcut_test_sample
+        #: Parent object; for ShortcutMixin
+        self.parent = shortcut_test_sample
+        #: Wrapped object
+        self.wrapped = ngs_library
+        #: Wrapped NGSLibrary
+        self.ngs_library = ngs_library
 
 
-class GenericBioSample(GenericMixin):
-    """Shortcut wrapper for bio sample in generic sample sheet"""
-
-    def __init__(self, bio_entity, bio_sample):
-        #: Parent GenericBioEntity
-        self.bio_entity = bio_entity
-        #: Wrapped BioSample
-        self.bio_sample = bio_sample
-        #: Shortcut BioSample objects
-        self.test_samples = OrderedDict(self._build_test_samples())
-
-    def _build_test_samples(self):
-        """Build GenericTestSample objects for ``self.bio_sample.test_samples``
-        """
-        for name, test_sample in self.bio_sample.test_samples.items():
-            yield name, GenericTestSample(self, test_sample)
-
-
-class GenericTestSample(GenericMixin):
+class GenericTestSample(ShortcutMixin):
     """Shortcut wrapper for test sample in generic sample sheet"""
 
-    def __init__(self, bio_sample, test_sample):
+    #: Type to use for creating bio samples
+    ngs_library_class = GenericNGSLibrary
+
+    def __init__(self, shortcut_bio_sample, test_sample):
         #: Parent GenericBioSample
-        self.bio_sample = bio_sample
+        self.bio_sample = shortcut_bio_sample
+        #: Parent object; for ShortcutMixin
+        self.parent = shortcut_bio_sample
+        #: Wrapped object
+        self.wrapped = test_sample
         #: Wrapped TestSample
         self.test_sample = test_sample
         #: Shortcut to NGSLibrary objects
@@ -107,16 +81,56 @@ class GenericTestSample(GenericMixin):
         """BuildGenericNGSLibrary objects from
         ``self.test_sample.ngs_libraries"""
         for name, ngs_library in self.test_sample.ngs_libraries.items():
-            yield name, GenericNGSLibrary(self, ngs_library)
+            yield name, self.__class__.ngs_library_class(self, ngs_library)
 
 
-class GenericNGSLibrary(GenericMixin):
-    """Shortcut wrapper for NGS library in generic sample sheet"""
+class GenericBioSample(ShortcutMixin):
+    """Shortcut wrapper for bio sample in generic sample sheet"""
 
-    def __init__(self, test_sample, ngs_library):
-        #: Parent GenericTestSample
-        self.test_sample = test_sample
-        #: Wrapped NGSLibrary
-        self.ngs_library = ngs_library
+    #: Type to use for creating bio samples
+    test_sample_class = GenericTestSample
+
+    def __init__(self, shortcut_bio_entity, bio_sample):
+        #: Parent GenericBioEntity
+        self.bio_entity = shortcut_bio_entity
+        #: Parent object; for ShortcutMixin
+        self.parent = shortcut_bio_entity
+        #: Wrapped object
+        self.wrapped = bio_sample
+        #: Wrapped BioSample
+        self.bio_sample = bio_sample
+        #: Shortcut BioSample objects
+        self.test_samples = OrderedDict(self._build_test_samples())
+
+    def _build_test_samples(self):
+        """Build GenericTestSample objects for ``self.bio_sample.test_samples``
+        """
+        for name, test_sample in self.bio_sample.test_samples.items():
+            yield name, self.__class__.test_sample_class(self, test_sample)
+
+
+class GenericBioEntity(ShortcutMixin):
+    """Shortcut wrapper for bio entity in generic sample sheet"""
+
+    #: Type to use for creating bio samples
+    bio_sample_class = GenericBioSample
+
+    def __init__(self, shortcut_sheet, bio_entity):
+        #: Parent GenericSampleSheet
+        self.sheet = shortcut_sheet
+        #: Parent object; for ShortcutMixin
+        self.parent = None
+        #: Wrapped object; for ShortcutMixin
+        self.wrapped = bio_entity
+        #: Wrapped BioEntity
+        self.bio_entity = bio_entity
+        #: Shortcut BioSample objects
+        self.bio_samples = OrderedDict(self._build_bio_samples())
+
+    def _build_bio_samples(self):
+        """Build GenericBioSample objects for ``self.bio_entity.bio_samples``
+        """
+        for name, bio_sample in self.bio_entity.bio_samples.items():
+            yield name, self.__class__.bio_sample_class(self, bio_sample)
 
 
