@@ -47,6 +47,18 @@ EXTRACTION_TYPE_DNA = 'DNA'
 EXTRACTION_TYPE_RNA = 'RNA'
 
 
+def is_background(sheet):
+    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
+    """
+    return sheet.extra_infos.get('is_background', False)
+
+
+def is_not_background(sheet):
+    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
+    """
+    return not is_background(sheet)
+
+
 class InvalidSelector(Exception):
     """Raised in the case of an invalid ``TestSample`` child type"""
 
@@ -61,11 +73,18 @@ class ShortcutSampleSheet:
     def __init__(self, sheet):
         #: The wrapped ``Sheet``
         self.sheet = sheet
+        #: Shortcut to wrapped sheet
+        self.wrapped = sheet
         #: A list of shortcut objects to all enabled NGS libraries
         self.all_ngs_libraries = None
         #: A list of shortcut objects to the first enabled NGS library for
         #: each sample
         self.primary_ngs_libraries = None
+
+    @property
+    def extra_infos(self):
+        """Shorcut to wrapped object's ``extra_infos``"""
+        return self.wrapped.extra_infos
 
 
 class ShortcutMixin:
@@ -265,6 +284,11 @@ class TestSampleChildShortcut:
     def enabled(self):
         """Shortcut to ``enabled`` property of wrapped ``TestSample``"""
         return self.wrapped.enabled
+
+    @property
+    def extra_infos(self):
+        """Shorcut to wrapped object's ``extra_infos``"""
+        return self.wrapped.extra_infos
 
 
 class NGSLibraryShortcut(TestSampleChildShortcut):

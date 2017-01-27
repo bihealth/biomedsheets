@@ -13,6 +13,9 @@
         "id": { "type": "string" },
         "title": { "type": "string" },
         "description": { "type": "string" },
+        "extraInfo": {
+            "type": "object"
+        },
         "bioEntities": {
             "type": "object",
             "patternProperties": {
@@ -24,6 +27,7 @@
         "extraInfoDefs": {
             "type": "object",
             "properties": {
+                "sheet": { "$ref": "#/definitions/extraInfoDef" },
                 "bioEntity": { "$ref": "#/definitions/extraInfoDef" },
                 "bioSample": { "$ref": "#/definitions/extraInfoDef" },
                 "testSample": { "$ref": "#/definitions/extraInfoDef" },

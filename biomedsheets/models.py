@@ -88,7 +88,7 @@ class Sheet(CrawlMixin):
     """
 
     def __init__(self, identifier, title, json_data, description=None,
-                 bio_entities=None, dict_type=OrderedDict):
+                 bio_entities=None, extra_infos=None, dict_type=OrderedDict):
         #: Identifier URI of the sheet, cannot be changed after construction
         self.identifier = identifier
         #: Title of the sheet, can be changed after construction
@@ -97,6 +97,8 @@ class Sheet(CrawlMixin):
         self.json_data = json_data
         #: Description of the sheet
         self.description = description
+        #: Extra info, ``dict``-like object
+        self.extra_infos = dict_type(extra_infos or [])
         #: List of ``BioEntity`` objects described in the sheet
         self.bio_entities = dict_type(bio_entities or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
@@ -105,7 +107,7 @@ class Sheet(CrawlMixin):
     def __repr__(self):
         return 'Sheet({})'.format(', '.join(map(str, [
             self.identifier, self.title, self.json_data, self.description,
-            self.bio_entities, self.sub_entries])))
+            self.bio_entities, self.extra_infos, self.sub_entries])))
 
     def __str__(self):
         return repr(self)
