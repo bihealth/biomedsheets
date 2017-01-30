@@ -138,7 +138,7 @@ class CancerMatchedSheetCreator(SetupColumnSizesMixin):
             'SEX',
             'BIO SAMPLE ID',
             'ICD-10 ENTRY (2016)',
-            'IS CANCER',
+            'IS TUMOR',
             'TNM STAGE',
             'PRESERVATION',
             'TEST SAMPLE ID',
@@ -159,11 +159,11 @@ class CancerMatchedSheetCreator(SetupColumnSizesMixin):
         dv_sex.errorTitle = 'Invalid sex'
         ws.add_data_validation(dv_sex)
         # Column: E/is cancer
-        dv_cancer = DataValidation(
+        dv_tumor = DataValidation(
             type='list', formula1='"yes,no"', allow_blank=True)
-        dv_cancer.ranges.append('E2:E1000')
-        dv_cancer.error = 'Is Cancer? must be one of yes, no, unknown'
-        dv_cancer.errorTitle = 'Invalid flag'
+        dv_tumor.ranges.append('E2:E1000')
+        dv_tumor.error = 'Is tumor? must be one of yes, no, unknown'
+        dv_tumor.errorTitle = 'Invalid flag'
         # Column: G/preservation
         dv_preservation = DataValidation(
             type='list', formula1='"FFPE,fresh-frozen,other"',

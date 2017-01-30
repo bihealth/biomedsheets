@@ -13,32 +13,32 @@ from .generic import (GenericBioEntity, GenericBioSample)
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 
-#: Key value for "is cancer" flag
-KEY_IS_CANCER = 'isCancer'
+#: Key value for "is tumor" flag
+KEY_IS_TUMOR = 'isTumor'
 
 #: Key value for "extraction type" value
 KEY_EXTRACTION_TYPE = 'extractionType'
 
 
 class CancerCaseSheet(ShortcutSampleSheet):
-    """Shortcut for "matched cancer/normal" view on bio-medical sample sheets
+    """Shortcut for "matched tumor/normal" view on bio-medical sample sheets
     """
 
     def __init__(self, sheet):
         super().__init__(sheet)
         #: List of donors in the sample sheet
         self.donors = list(self._iter_donors())
-        #: List of primary matched cancer/normal sample pairs in the sheet
+        #: List of primary matched tumor/normal sample pairs in the sheet
         self.primary_sample_pairs = list(self._iter_sample_pairs(True))
-        #: List of all matched cancer/normal sample pairs in the sample sheet
+        #: List of all matched tumor/normal sample pairs in the sample sheet
         self.all_sample_pairs = list(self._iter_sample_pairs(False))
         #: Mapping of all sample pairs by name of primary DNA test sample
-        self.all_sample_pairs_by_cancer_dna_test_sample = OrderedDict(
-            (pair.cancer_sample.dna_test_sample.name, pair)
+        self.all_sample_pairs_by_tumor_dna_test_sample = OrderedDict(
+            (pair.tumor_sample.dna_test_sample.name, pair)
             for pair in self.all_sample_pairs)
         #: Mapping of all sample pairs by name of primary DNA library name
-        self.all_sample_pairs_by_cancer_dna_ngs_library = OrderedDict(
-            (pair.cancer_sample.dna_ngs_library.name, pair)
+        self.all_sample_pairs_by_tumor_dna_ngs_library = OrderedDict(
+            (pair.tumor_sample.dna_ngs_library.name, pair)
             for pair in self.all_sample_pairs)
 
     def _iter_donors(self):
@@ -47,7 +47,7 @@ class CancerCaseSheet(ShortcutSampleSheet):
             yield CancerDonor(self, bio_entity)
 
     def _iter_sample_pairs(self, only_primary_sample_pairs):
-        """Return iterator over the matched cancer/normal pairs
+        """Return iterator over the matched tumor/normal pairs
 
         If ``only_primary_sample`` is ``True`` then only one pair per donor
         will be returned with the cancer sample marked as primary.  If this
@@ -62,29 +62,29 @@ class CancerCaseSheet(ShortcutSampleSheet):
 
 
 class CancerMatchedSamplePair:
-    """Represents a matched cancer/normal sample pair"""
+    """Represents a matched tumor/normal sample pair"""
 
-    def __init__(self, donor, cancer_sample, normal_sample):
+    def __init__(self, donor, tumor_sample, normal_sample):
         #: The ``BioEntity`` from the sample sheet
         self.donor = donor
         #: Alias for ``self.donor``
         self.bio_entity = self.donor
         #: The ``CancerBioSample`` from the sample sheet
-        self.cancer_sample = cancer_sample
+        self.tumor_sample = tumor_sample
         #: The ``CancerBioSample`` from the sample sheet
         self.normal_sample = normal_sample
 
     def __repr__(self):
         return 'CancerMatchedSamplePair({})'.format(', '.join(
-            map(str, [self.donor, self.cancer_sample, self.normal_sample])))
+            map(str, [self.donor, self.tumor_sample, self.normal_sample])))
 
     def __str__(self):
         return repr(self)
 
 
 class CancerBioSample(GenericBioSample):
-    """Represents one sample in a cancer/normal sample pair in the context
-    of a matched Cancer cancer/normal study
+    """Represents one sample in a tumor/normal sample pair in the context
+    of a matched Cancer tumor/normal study
 
     Currently, only NGS samples are supported and at least one DNA library is
     required.  This will change in the future
@@ -104,9 +104,9 @@ class CancerBioSample(GenericBioSample):
         self.rna_ngs_library = self._get_primary_rna_ngs_library()
 
     @property
-    def is_cancer(self):
+    def is_tumor(self):
         """Whether or not the bio sample is cancerous"""
-        return self.extra_infos['isCancer']
+        return self.extra_infos[KEY_IS_TUMOR]
 
     def _get_primary_dna_test_sample(self):
         """Spider through ``self.bio_sample`` and return primary DNA test
@@ -176,7 +176,7 @@ class CancerBioSample(GenericBioSample):
 
 
 class CancerDonor(GenericBioEntity):
-    """Represent a donor in a matched cancer/normal"""
+    """Represent a donor in a matched tumor/normal"""
 
     # Override to use cancer-specific bio sample class
     bio_sample_class = CancerBioSample
@@ -185,7 +185,7 @@ class CancerDonor(GenericBioEntity):
         super().__init__(shortcut_sheet, bio_entity)
         #: The primary ``CancerMatchedSamplePair``
         self.primary_pair = self._get_primary_pair()
-        #: All cancer/normal pairs
+        #: All tumor/normal pairs
         self.all_pairs = list(self._iter_all_pairs())
 
     def _get_primary_pair(self):
@@ -193,11 +193,11 @@ class CancerDonor(GenericBioEntity):
         return next(self._iter_all_pairs())
 
     def _iter_all_pairs(self):
-        """Iterate all cancer/normal pair"""
+        """Iterate all tumor/normal pair"""
         normal_bio_sample = self._get_primary_normal_bio_sample()
-        for cancer_bio_sample in self._iter_cancer_bio_samples():
+        for tumor_bio_sample in self._iter_tumor_bio_samples():
             yield CancerMatchedSamplePair(
-                self, cancer_bio_sample, normal_bio_sample)
+                self, tumor_bio_sample, normal_bio_sample)
 
     def _get_primary_normal_bio_sample(self):
         """Return primary normal ``BioSample``
@@ -205,18 +205,18 @@ class CancerDonor(GenericBioEntity):
         Raises ``MissingDataEntity`` in the case of problems
         """
         for bio_sample in self.bio_samples.values():
-            if KEY_IS_CANCER not in bio_sample.extra_infos:
+            if KEY_IS_TUMOR not in bio_sample.extra_infos:
                 raise MissingDataEntity(
                     'Could not find "{}" flag in BioSample {}'.format(
-                        KEY_IS_CANCER, bio_sample))
-            elif not bio_sample.extra_infos[KEY_IS_CANCER]:
+                        KEY_IS_TUMOR, bio_sample))
+            elif not bio_sample.extra_infos[KEY_IS_TUMOR]:
                 return bio_sample
 
         raise MissingDataEntity(
             'Could not find primary normal sample for BioEntity {}'.format(
                 self.bio_entity))
 
-    def _iter_cancer_bio_samples(self):
+    def _iter_tumor_bio_samples(self):
         """Return iterable over all cancer bio samples
 
         The order depends on the order in ``self.bio_samples``.  If
@@ -227,17 +227,17 @@ class CancerDonor(GenericBioEntity):
         """
         yielded_any = False
         for bio_sample in self.bio_samples.values():
-            if KEY_IS_CANCER not in bio_sample.extra_infos:
+            if KEY_IS_TUMOR not in bio_sample.extra_infos:
                 raise MissingDataEntity(
                     'Could not find "{}" flag in BioSample {}'.format(
-                        KEY_IS_CANCER, bio_sample))
-            elif bio_sample.extra_infos[KEY_IS_CANCER]:
+                        KEY_IS_TUMOR, bio_sample))
+            elif bio_sample.extra_infos[KEY_IS_TUMOR]:
                 yielded_any = True
                 yield bio_sample
         if not yielded_any:
             raise MissingDataEntity(
                 ('Could not find a BioSample with {} = true for '
-                 'BioEntity {}'.format(KEY_IS_CANCER, self.bio_entity)))
+                 'BioEntity {}'.format(KEY_IS_TUMOR, self.bio_entity)))
 
     def __repr__(self):
         return 'CancerDonor({})'.format(', '.join(map(

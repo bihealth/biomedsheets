@@ -22,7 +22,7 @@ DEFAULT_DESCRIPTION = (
 DELIM = '\t'
 
 #: Cancer TSV header
-CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isCancer',
+CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isTumor',
                      'libraryType', 'folderName')
 
 #: Known library types
@@ -65,10 +65,10 @@ CANCER_EXTRA_INFO_DEFS = OrderedDict([
         ])),
     ])),
     ('bioSample', OrderedDict([
-        ('isCancer', OrderedDict([
+        ('isTumor', OrderedDict([
             ('$ref',
              'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/isCancer')
+             '#/extraInfoDefs/template/isTumor')
         ])),
     ])),
     ('testSample', OrderedDict([
@@ -184,13 +184,13 @@ class CancerTSVReader:
                     ('Invalid number of entries in line {} of data '
                      'section of {}').format(lineno + 2, self.fname))
             mapping = dict(zip(names, arr))
-            # Check "isCancer" field, convert to bool
-            if mapping['isCancer'] not in BOOL_VALUES.keys():
+            # Check "isTumor" field, convert to bool
+            if mapping['isTumor'] not in BOOL_VALUES.keys():
                 raise CancerTSVSheetException(
                     ('Invalid boolean value {} in line {} of data '
                      'section of {}').format(
-                         mapping['isCancer'], lineno + 2, self.fname))
-            mapping['isCancer'] = BOOL_VALUES[mapping['isCancer']]
+                         mapping['isTumor'], lineno + 2, self.fname))
+            mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
             # Check "libraryType" field
             if mapping['libraryType'] not in LIBRARY_TYPES:
                 raise CancerTSVSheetException(
@@ -253,13 +253,13 @@ class CancerTSVReader:
 
         A test sample entry will be implicitely added.
         """
-        if len(set(r['isCancer'] for r in records)) != 1:
+        if len(set(r['isTumor'] for r in records)) != 1:
             raise CancerTSVSheetException(
-                'Inconsistent "isCancer" flag for records')
+                'Inconsistent "isTumor" flag for records')
         result = OrderedDict([
             ('pk', self.next_pk),
             ('extraInfo', OrderedDict([
-                ('isCancer', records[0]['isCancer']),
+                ('isTumor', records[0]['isTumor']),
             ])),
             ('testSamples', OrderedDict()),
         ])

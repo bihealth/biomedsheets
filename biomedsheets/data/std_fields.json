@@ -97,9 +97,9 @@
                 "pattern": "^.*$"
             },
 
-            "isCancer": {
-                "docs": "Boolean flag for distinguishing cancer/normal samples",
-                "key": "isCancer",
+            "isTumor": {
+                "docs": "Boolean flag for distinguishing tumor/normal samples",
+                "key": "isTumor",
                 "type": "boolean"
             },
 

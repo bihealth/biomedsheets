@@ -11,7 +11,7 @@
             "uberonCellSource": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/uberonCellSource" },
             "icd10Entry": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/icd10Entry" },
             "icd10Version": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/icd10Version" },
-            "isCancer": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/isCancer" },
+            "isTumor": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/isTumor" },
             "tnmStage": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/tnmStage" },
             "preservationType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/preservationType" }
         },
@@ -47,7 +47,7 @@
                     "pk": "234001",
                     "extraInfo": {
                         "uberonCellSource": "UBERON:0000178",
-                        "isCancer": false
+                        "isTumor": false
                     },
                     "testSamples": {
                         "DNA1": {
@@ -66,7 +66,7 @@
                     "pk": "234002",
                     "extraInfo": {
                         "uberonCellSource": "UBERON:0006866",
-                        "isCancer": true,
+                        "isTumor": true,
                         "icd10Entry": "C18.9",
                         "icd10Version": 2016,
                         "tnmStage": "T3_N1_M0",
@@ -107,7 +107,7 @@
                     "pk": "234003",
                     "extraInfo": {
                         "uberonCellSource": "UBERON:0002048",
-                        "isCancer": true,
+                        "isTumor": true,
                         "icd10Entry": "C7B.09",
                         "icd10Version": 2016,
                         "tnmStage": "T3_N1_M1",

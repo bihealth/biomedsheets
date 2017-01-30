@@ -18,38 +18,38 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 def tsv_sheet_cancer_header():
     f = io.StringIO(textwrap.dedent("""
     [Metadata]
-    schema          cancer_matched
+    schema          tumor_matched
     schema_version  v1
     title           Example matched cancer tumor/normal study
     description     The study has two patients, P001 has one tumor sample, P002 has two
 
     [Data]
-    patientName\tsampleName\tisCancer\tlibraryType\tfolderName
+    patientName\tsampleName\tisTumor\tlibraryType\tfolderName
     P001\tN1\tN\tWES\tP001-N1-DNA1-WES1
     P001\tT1\tY\tWES\tP001-T1-DNA1-WES1
-    P001\tT1\tY\tmRNA-seq\tP001-T1-RNA1-mRNAseq1
+    P001\tT1\tY\tmRNA_seq\tP001-T1-RNA1-mRNAseq1
     P002\tN1\tN\tWES\tP001-N1-DNA1-WES1
     P002\tT1\tY\tWES\tP001-T1-DNA1-WES1
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1
-    P002\tT2\tY\tmRNA-seq\tP001-T2-RNA1-mRNAseq1
+    P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1
     """.lstrip()))
     return f
 
 
 @pytest.fixture
 def tsv_sheet_cancer_no_header():
-    """Cancer TSV sheet without header"""
+    """Tumor TSV sheet without header"""
     f = io.StringIO(textwrap.dedent("""
-    patientName\tsampleName\tisCancer\tlibraryType\tfolderName
+    patientName\tsampleName\tisTumor\tlibraryType\tfolderName
     P001\tN1\tN\tWES\tP001-N1-DNA1-WES1
     P001\tT1\tY\tWES\tP001-T1-DNA1-WES1
-    P001\tT1\tY\tmRNA-seq\tP001-T1-RNA1-mRNAseq1
+    P001\tT1\tY\tmRNA_seq\tP001-T1-RNA1-mRNAseq1
     P002\tN1\tN\tWES\tP001-N1-DNA1-WES1
     P002\tT1\tY\tWES\tP001-T1-DNA1-WES1
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1
-    P002\tT2\tY\tmRNA-seq\tP001-T2-RNA1-mRNAseq1
+    P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1
     """.lstrip()))
     return f
 
@@ -70,9 +70,9 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
             }
         },
         "bioSample": {
-            "isCancer": {
-                "docs": "Boolean flag for distinguishing cancer/normal samples",
-                "key": "isCancer",
+            "isTumor": {
+                "docs": "Boolean flag for distinguishing tumor/normal samples",
+                "key": "isTumor",
                 "type": "boolean"
             }
         },
@@ -119,36 +119,60 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                 "N1": {
                     "pk": 2,
                     "extraInfo": {
-                        "isCancer": false
+                        "isTumor": false
                     },
-                    "ngs_libraries": {
-                        "WES1": {
+                    "testSamples": {
+                        "DNA1": {
                             "pk": 3,
                             "extraInfo": {
-                                "folderName": "P001-N1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "folderName": "P001-N1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T1": {
-                    "pk": 4,
+                    "pk": 5,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 5,
-                            "extraInfo": {
-                                "folderName": "P001-T1-DNA1-WES1",
-                                "libraryType": "WES"
-                            }
-                        },
-                        "mRNA-seq1": {
+                    "testSamples": {
+                        "DNA1": {
                             "pk": 6,
                             "extraInfo": {
-                                "folderName": "P001-T1-RNA1-mRNAseq1",
-                                "libraryType": "mRNA-seq"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 7,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
+                            }
+                        },
+                        "RNA1": {
+                            "pk": 8,
+                            "extraInfo": {
+                                "extractionType": "RNA"
+                            },
+                            "ngsLibraries": {
+                                "mRNA_seq1": {
+                                    "pk": 9,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-RNA1-mRNAseq1",
+                                        "libraryType": "mRNA_seq"
+                                    }
+                                }
                             }
                         }
                     }
@@ -156,66 +180,106 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
             }
         },
         "P002": {
-            "pk": 7,
+            "pk": 10,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {
                 "N1": {
-                    "pk": 8,
+                    "pk": 11,
                     "extraInfo": {
-                        "isCancer": false
+                        "isTumor": false
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 9,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 12,
                             "extraInfo": {
-                                "folderName": "P001-N1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 13,
+                                    "extraInfo": {
+                                        "folderName": "P001-N1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T1": {
-                    "pk": 10,
+                    "pk": 14,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 11,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 15,
                             "extraInfo": {
-                                "folderName": "P001-T1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 16,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         },
-                        "WES2": {
-                            "pk": 12,
+                        "DNA2": {
+                            "pk": 17,
                             "extraInfo": {
-                                "folderName": "P001-T1-RNA1-RNAseq1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES2": {
+                                    "pk": 18,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-RNA1-RNAseq1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T2": {
-                    "pk": 13,
+                    "pk": 19,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 14,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 20,
                             "extraInfo": {
-                                "folderName": "P001-T2-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 21,
+                                    "extraInfo": {
+                                        "folderName": "P001-T2-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         },
-                        "mRNA-seq1": {
-                            "pk": 15,
+                        "RNA1": {
+                            "pk": 22,
                             "extraInfo": {
-                                "folderName": "P001-T2-RNA1-mRNAseq1",
-                                "libraryType": "mRNA-seq"
+                                "extractionType": "RNA"
+                            },
+                            "ngsLibraries": {
+                                "mRNA_seq1": {
+                                    "pk": 23,
+                                    "extraInfo": {
+                                        "folderName": "P001-T2-RNA1-mRNAseq1",
+                                        "libraryType": "mRNA_seq"
+                                    }
+                                }
                             }
                         }
                     }
@@ -241,9 +305,9 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
             }
         },
         "bioSample": {
-            "isCancer": {
-                "docs": "Boolean flag for distinguishing cancer/normal samples",
-                "key": "isCancer",
+            "isTumor": {
+                "docs": "Boolean flag for distinguishing tumor/normal samples",
+                "key": "isTumor",
                 "type": "boolean"
             }
         },
@@ -290,36 +354,60 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                 "N1": {
                     "pk": 2,
                     "extraInfo": {
-                        "isCancer": false
+                        "isTumor": false
                     },
-                    "ngs_libraries": {
-                        "WES1": {
+                    "testSamples": {
+                        "DNA1": {
                             "pk": 3,
                             "extraInfo": {
-                                "folderName": "P001-N1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "folderName": "P001-N1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T1": {
-                    "pk": 4,
+                    "pk": 5,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 5,
-                            "extraInfo": {
-                                "folderName": "P001-T1-DNA1-WES1",
-                                "libraryType": "WES"
-                            }
-                        },
-                        "mRNA-seq1": {
+                    "testSamples": {
+                        "DNA1": {
                             "pk": 6,
                             "extraInfo": {
-                                "folderName": "P001-T1-RNA1-mRNAseq1",
-                                "libraryType": "mRNA-seq"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 7,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
+                            }
+                        },
+                        "RNA1": {
+                            "pk": 8,
+                            "extraInfo": {
+                                "extractionType": "RNA"
+                            },
+                            "ngsLibraries": {
+                                "mRNA_seq1": {
+                                    "pk": 9,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-RNA1-mRNAseq1",
+                                        "libraryType": "mRNA_seq"
+                                    }
+                                }
                             }
                         }
                     }
@@ -327,66 +415,106 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
             }
         },
         "P002": {
-            "pk": 7,
+            "pk": 10,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {
                 "N1": {
-                    "pk": 8,
+                    "pk": 11,
                     "extraInfo": {
-                        "isCancer": false
+                        "isTumor": false
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 9,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 12,
                             "extraInfo": {
-                                "folderName": "P001-N1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 13,
+                                    "extraInfo": {
+                                        "folderName": "P001-N1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T1": {
-                    "pk": 10,
+                    "pk": 14,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 11,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 15,
                             "extraInfo": {
-                                "folderName": "P001-T1-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 16,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         },
-                        "WES2": {
-                            "pk": 12,
+                        "DNA2": {
+                            "pk": 17,
                             "extraInfo": {
-                                "folderName": "P001-T1-RNA1-RNAseq1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES2": {
+                                    "pk": 18,
+                                    "extraInfo": {
+                                        "folderName": "P001-T1-RNA1-RNAseq1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         }
                     }
                 },
                 "T2": {
-                    "pk": 13,
+                    "pk": 19,
                     "extraInfo": {
-                        "isCancer": true
+                        "isTumor": true
                     },
-                    "ngs_libraries": {
-                        "WES1": {
-                            "pk": 14,
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 20,
                             "extraInfo": {
-                                "folderName": "P001-T2-DNA1-WES1",
-                                "libraryType": "WES"
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 21,
+                                    "extraInfo": {
+                                        "folderName": "P001-T2-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
                             }
                         },
-                        "mRNA-seq1": {
-                            "pk": 15,
+                        "RNA1": {
+                            "pk": 22,
                             "extraInfo": {
-                                "folderName": "P001-T2-RNA1-mRNAseq1",
-                                "libraryType": "mRNA-seq"
+                                "extractionType": "RNA"
+                            },
+                            "ngsLibraries": {
+                                "mRNA_seq1": {
+                                    "pk": 23,
+                                    "extraInfo": {
+                                        "folderName": "P001-T2-RNA1-mRNAseq1",
+                                        "libraryType": "mRNA_seq"
+                                    }
+                                }
                             }
                         }
                     }
@@ -409,13 +537,13 @@ def test_read_cancer_sheet_no_header(tsv_sheet_cancer_no_header):
         sheet.json_data, indent='    ')
 
 
-def test_read_cancer_json_header(tsv_sheet_cancer_header):
+def test_read_tumor_json_header(tsv_sheet_cancer_header):
     sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_header)
     assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
         sheet_struc, indent='    ')
 
 
-def test_read_cancer_json_no_header(tsv_sheet_cancer_no_header):
+def test_read_tumor_json_no_header(tsv_sheet_cancer_no_header):
     sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
     assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(
         sheet_struc, indent='    ')

@@ -5,7 +5,7 @@
 
     "extraInfoDefs": {
         "bioSample": {
-            "isCancer": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/isCancer" }
+            "isTumor": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/isTumor" }
         },
         "testSample": {
             "extractionType": { "$ref": "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/extractionType" }
@@ -21,7 +21,7 @@
             "bioSamples": {
                 "N1": {
                     "pk": "2",
-                    "extraInfo": { "isCancer": false },
+                    "extraInfo": { "isTumor": false },
                     "testSamples": {
                         "DNA1": {
                             "pk": "3",
@@ -37,7 +37,7 @@
                 },
                 "T1": {
                     "pk": "5",
-                    "extraInfo": { "isCancer": true },
+                    "extraInfo": { "isTumor": true },
                     "testSamples": {
                         "DNA1": {
                             "pk": "6",
@@ -58,7 +58,7 @@
             "bioSamples": {
                 "N1": {
                     "pk": "9",
-                    "extraInfo": { "isCancer": false },
+                    "extraInfo": { "isTumor": false },
                     "testSamples": {
                         "DNA1": {
                             "pk": "10",
@@ -74,7 +74,7 @@
                 },
                 "T1": {
                     "pk": "12",
-                    "extraInfo": { "isCancer": true },
+                    "extraInfo": { "isTumor": true },
                     "testSamples": {
                         "DNA1": {
                             "pk": "13",
