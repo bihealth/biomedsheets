@@ -72,9 +72,9 @@ biomedsheets.shortcuts.CancerBioSample
     :members:
 
 
----------------------------------------------------
-biomedsheets.shortcuts.GenericExperimentSampleSheet
----------------------------------------------------
+----------------------------------
+biomedsheets.shortcuts.SampleSheet
+----------------------------------
 
-.. autoclass:: biomedsheets.shortcuts.GenericExperimentSampleSheet
+.. autoclass:: biomedsheets.shortcuts.GenericSampleSheet
     :members:

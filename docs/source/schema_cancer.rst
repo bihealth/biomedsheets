@@ -39,7 +39,7 @@ Instead, a TSV-based schema can be used.
 
 Optionally, the schema can contain meta data, starting with ``[Metadata]`` INI-style section header (the data section has to start with ``[Data]``).
 
-.. literalinclude:: code/tumor_schema.tsv
+.. literalinclude:: code/cancer_schema.tsv
     :language: text
     :lines: 1-7
 
@@ -48,7 +48,7 @@ The ``schema`` and ``schema_version`` lines are optional.
 If the file does not start with an INI-style section header, it starts with tab-separated column names.
 An example is shown below:
 
-.. literalinclude:: code/tumor_schema.tsv
+.. literalinclude:: code/cancer_schema.tsv
     :language: text
     :lines: 8-
 
