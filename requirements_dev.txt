@@ -1,0 +1,23 @@
+# Requirements for developing biomedsheets
+
+# Include base requirements
+-r requirements.txt
+
+# Custom sphinx that allows for prettier embedding of multi-line string constants
+-e git://github.com/holtgrewe/sphinx.git@autodata/human-readable#egg=sphinx
+
+# More development dependencies
+Babel==2.3.4
+Jinja2==2.9.4
+MarkupSafe==0.23
+Pygments==2.2.0
+decorator==4.0.11
+docutils==0.13.1
+imagesize==0.7.1
+ply==3.9
+pytz==2016.10
+six==1.10.0
+snowballstemmer==1.2.1
+typing==3.5.3.0
+wrapt==1.10.8
+sphinx_rtd_theme==0.1.9

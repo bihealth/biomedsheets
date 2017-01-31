@@ -1,0 +1,10 @@
+# JSON schema and JSON path helpers
+jsonschema==2.5.1
+jsonpath-rw==1.4.0
+
+# YAML parsing
+pyyaml==3.12
+
+# Kenneth Reitz' wonderful requests module
+requests==2.12.4
+requests-file==1.4.1

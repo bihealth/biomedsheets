@@ -1,9 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
+import os
 
 from setuptools import setup
+import pip
+from pip.req import parse_requirements
+
+__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 with open('README.rst') as readme_file:
     readme = readme_file.read()
@@ -11,13 +15,9 @@ with open('README.rst') as readme_file:
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
-requirements = [
-    'jsonschema==2.5.1',
-    'pyyaml==3.12',
-    'jsonpath-rw==1.4.0',
-    'requests==2.12.4',
-    'requests-file==1.4.1'
-]
+reqs = parse_requirements('requirements.txt', session=pip.download.PipSession())
+
+requirements = [str(ir.req) for ir in reqs]
 
 test_requirements = [
     # TODO: put package test requirements here
