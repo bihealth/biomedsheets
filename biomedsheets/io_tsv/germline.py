@@ -6,9 +6,8 @@ from collections import OrderedDict
 
 from .base import (
     LIBRARY_TYPES, LIBRARY_TO_EXTRACTION, EXTRACTION_TYPES, KEY_TITLE, KEY_DESCRIPTION,
-    BOOL_VALUES, DELIM, std_field, TSVSheetException)
-from .. import io
-from .. import ref_resolver
+    BOOL_VALUES, DELIM, NCBI_TAXON_HUMAN,
+    std_field, TSVSheetException, BaseTSVReader)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -20,7 +19,7 @@ GERMLINE_DEFAULT_DESCRIPTION = 'Sample Sheet constructed from germline compact T
 
 #: Germline TSV header
 GERMLINE_TSV_HEADER = ('patientName', 'fatherName', 'motherName', 'sex',
-                       'affected', 'folderName', 'hpoTerms', 'libraryType')
+                       'isAffected', 'folderName', 'hpoTerms', 'libraryType')
 
 #: Fixed "extraInfoDefs" field for germline compact TSV
 GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
@@ -28,6 +27,16 @@ GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
         std_field('ncbiTaxon'),
         std_field('fatherPk'),
         std_field('motherPk'),
+        ('fatherName', OrderedDict([
+            ('docs', 'secondary_id of father, used for construction only'),
+            ('key', 'fatherName'),
+            ('type', 'string'),
+        ])),
+        ('motherName', OrderedDict([
+            ('key', 'motherName'),
+            ('docs', 'secondary_id of mother, used for construction only'),
+            ('type', 'string'),
+        ])),
         std_field('sex'),
         std_field('isAffected'),
         std_field('hpoTerms'),
@@ -35,6 +44,7 @@ GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
     ('bioSample', OrderedDict([
     ])),
     ('testSample', OrderedDict([
+        std_field('extractionType'),
     ])),
     ('ngsLibrary', OrderedDict([
         std_field('libraryType'),
@@ -42,205 +52,101 @@ GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
     ])),
 ])
 
+#: Constants for interpreting "sex" field
+SEX_VALUES = {
+    'M': 'male',
+    'm': 'male',
+    'f': 'female',
+    'F': 'female',
+    'U': 'unknown',
+    'u': 'unknown',
+    None: 'unknown,'
+}
+
+#: Constants for interpreting "sex" field
+AFFECTED_VALUES = {
+    'Y': 'affected',
+    'y': 'affected',
+    'N': 'unaffected',
+    'n': 'unaffected',
+    'U': 'unknown',
+    'u': 'unknown',
+    None: 'unknown,'
+}
+
 
 class GermlineTSVSheetException(TSVSheetException):
     """Raised on problems with loading germline TSV sample sheets"""
 
 
-class GermlineTSVReader:
+class GermlineTSVReader(BaseTSVReader):
     """Helper class for reading germline TSV file
 
     Prefer using ``read_germline_tsv_*()`` for shortcut
     """
 
-    def __init__(self, f, fname=None):
-        self.f = f
-        self.fname = fname or '<unknown>'
-        self.next_pk = 1
+    tsv_header = GERMLINE_TSV_HEADER
+    extra_info_defs = GERMLINE_EXTRA_INFO_DEFS
+    default_title = GERMLINE_DEFAULT_TITLE
+    default_description = GERMLINE_DEFAULT_DESCRIPTION
+    bio_entity_name_column = 'patientName'
+    bio_sample_name = 'DNA1'
 
-    def read_json_data(self):
-        """Read from file-like object ``self.f``, use file name in case of
-        problems
-
-        :raises:GermlineTSVSheetException in case of problems
-        """
-        # Read lines from file and check for file not being empty
-        lines = [l.strip() for l in self.f]
-        if not lines:
+    def check_tsv_line(self, mapping, lineno):
+        """Cancer sample sheet--specific valiation"""
+        # Check "libraryType" field
+        if mapping['libraryType'] and mapping['libraryType'] not in LIBRARY_TYPES:
+            raise GermlineTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
+                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
+        # Check "sex" field
+        if mapping['sex'] not in SEX_VALUES.keys():
             raise GermlineTSVSheetException(
-                'Problem loading germline TSV sheet in file {}'.format(
-                    self.fname))
-        # Decide between the case with or without header
-        if lines[0].startswith('['):
-            header, body = self._split_lines(lines)
-        else:
-            header = []
-            body = lines
-        # Process header and then create a models.Sheet
-        proc_header = self._process_header(header)
-        if not body or set(body[0].split('\t')) != set(GERMLINE_TSV_HEADER):
+                'Invalid "sex" value {} in line {} of data section of {}'.format(
+                    mapping['sex'], lineno + 2, self.fname))
+        mapping['sex'] = SEX_VALUES[mapping['sex']]
+        # Check "affected"
+        if mapping['isAffected'] not in AFFECTED_VALUES.keys():
             raise GermlineTSVSheetException(
-                ('Empty or invalid data column names in germline TSV sheet '
-                 'file {}. Must be {{{}}} but is {{{}}}').format(
-                     self.fname, ', '.join(GERMLINE_TSV_HEADER),
-                     body[0].replace('\t', ', ')))
-        return self._create_sheet_json(proc_header, body)
+                'Invalid "isAffected" value {} in line {} of data section of {}'.format(
+                    mapping['isAffected'], lineno + 2, self.fname))
+        mapping['isAffected'] = AFFECTED_VALUES[mapping['isAffected']]
 
-    def read_sheet(self):
-        """Read into JSON and construct ``models.Sheet``"""
-        return io.SheetBuilder(self.read_json_data()).run()
+    def postprocess_json_data(self, json_data):
+        """Postprocess JSON data"""
+        # Build mapping from bio entity name to pk
+        bio_entity_name_to_pk = {
+            name: bio_entity['pk'] for name, bio_entity in json_data['bioEntities'].items()}
+        # Update bio entities motherPk and fatherPk attributes
+        for bio_entity in json_data['bioEntities'].values():
+            if bio_entity['extraInfo'].get('fatherName'):
+                bio_entity['extraInfo']['fatherPk'] = bio_entity_name_to_pk[
+                    bio_entity['extraInfo']['fatherName']]
+            if bio_entity['extraInfo'].get('motherName'):
+                bio_entity['extraInfo']['motherPk'] = bio_entity_name_to_pk[
+                    bio_entity['extraInfo']['motherName']]
 
-    def _split_lines(self, lines):
-        """Split string array lines into header and body"""
-        header, body = [], []
-        in_data = False
-        for line in lines:
-            if in_data:
-                body.append(line)
-            else:
-                header.append(line)
-                if line.startswith('[Data]'):
-                    in_data = True
-        return header, body
-
-    def _process_header(self, header):
-        """Process header lines"""
-        result = {}
-        for line in header:
-            if DELIM in line:
-                key, value = line.split(DELIM, 1)
-                result[key] = value
+    def construct_bio_entity_dict(self, records):
+        result = super().construct_bio_entity_dict(records)
+        result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
+        # Check fatherName and motherName entries and assign to result
+        self._check_consistency(records, 'fatherName')
+        if records[0]['fatherName']:
+            result['extraInfo']['fatherName'] = records[0]['fatherName']
+        if records[0]['motherName']:
+            result['extraInfo']['motherName'] = records[0]['motherName']
+        # Check sex and isAffected entries and assign to result
+        result['extraInfo']['sex'] = records[0]['sex']
+        result['extraInfo']['isAffected'] = records[0]['isAffected']
+        # Check hpoTerms entries and assign to result
+        if records[0]['hpoTerms']:
+            result['extraInfo']['hpoTerms'] = records[0]['hpoTerms'].split(',')
         return result
 
-    def _create_sheet_json(self, header_dict, body):
-        """Create models.Sheet object from header dictionary and body lines
-        """
-        names = body[0].split('\t')  # idx to name
-        # Build validated list of records
-        records = []
-        for lineno, line in enumerate(body[1:]):
-            arr = line.split('\t')
-            # Check number of entries in line
-            if len(arr) != len(names):
-                raise GermlineTSVSheetException(
-                    ('Invalid number of entries in line {} of data '
-                     'section of {}').format(lineno + 2, self.fname))
-            mapping = dict(zip(names, arr))
-            # Check "isTumor" field, convert to bool
-            if mapping['isTumor'] not in BOOL_VALUES.keys():
-                raise GermlineTSVSheetException(
-                    ('Invalid boolean value {} in line {} of data '
-                     'section of {}').format(
-                         mapping['isTumor'], lineno + 2, self.fname))
-            mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
-            # Check "libraryType" field
-            if mapping['libraryType'] not in LIBRARY_TYPES:
-                raise GermlineTSVSheetException(
-                    'Invalid library type {}, must be in {{{}}}'.format(
-                        mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
-            # Check other fields for being non-empty
-            for key in GERMLINE_TSV_HEADER:
-                if mapping[key] == '':
-                    raise GermlineTSVSheetException(
-                        'Field {} empty in line {} of {}'.format(
-                            key, lineno + 2, self.fname))
-            records.append(mapping)
-        # TODO: we should perform more validation here in the future
-        # Create the sheet from records
-        return self._create_sheet_json_from_records(header_dict, records)
-
-    def _create_sheet_json_from_records(self, header_dict, records):
-        """Create a new models.Sheet object from TSV records"""
-        furl = 'file://{}'.format(self.fname)
-        resolver = ref_resolver.RefResolver(dict_class=OrderedDict)
-        extraDefs = resolver.resolve(furl, GERMLINE_EXTRA_INFO_DEFS)
-        json_data = OrderedDict([
-            ('identifier', furl),
-            ('title', header_dict.get(KEY_TITLE, GERMLINE_DEFAULT_TITLE)),
-            ('description',
-             header_dict.get(KEY_DESCRIPTION, GERMLINE_DEFAULT_DESCRIPTION)),
-            ('extraInfoDefs', extraDefs),
-            ('bioEntities', OrderedDict()),
-        ])
-        patient_records = OrderedDict()
-        for record in records:
-            patient_records.setdefault(record['patientName'], [])
-            patient_records[record['patientName']].append(record)
-        for patient_name, entry in patient_records.items():
-            json_data['bioEntities'][patient_name] = \
-                self._build_bio_entity_json(patient_name, entry)
-        return json_data
-
-    def _build_bio_entity_json(self, patient_name, records):
-        """Build JSON for bio_entities entry"""
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('ncbiTaxon', 'NCBITaxon_9606'),
-            ])),
-            ('bioSamples', OrderedDict()),
-        ])
-        self.next_pk += 1
-        sample_records = OrderedDict()
-        for record in records:
-            sample_records.setdefault(record['sampleName'], [])
-            sample_records[record['sampleName']].append(record)
-        for sample_name, entry in sample_records.items():
-            result['bioSamples'][sample_name] = \
-                self._build_bio_sample_json(sample_name, entry)
-        return result
-
-    def _build_bio_sample_json(self, sample_name, records):
-        """Build JSON for bio_samples entry
-
-        A test sample entry will be implicitely added.
-        """
-        if len(set(r['isTumor'] for r in records)) != 1:
-            raise GermlineTSVSheetException(
-                'Inconsistent "isTumor" flag for records')
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('isTumor', records[0]['isTumor']),
-            ])),
-            ('testSamples', OrderedDict()),
-        ])
-        self.next_pk += 1
-        counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
-        counters_lib = dict((x, 1) for x in LIBRARY_TYPES)
-        for record in records:
-            extraction_type = LIBRARY_TO_EXTRACTION[record['libraryType']]
-            test_sample_name = '{}{}'.format(
-                extraction_type, counters_ext[extraction_type])
-            lib_name = '{}{}'.format(record['libraryType'],
-                                     counters_lib[record['libraryType']])
-            counters_ext[extraction_type] += 1
-            counters_lib[record['libraryType']] += 1
-            pk = self.next_pk
-            self.next_pk += 1
-            result['testSamples'][test_sample_name] = OrderedDict([
-                ('pk', pk),
-                ('extraInfo', OrderedDict([
-                    ('extractionType', extraction_type),
-                ])),
-                ('ngsLibraries', OrderedDict([
-                    (lib_name, self._build_ngs_library_json(lib_name, record)),
-                ]))
-            ])
-        return result
-
-
-    def _build_ngs_library_json(self, library_name, record):
-        """Build JSON for ngs_libraries entry"""
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('folderName', record['folderName']),
-                ('libraryType', record['libraryType']),
-            ])),
-        ])
-        self.next_pk += 1
-        return result
+    @classmethod
+    def _check_consistency(cls, records, key):
+        values = list(sorted(set(r[key] for r in records)))
+        if len(values) > 1:
+            raise ValueError('Inconsistent {} entries in records: {}'.format(key, values))
 
 
 def read_germline_tsv_sheet(f, fname=None):

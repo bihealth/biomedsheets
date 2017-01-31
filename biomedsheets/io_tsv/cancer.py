@@ -6,24 +6,23 @@ from collections import OrderedDict
 
 from .base import (
     LIBRARY_TYPES, LIBRARY_TO_EXTRACTION, EXTRACTION_TYPES, KEY_TITLE, KEY_DESCRIPTION,
-    BOOL_VALUES, DELIM, std_field, TSVSheetException)
+    BOOL_VALUES, DELIM, NCBI_TAXON_HUMAN,
+    std_field, TSVSheetException, BaseTSVReader)
 from .. import io
 from .. import ref_resolver
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 #: Default title
-DEFAULT_TITLE = 'Cancer Sample Sheet'
+CANCER_DEFAULT_TITLE = 'Cancer Sample Sheet'
 
 #: Default description
-DEFAULT_DESCRIPTION = (
+CANCER_DEFAULT_DESCRIPTION = (
     'Sample Sheet constructed from cancer matched samples '
     'compact TSV file')
 
 #: Cancer TSV header
-CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isTumor',
-                     'libraryType', 'folderName')
-
+CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isTumor', 'libraryType', 'folderName')
 
 #: Fixed "extraInfoDefs" field for cancer compact TSV
 CANCER_EXTRA_INFO_DEFS = OrderedDict([
@@ -47,199 +46,51 @@ class CancerTSVSheetException(TSVSheetException):
     """Raised on problems with loading cancer TSV sample sheets"""
 
 
-class CancerTSVReader:
+class CancerTSVReader(BaseTSVReader):
     """Helper class for reading cancer TSV file
 
-    Prefer using ``read_cancer_tsv_*()`` for shortcut
+    Prefer using ``read_germline_tsv_*()`` for shortcut
     """
 
-    def __init__(self, f, fname=None):
-        self.f = f
-        self.fname = fname or '<unknown>'
-        self.next_pk = 1
+    tsv_header = CANCER_TSV_HEADER
+    extra_info_defs = CANCER_EXTRA_INFO_DEFS
+    default_title = CANCER_DEFAULT_TITLE
+    default_description = CANCER_DEFAULT_DESCRIPTION
+    bio_entity_name_column = 'patientName'
+    bio_sample_name_column = 'sampleName'
 
-    def read_json_data(self):
-        """Read from file-like object ``self.f``, use file name in case of
-        problems
-
-        :raises:CancerTSVSheetException in case of problems
-        """
-        # Read lines from file and check for file not being empty
-        lines = [l.strip() for l in self.f]
-        if not lines:
+    def check_tsv_line(self, mapping, lineno):
+        """Cancer sample sheet--specific valiation"""
+        # Check "isTumor" field, convert to bool
+        if mapping['isTumor'] not in BOOL_VALUES.keys():
             raise CancerTSVSheetException(
-                'Problem loading cancer TSV sheet in file {}'.format(
-                    self.fname))
-        # Decide between the case with or without header
-        if lines[0].startswith('['):
-            header, body = self._split_lines(lines)
-        else:
-            header = []
-            body = lines
-        # Process header and then create a models.Sheet
-        proc_header = self._process_header(header)
-        if not body or set(body[0].split('\t')) != set(CANCER_TSV_HEADER):
-            raise CancerTSVSheetException(
-                ('Empty or invalid data column names in cancer TSV sheet '
-                 'file {}. Must be {{{}}} but is {{{}}}').format(
-                     self.fname, ', '.join(CANCER_TSV_HEADER),
-                     body[0].replace('\t', ', ')))
-        return self._create_sheet_json(proc_header, body)
-
-    def read_sheet(self):
-        """Read into JSON and construct ``models.Sheet``"""
-        return io.SheetBuilder(self.read_json_data()).run()
-
-    def _split_lines(self, lines):
-        """Split string array lines into header and body"""
-        header, body = [], []
-        in_data = False
-        for line in lines:
-            if in_data:
-                body.append(line)
-            else:
-                header.append(line)
-                if line.startswith('[Data]'):
-                    in_data = True
-        return header, body
-
-    def _process_header(self, header):
-        """Process header lines"""
-        result = {}
-        for line in header:
-            if DELIM in line:
-                key, value = line.split(DELIM, 1)
-                result[key] = value
-        return result
-
-    def _create_sheet_json(self, header_dict, body):
-        """Create models.Sheet object from header dictionary and body lines
-        """
-        names = body[0].split('\t')  # idx to name
-        # Build validated list of records
-        records = []
-        for lineno, line in enumerate(body[1:]):
-            arr = line.split('\t')
-            # Check number of entries in line
-            if len(arr) != len(names):
-                raise CancerTSVSheetException(
-                    ('Invalid number of entries in line {} of data '
-                     'section of {}').format(lineno + 2, self.fname))
-            mapping = dict(zip(names, arr))
-            # Check "isTumor" field, convert to bool
-            if mapping['isTumor'] not in BOOL_VALUES.keys():
-                raise CancerTSVSheetException(
-                    ('Invalid boolean value {} in line {} of data '
-                     'section of {}').format(
-                         mapping['isTumor'], lineno + 2, self.fname))
-            mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
-            # Check "libraryType" field
-            if mapping['libraryType'] not in LIBRARY_TYPES:
-                raise CancerTSVSheetException(
-                    'Invalid library type {}, must be in {{{}}}'.format(
-                        mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
-            # Check other fields for being non-empty
-            for key in CANCER_TSV_HEADER:
-                if mapping[key] == '':
-                    raise CancerTSVSheetException(
-                        'Field {} empty in line {} of {}'.format(
-                            key, lineno + 2, self.fname))
-            records.append(mapping)
+                'Invalid boolean value {} in line {} of data section of {}'.format(
+                    mapping['isTumor'], lineno + 2, self.fname))
+        mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
+        # Check "libraryType" field
+        if mapping['libraryType'] not in LIBRARY_TYPES:
+            raise CancerTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
+                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
+        # Check other fields for being non-empty
+        for key in self.__class__.tsv_header:
+            if mapping[key] is None:
+                raise CancerTSVSheetException('Field {} empty in line {} of {}'.format(
+                    key, lineno + 2, self.fname))
         # TODO: we should perform more validation here in the future
-        # Create the sheet from records
-        return self._create_sheet_json_from_records(header_dict, records)
 
-    def _create_sheet_json_from_records(self, header_dict, records):
-        """Create a new models.Sheet object from TSV records"""
-        furl = 'file://{}'.format(self.fname)
-        resolver = ref_resolver.RefResolver(dict_class=OrderedDict)
-        extraDefs = resolver.resolve(furl, CANCER_EXTRA_INFO_DEFS)
-        json_data = OrderedDict([
-            ('identifier', furl),
-            ('title', header_dict.get(KEY_TITLE, DEFAULT_TITLE)),
-            ('description',
-             header_dict.get(KEY_DESCRIPTION, DEFAULT_DESCRIPTION)),
-            ('extraInfoDefs', extraDefs),
-            ('bioEntities', OrderedDict()),
-        ])
-        patient_records = OrderedDict()
-        for record in records:
-            patient_records.setdefault(record['patientName'], [])
-            patient_records[record['patientName']].append(record)
-        for patient_name, entry in patient_records.items():
-            json_data['bioEntities'][patient_name] = \
-                self._build_bio_entity_json(patient_name, entry)
-        return json_data
-
-    def _build_bio_entity_json(self, patient_name, records):
-        """Build JSON for bio_entities entry"""
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('ncbiTaxon', 'NCBITaxon_9606'),
-            ])),
-            ('bioSamples', OrderedDict()),
-        ])
-        self.next_pk += 1
-        sample_records = OrderedDict()
-        for record in records:
-            sample_records.setdefault(record['sampleName'], [])
-            sample_records[record['sampleName']].append(record)
-        for sample_name, entry in sample_records.items():
-            result['bioSamples'][sample_name] = \
-                self._build_bio_sample_json(sample_name, entry)
+    def construct_bio_entity_dict(self, records):
+        result = super().construct_bio_entity_dict(records)
+        result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
         return result
 
-    def _build_bio_sample_json(self, sample_name, records):
-        """Build JSON for bio_samples entry
-
-        A test sample entry will be implicitely added.
-        """
+    def check_bio_sample_records(self, records):
         if len(set(r['isTumor'] for r in records)) != 1:
-            raise CancerTSVSheetException(
+            raise TSVSheetException(
                 'Inconsistent "isTumor" flag for records')
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('isTumor', records[0]['isTumor']),
-            ])),
-            ('testSamples', OrderedDict()),
-        ])
-        self.next_pk += 1
-        counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
-        counters_lib = dict((x, 1) for x in LIBRARY_TYPES)
-        for record in records:
-            extraction_type = LIBRARY_TO_EXTRACTION[record['libraryType']]
-            test_sample_name = '{}{}'.format(
-                extraction_type, counters_ext[extraction_type])
-            lib_name = '{}{}'.format(record['libraryType'],
-                                     counters_lib[record['libraryType']])
-            counters_ext[extraction_type] += 1
-            counters_lib[record['libraryType']] += 1
-            pk = self.next_pk
-            self.next_pk += 1
-            result['testSamples'][test_sample_name] = OrderedDict([
-                ('pk', pk),
-                ('extraInfo', OrderedDict([
-                    ('extractionType', extraction_type),
-                ])),
-                ('ngsLibraries', OrderedDict([
-                    (lib_name, self._build_ngs_library_json(lib_name, record)),
-                ]))
-            ])
-        return result
 
-
-    def _build_ngs_library_json(self, library_name, record):
-        """Build JSON for ngs_libraries entry"""
-        result = OrderedDict([
-            ('pk', self.next_pk),
-            ('extraInfo', OrderedDict([
-                ('folderName', record['folderName']),
-                ('libraryType', record['libraryType']),
-            ])),
-        ])
-        self.next_pk += 1
+    def construct_bio_sample_dict(self, records):
+        result = super().construct_bio_sample_dict(records)
+        result['extraInfo']['isTumor'] = records[0]['isTumor']
         return result
 
 

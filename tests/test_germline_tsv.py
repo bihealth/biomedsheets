@@ -23,11 +23,11 @@ def tsv_sheet_germline_header():
     description     The study has two patients, P001 has one tumor sample, P002 has two
 
     [Data]
-    patientName\tfatherName\tmotherName\tsex\taffected\tfolderName\thpoTerms
-    12-345\t12-346\t12-347\tM\tY\t12-345\tHP:0009946,HP:0009899
-    12-348\t12-346\t12-347\tM\tN\t12-348
-    12-346\t.\t.\tM\tN\t.
-    12-347\t.\t.\tF\tN\t12-347
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    12-345\t12-346\t12-347\tM\tY\tWGS\t12-345\tHP:0009946,HP:0009899
+    12-348\t12-346\t12-347\tM\tN\tWGS\t12-348\t.
+    12-346\t.\t.\tM\tN\t.\t.\t.
+    12-347\t.\t.\tF\tN\tWGS\t12-347\t.
     """.lstrip()))
     return f
 
@@ -36,22 +36,442 @@ def tsv_sheet_germline_header():
 def tsv_sheet_germline_no_header():
     """Tumor TSV sheet without header"""
     f = io.StringIO(textwrap.dedent("""
-    patientName\tfatherName\tmotherName\tsex\taffected\tfolderName\thpoTerms
-    12-345\t12-346\t12-347\tM\tY\t12-345\tHP:0009946,HP:0009899
-    12-348\t12-346\t12-347\tM\tN\t12-348
-    12-346\t.\t.\tM\tN\t.
-    12-347\t.\t.\tF\tN\t12-347
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    12-345\t12-346\t12-347\tM\tY\tWGS\t12-345\tHP:0009946,HP:0009899
+    12-348\t12-346\t12-347\tM\tN\tWGS\t12-348\t.
+    12-346\t.\t.\tM\tN\t.\t.\t.
+    12-347\t.\t.\tF\tN\tWGS\t12-347\t.
     """.lstrip()))
     return f
 
 
 # Expected value for the germline sheet JSON with header
 EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
-""".lstrip()
+{
+    "identifier": "file://<unknown>",
+    "title": "Germline Sample Sheet",
+    "description": "Sample Sheet constructed from germline compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            },
+            "fatherPk": {
+                "docs": "Primary key of mother",
+                "key": "fatherPk",
+                "type": "string"
+            },
+            "motherPk": {
+                "docs": "Primary key of mother",
+                "key": "motherPk",
+                "type": "string"
+            },
+            "fatherName": {
+                "docs": "secondary_id of father, used for construction only",
+                "key": "fatherName",
+                "type": "string"
+            },
+            "motherName": {
+                "key": "motherName",
+                "docs": "secondary_id of mother, used for construction only",
+                "type": "string"
+            },
+            "sex": {
+                "docs": "Biological sex of individual",
+                "key": "sex",
+                "type": "enum",
+                "choices": [
+                    "male",
+                    "female",
+                    "unknown"
+                ]
+            },
+            "isAffected": {
+                "docs": "Flag for marking individiual as (un-)affected",
+                "key": "isAffected",
+                "type": "enum",
+                "choices": [
+                    "affected",
+                    "unaffected",
+                    "unknown"
+                ]
+            },
+            "hpoTerms": {
+                "docs": "HPO terms for individual",
+                "key": "hpoTerms",
+                "type": "array",
+                "entry": "string",
+                "pattern": "^HPO:[0-9]+$"
+            }
+        },
+        "bioSample": {},
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "12-345": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "fatherName": "12-346",
+                "motherName": "12-347",
+                "sex": "male",
+                "isAffected": "affected",
+                "hpoTerms": [
+                    "HP:0009946",
+                    "HP:0009899"
+                ],
+                "fatherPk": 9,
+                "motherPk": 10
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 2,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "folderName": "12-345",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "12-348": {
+            "pk": 5,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "fatherName": "12-346",
+                "motherName": "12-347",
+                "sex": "male",
+                "isAffected": "unaffected",
+                "fatherPk": 9,
+                "motherPk": 10
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 6,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 7,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 8,
+                                    "extraInfo": {
+                                        "folderName": "12-348",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "12-346": {
+            "pk": 9,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "sex": "male",
+                "isAffected": "unaffected"
+            },
+            "bioSamples": {}
+        },
+        "12-347": {
+            "pk": 10,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "sex": "female",
+                "isAffected": "unaffected"
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 11,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 12,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 13,
+                                    "extraInfo": {
+                                        "folderName": "12-347",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}""".lstrip()
 
 # Expected value for the germline sheet JSON without header
 EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
-""".lstrip()
+{
+    "identifier": "file://<unknown>",
+    "title": "Germline Sample Sheet",
+    "description": "Sample Sheet constructed from germline compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            },
+            "fatherPk": {
+                "docs": "Primary key of mother",
+                "key": "fatherPk",
+                "type": "string"
+            },
+            "motherPk": {
+                "docs": "Primary key of mother",
+                "key": "motherPk",
+                "type": "string"
+            },
+            "fatherName": {
+                "docs": "secondary_id of father, used for construction only",
+                "key": "fatherName",
+                "type": "string"
+            },
+            "motherName": {
+                "key": "motherName",
+                "docs": "secondary_id of mother, used for construction only",
+                "type": "string"
+            },
+            "sex": {
+                "docs": "Biological sex of individual",
+                "key": "sex",
+                "type": "enum",
+                "choices": [
+                    "male",
+                    "female",
+                    "unknown"
+                ]
+            },
+            "isAffected": {
+                "docs": "Flag for marking individiual as (un-)affected",
+                "key": "isAffected",
+                "type": "enum",
+                "choices": [
+                    "affected",
+                    "unaffected",
+                    "unknown"
+                ]
+            },
+            "hpoTerms": {
+                "docs": "HPO terms for individual",
+                "key": "hpoTerms",
+                "type": "array",
+                "entry": "string",
+                "pattern": "^HPO:[0-9]+$"
+            }
+        },
+        "bioSample": {},
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "12-345": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "fatherName": "12-346",
+                "motherName": "12-347",
+                "sex": "male",
+                "isAffected": "affected",
+                "hpoTerms": [
+                    "HP:0009946",
+                    "HP:0009899"
+                ],
+                "fatherPk": 9,
+                "motherPk": 10
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 2,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "folderName": "12-345",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "12-348": {
+            "pk": 5,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "fatherName": "12-346",
+                "motherName": "12-347",
+                "sex": "male",
+                "isAffected": "unaffected",
+                "fatherPk": 9,
+                "motherPk": 10
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 6,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 7,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 8,
+                                    "extraInfo": {
+                                        "folderName": "12-348",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "12-346": {
+            "pk": 9,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "sex": "male",
+                "isAffected": "unaffected"
+            },
+            "bioSamples": {}
+        },
+        "12-347": {
+            "pk": 10,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "sex": "female",
+                "isAffected": "unaffected"
+            },
+            "bioSamples": {
+                "DNA1": {
+                    "pk": 11,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 12,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 13,
+                                    "extraInfo": {
+                                        "folderName": "12-347",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}""".lstrip()
 
 
 def test_read_germline_sheet_header(tsv_sheet_germline_header):

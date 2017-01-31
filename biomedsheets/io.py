@@ -54,7 +54,7 @@ class ExtraInfoBuilder:
     def _build_array(self, value):
         """Handle array entry type"""
         func = self.builders[self.definition['entry']]
-        return list(map(self.build, func))
+        return list(map(func, value))
 
 
 class SheetBuilder:
