@@ -3,4 +3,4 @@
 from .base import *
 from .generic import *
 from .cancer import *
-from .rare_disease import *
+from .germline import *
