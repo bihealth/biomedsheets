@@ -1,114 +1,56 @@
 # -*- coding: utf-8 -*-
-"""Code for reading and writing the compact TSV formats
+"""Code for reading and writing the compact germline TSV format
 """
 
 from collections import OrderedDict
 
-from . import io
-from . import ref_resolver
-from . import models
+from .base import (
+    LIBRARY_TYPES, LIBRARY_TO_EXTRACTION, EXTRACTION_TYPES, KEY_TITLE, KEY_DESCRIPTION,
+    BOOL_VALUES, DELIM, std_field, TSVSheetException)
+from .. import io
+from .. import ref_resolver
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 #: Default title
-DEFAULT_TITLE = 'Cancer Sample Sheet'
+GERMLINE_DEFAULT_TITLE = 'Germline Sample Sheet'
 
 #: Default description
-DEFAULT_DESCRIPTION = (
-    'Sample Sheet constructed from cancer matched samples '
-    'compact TSV file')
+GERMLINE_DEFAULT_DESCRIPTION = 'Sample Sheet constructed from germline compact TSV file'
 
-#: Delimiter to use
-DELIM = '\t'
+#: Germline TSV header
+GERMLINE_TSV_HEADER = ('patientName', 'fatherName', 'motherName', 'sex',
+                       'affected', 'folderName', 'hpoTerms', 'libraryType')
 
-#: Cancer TSV header
-CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isTumor',
-                     'libraryType', 'folderName')
-
-#: Known library types
-LIBRARY_TYPES = (
-    'WES', 'WGS', 'Panel_seq', 'mRNA_seq', 'total_RNA_seq')
-
-#: Map library type to extraction type
-LIBRARY_TO_EXTRACTION = {
-    'WES': 'DNA',
-    'WGS': 'DNA',
-    'Panel_seq': 'DNA',
-    'mRNA_seq': 'RNA',
-    'total_RNA_seq': 'RNA',
-}
-
-#: Known extraction types
-EXTRACTION_TYPES = ('DNA', 'RNA')
-
-#: Key for the TSV header, field "title"
-KEY_TITLE = 'title'
-
-#: Key for the TSV header, field "description"
-KEY_DESCRIPTION = 'description'
-
-#: Constants for interpreting booleans
-BOOL_VALUES = {
-    'Y': True,
-    'y': True,
-    'N': False,
-    'n': False,
-}
-
-#: Fixed "extraInfoDefs" field for cancer compact TSV
-CANCER_EXTRA_INFO_DEFS = OrderedDict([
+#: Fixed "extraInfoDefs" field for germline compact TSV
+GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
     ('bioEntity', OrderedDict([
-        ('ncbiTaxon', OrderedDict([
-            ('$ref',
-             'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/ncbiTaxon')
-        ])),
+        std_field('ncbiTaxon'),
+        std_field('fatherPk'),
+        std_field('motherPk'),
+        std_field('sex'),
+        std_field('isAffected'),
+        std_field('hpoTerms'),
     ])),
     ('bioSample', OrderedDict([
-        ('isTumor', OrderedDict([
-            ('$ref',
-             'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/isTumor')
-        ])),
     ])),
     ('testSample', OrderedDict([
-        ('extractionType', OrderedDict([
-            ('$ref',
-             'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/extractionType')
-        ])),
     ])),
     ('ngsLibrary', OrderedDict([
-        ('libraryType', OrderedDict([
-            ('$ref',
-             'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/libraryType')
-        ])),
-        ('folderName', OrderedDict([
-            ('$ref',
-             'resource://biomedsheets/data/std_fields.json'
-             '#/extraInfoDefs/template/folderName')
-        ])),
+        std_field('libraryType'),
+        std_field('folderName'),
     ])),
 ])
 
 
-class SheetIOException(Exception):
-    """Raised on problems with loading sample sheets"""
+class GermlineTSVSheetException(TSVSheetException):
+    """Raised on problems with loading germline TSV sample sheets"""
 
 
-class TSVSheetException(SheetIOException):
-    """Raised on problems with loading the compact TSV sheets"""
+class GermlineTSVReader:
+    """Helper class for reading germline TSV file
 
-
-class CancerTSVSheetException(TSVSheetException):
-    """Raised on problems with loading cancer TSV sample sheets"""
-
-
-class CancerTSVReader:
-    """Helper class for reading cancer TSV file
-
-    Prefer using ``read_cancer_tsv_*()`` for shortcut
+    Prefer using ``read_germline_tsv_*()`` for shortcut
     """
 
     def __init__(self, f, fname=None):
@@ -120,13 +62,13 @@ class CancerTSVReader:
         """Read from file-like object ``self.f``, use file name in case of
         problems
 
-        :raises:CancerTSVSheetException in case of problems
+        :raises:GermlineTSVSheetException in case of problems
         """
         # Read lines from file and check for file not being empty
         lines = [l.strip() for l in self.f]
         if not lines:
-            raise CancerTSVSheetException(
-                'Problem loading cancer TSV sheet in file {}'.format(
+            raise GermlineTSVSheetException(
+                'Problem loading germline TSV sheet in file {}'.format(
                     self.fname))
         # Decide between the case with or without header
         if lines[0].startswith('['):
@@ -136,11 +78,11 @@ class CancerTSVReader:
             body = lines
         # Process header and then create a models.Sheet
         proc_header = self._process_header(header)
-        if not body or set(body[0].split('\t')) != set(CANCER_TSV_HEADER):
-            raise CancerTSVSheetException(
-                ('Empty or invalid data column names in cancer TSV sheet '
+        if not body or set(body[0].split('\t')) != set(GERMLINE_TSV_HEADER):
+            raise GermlineTSVSheetException(
+                ('Empty or invalid data column names in germline TSV sheet '
                  'file {}. Must be {{{}}} but is {{{}}}').format(
-                     self.fname, ', '.join(CANCER_TSV_HEADER),
+                     self.fname, ', '.join(GERMLINE_TSV_HEADER),
                      body[0].replace('\t', ', ')))
         return self._create_sheet_json(proc_header, body)
 
@@ -180,26 +122,26 @@ class CancerTSVReader:
             arr = line.split('\t')
             # Check number of entries in line
             if len(arr) != len(names):
-                raise CancerTSVSheetException(
+                raise GermlineTSVSheetException(
                     ('Invalid number of entries in line {} of data '
                      'section of {}').format(lineno + 2, self.fname))
             mapping = dict(zip(names, arr))
             # Check "isTumor" field, convert to bool
             if mapping['isTumor'] not in BOOL_VALUES.keys():
-                raise CancerTSVSheetException(
+                raise GermlineTSVSheetException(
                     ('Invalid boolean value {} in line {} of data '
                      'section of {}').format(
                          mapping['isTumor'], lineno + 2, self.fname))
             mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
             # Check "libraryType" field
             if mapping['libraryType'] not in LIBRARY_TYPES:
-                raise CancerTSVSheetException(
+                raise GermlineTSVSheetException(
                     'Invalid library type {}, must be in {{{}}}'.format(
                         mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
             # Check other fields for being non-empty
-            for key in CANCER_TSV_HEADER:
+            for key in GERMLINE_TSV_HEADER:
                 if mapping[key] == '':
-                    raise CancerTSVSheetException(
+                    raise GermlineTSVSheetException(
                         'Field {} empty in line {} of {}'.format(
                             key, lineno + 2, self.fname))
             records.append(mapping)
@@ -211,12 +153,12 @@ class CancerTSVReader:
         """Create a new models.Sheet object from TSV records"""
         furl = 'file://{}'.format(self.fname)
         resolver = ref_resolver.RefResolver(dict_class=OrderedDict)
-        extraDefs = resolver.resolve(furl, CANCER_EXTRA_INFO_DEFS)
+        extraDefs = resolver.resolve(furl, GERMLINE_EXTRA_INFO_DEFS)
         json_data = OrderedDict([
             ('identifier', furl),
-            ('title', header_dict.get(KEY_TITLE, DEFAULT_TITLE)),
+            ('title', header_dict.get(KEY_TITLE, GERMLINE_DEFAULT_TITLE)),
             ('description',
-             header_dict.get(KEY_DESCRIPTION, DEFAULT_DESCRIPTION)),
+             header_dict.get(KEY_DESCRIPTION, GERMLINE_DEFAULT_DESCRIPTION)),
             ('extraInfoDefs', extraDefs),
             ('bioEntities', OrderedDict()),
         ])
@@ -254,7 +196,7 @@ class CancerTSVReader:
         A test sample entry will be implicitely added.
         """
         if len(set(r['isTumor'] for r in records)) != 1:
-            raise CancerTSVSheetException(
+            raise GermlineTSVSheetException(
                 'Inconsistent "isTumor" flag for records')
         result = OrderedDict([
             ('pk', self.next_pk),
@@ -301,17 +243,17 @@ class CancerTSVReader:
         return result
 
 
-def read_cancer_tsv_sheet(f, fname=None):
-    """Read compact cancer TSV format from file-like object ``f``
+def read_germline_tsv_sheet(f, fname=None):
+    """Read compact germline TSV format from file-like object ``f``
 
     :return: models.Sheet
     """
-    return CancerTSVReader(f, fname).read_sheet()
+    return GermlineTSVReader(f, fname).read_sheet()
 
 
-def read_cancer_tsv_json_data(f, fname=None):
-    """Read compact cancer TSV format from file-like object ``f``
+def read_germline_tsv_json_data(f, fname=None):
+    """Read compact germline TSV format from file-like object ``f``
 
     :return: ``dict``
     """
-    return CancerTSVReader(f, fname).read_json_data()
+    return GermlineTSVReader(f, fname).read_json_data()

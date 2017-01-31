@@ -1,7 +1,7 @@
 {
     "id": "https://omics.cubi.bihealth.org/experiments/33",
-    "title": "Tumor/Normal Study Example",
-    "description": "Example biomedical sheet for standard rare disease study",
+    "title": "Germline Study Example",
+    "description": "Example biomedical sheet for standard germline study",
 
     "extraInfoDefs": {
         "bioEntity": {

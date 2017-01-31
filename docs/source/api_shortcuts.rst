@@ -34,11 +34,11 @@ biomedsheets.shortcuts.TestSampleShortcut
 .. autoclass:: biomedsheets.shortcuts.TestSampleShortcut
     :members:
 
--------------------------------------------
-biomedsheets.shortcuts.RareDiseaseCaseSheet
--------------------------------------------
+----------------------------------------
+biomedsheets.shortcuts.GermlineCaseSheet
+----------------------------------------
 
-.. autoclass:: biomedsheets.shortcuts.RareDiseaseCaseSheet
+.. autoclass:: biomedsheets.shortcuts.GermlineCaseSheet
     :members:
 
 --------------------------------------

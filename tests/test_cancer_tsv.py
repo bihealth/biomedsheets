@@ -2,12 +2,11 @@
 """Tests for loading the compressed cancer TSV file
 """
 
-import collections
 import io
 import json
-import os
-import pytest
 import textwrap
+
+import pytest
 
 from biomedsheets import io_tsv
 

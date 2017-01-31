@@ -66,6 +66,13 @@
                 "choices": [ "male", "female", "unknown" ]
             },
 
+            "isAffected": {
+                "docs": "Flag for marking individiual as (un-)affected",
+                "key": "isAffected",
+                "type": "enum",
+                "choices": [ "affected", "unaffected", "unknown" ]
+            },
+
             "__BioEntity and BioSample": null,
 
             "icd10Entry": {
