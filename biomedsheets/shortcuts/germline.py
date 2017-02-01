@@ -6,12 +6,14 @@ from collections import OrderedDict
 
 from .base import (
     EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA,
-    MissingDataEntity, ShortcutSampleSheet, TestSampleShortcut,
+    MissingDataEntity, ShortcutSampleSheet, BioSampleShortcut, TestSampleShortcut,
     NGSLibraryShortcut)
 from .generic import GenericBioEntity
 from ..union_find import UnionFind
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+
+# TODO: need selector or WGS/WES data somehow in case both are present.
 
 #: Key value for "extraction type" value
 KEY_EXTRACTION_TYPE = 'extractionType'
@@ -20,10 +22,10 @@ KEY_EXTRACTION_TYPE = 'extractionType'
 KEY_IS_AFFECTED = 'isAffected'
 
 #: Key value for the "father PK" value
-KEY_FATHER_PK = 'fatherPK'
+KEY_FATHER_PK = 'fatherPk'
 
 #: Key value for the "mother PK" value
-KEY_MOTHER_PK = 'motherPK'
+KEY_MOTHER_PK = 'motherPk'
 
 
 class Pedigree:
@@ -68,6 +70,12 @@ class Pedigree:
         self.name_to_donor = {d.name for d in self.donors}
         self.pk_to_donor = {d.pk for d in self.donors}
         self.secondary_id_to_donor = {d.secondary_id for d in self.donors}
+
+    def __repr__(self):
+        return 'Pedigree({})'.format(', '.join(map(str, [self.donors, self.index])))
+
+    def __str__(self):
+        return repr(self)
 
 
 class Cohort:
@@ -176,11 +184,13 @@ class CohortBuilder:
         union_find = UnionFind()
         for donor in self.donors:
             for parent_pk in (pk for pk in (donor.father_pk, donor.mother_pk) if pk):
-                union_find.union(donor.pk, parent_pk)
+                # String conversion is necessary because "fatherPk" and "motherPk" are given with
+                # type "str" in std_fields.json
+                union_find.union(str(donor.pk), parent_pk)
         # Partition the donors
         partition = OrderedDict()
         for donor in self.donors:
-            partition.setdefault(union_find[donor.pk], []).append(donor)
+            partition.setdefault(union_find[str(donor.pk)], []).append(donor)
         # Construct the pedigrees
         for ped_donors in partition.values():
             affecteds = [d for d in ped_donors if d.is_affected]
@@ -200,11 +210,23 @@ class GermlineDonor(GenericBioEntity):
         self._father = None
         # ``GermlineDonor`` object for mother, access via property, set in ``CohortBuilder``
         self._mother = None
+        #: The primary bio sample with DNA
+        self.dna_bio_sample = self._get_primary_dna_bio_sample()
+        #: The primary bio sample with RNA, if any
+        self.rna_bio_sample = self._get_primary_rna_bio_sample()
+        #: The primary DNA test sample
+        self.dna_test_sample = self._get_primary_dna_test_sample()
+        #: The primary RNA test sample, if any
+        self.rna_test_sample = self._get_primary_rna_test_sample()
+        #: The primary DNA NGS library for this sample
+        self.dna_ngs_library = self._get_primary_dna_ngs_library()
+        #: The primary RNA NGS library for this sample, if any
+        self.rna_ngs_library = self._get_primary_rna_ngs_library()
 
     @property
     def is_affected(self):
         """Return whether or not the donor is affected"""
-        return self.extra_infos[KEY_IS_AFFECTED]
+        return self.extra_infos[KEY_IS_AFFECTED] == "affected"
 
     @property
     def father_pk(self):
@@ -237,6 +259,95 @@ class GermlineDonor(GenericBioEntity):
         """Return whether is founder, i.e., has neither mother nor father"""
         return (not self.father_pk) and (not self.mother_pk)
 
+    def _get_primary_dna_bio_sample(self):
+        """Spider through ``self.bio_entity`` and return primary bio sample
+        """
+        sample = next(self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True), None)
+        if sample:
+            return BioSampleShortcut(self, sample, 'ngs_library')
+        else:
+            return None
+
+    def _get_primary_rna_bio_sample(self):
+        """Spider through ``self.bio_entity`` and return primary bio sample with RNA data, if any;
+        ``None`` otherwise
+        """
+        sample = next(self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True), None)
+        if sample:
+            return BioSampleShortcut(self, sample, 'ngs_library')
+        else:
+            return None
+
+    def _get_primary_dna_test_sample(self):
+        """Spider through ``self.bio_entity`` and return primary DNA test sample
+        """
+        if (self.dna_bio_sample and
+                self.dna_bio_sample.bio_sample.test_samples):
+            return TestSampleShortcut(self.dna_bio_sample, next(iter(
+                self.dna_bio_sample.bio_sample.test_samples.values())), 'ngs_library')
+        else:
+            return None
+
+
+    def _get_primary_rna_test_sample(self):
+        """Spider through ``self.bio_entity`` and return primary RNA testsample, if any;
+        ``None`` otherwise
+        """
+        if (self.rna_bio_sample and
+                self.rna_bio_sample.bio_sample.test_samples):
+            return TestSampleShortcut(self.rna_bio_sample, next(iter(
+                self.rna_bio_sample.bio_sample.test_samples.values())), 'ngs_library')
+        else:
+            return None
+
+    def _get_primary_dna_ngs_library(self):
+        """Get primary DNA NGS library from self.dna_test_sample
+        """
+        if (self.dna_test_sample and
+                self.dna_test_sample.test_sample.ngs_libraries):
+            return NGSLibraryShortcut(self.dna_test_sample, next(iter(
+                self.dna_test_sample.test_sample.ngs_libraries.values())))
+        else:
+            return None
+
+    def _get_primary_rna_ngs_library(self):
+        """Get primary RNA NGS library from self.rna_test_sample, if any
+        """
+        if (self.rna_test_sample and
+                self.rna_test_sample.test_sample.ngs_libraries):
+            return NGSLibraryShortcut(self.rna_test_sample, next(iter(
+                self.rna_test_sample.test_sample.ngs_libraries.values())))
+        else:
+            return None
+
+    def _iter_all_bio_samples(self, ext_type, allow_none):
+        """Yield all bio samples with a test sample of the given extraction type
+
+        Require yielding of at least one unless ``allow_none``
+        """
+        yielded_any = False
+        for bio_sample in self.bio_entity.bio_samples.values():
+            for test_sample in bio_sample.test_samples.values():
+                if KEY_EXTRACTION_TYPE not in test_sample.extra_infos:
+                    raise MissingDataEntity(
+                        'Could not find "{}" flag in TestSample {}'.format(
+                            KEY_EXTRACTION_TYPE, test_sample))
+                elif test_sample.extra_infos[KEY_EXTRACTION_TYPE] == ext_type:
+                    yielded_any = True
+                    yield bio_sample
+                    break  # each bio_sample only once
+        if not yielded_any and not allow_none:
+            raise MissingDataEntity(
+                ('Could not find a TestSample with {} == {} for BioEntity {}'.format(
+                    KEY_EXTRACTION_TYPE, ext_type, self.bio_entity)))
+
+    def __repr__(self):
+        return 'GermlineDonor({})'.format(', '.join(map(
+            str, [self.sheet, self.bio_entity])))
+
+    def __str__(self):
+        return repr(self)
+
 
 class GermlineCaseSheet(ShortcutSampleSheet):
     """Shortcut for "germline" view on bio-medical sample sheets"""
@@ -249,8 +360,21 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         self.donors = list(self._iter_donors())
         #: :py:class:`Cohort` object with the pedigrees and donors built from the sample sheet
         self.cohort = CohortBuilder(self.donors).run()
+        #: Mapping from DNA NGS library name to pedigree
+        self.index_ngs_library_to_pedigree = OrderedDict(
+            self._index_ngs_library_to_pedigree())
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
         for bio_entity in self.sheet.bio_entities.values():
             yield GermlineDonor(self, bio_entity)
+
+    def _index_ngs_library_to_pedigree(self):
+        """Build mapping from NGS library name to pedigree"""
+        for pedigree in self.cohort.pedigrees:
+            if not pedigree.index:
+                raise ValueError('Found pedigree without index! {}'.format(pedigree))
+            if not pedigree.index.dna_ngs_library:
+                raise ValueError('Pedigree index has no DNA library! {}/{}'.format(
+                    pedigree.index, pedigree))
+            yield pedigree.index.dna_ngs_library.name, pedigree

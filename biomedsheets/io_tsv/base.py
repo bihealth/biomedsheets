@@ -194,8 +194,7 @@ class BaseTSVReader:
             records_by_bio_entity[record[self.__class__.bio_entity_name_column]].append(record)
         for bio_entity_name, records in records_by_bio_entity.items():
             json_data['bioEntities'][bio_entity_name] = self._build_bio_entity_json(records)
-        self.postprocess_json_data(json_data)
-        return json_data
+        return self.postprocess_json_data(json_data)
 
     def postprocess_json_data(self, json_data):
         """Postprocess JSON data"""

@@ -115,7 +115,9 @@ class GermlineTSVReader(BaseTSVReader):
         """Postprocess JSON data"""
         # Build mapping from bio entity name to pk
         bio_entity_name_to_pk = {
-            name: bio_entity['pk'] for name, bio_entity in json_data['bioEntities'].items()}
+            name: bio_entity['pk']
+            for name, bio_entity in json_data['bioEntities'].items()
+        }
         # Update bio entities motherPk and fatherPk attributes
         for bio_entity in json_data['bioEntities'].values():
             if bio_entity['extraInfo'].get('fatherName'):
@@ -124,6 +126,7 @@ class GermlineTSVReader(BaseTSVReader):
             if bio_entity['extraInfo'].get('motherName'):
                 bio_entity['extraInfo']['motherPk'] = bio_entity_name_to_pk[
                     bio_entity['extraInfo']['motherName']]
+        return json_data
 
     def construct_bio_entity_dict(self, records):
         result = super().construct_bio_entity_dict(records)

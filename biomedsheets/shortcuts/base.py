@@ -27,6 +27,8 @@ Also note that none of the shortcut objects will reflect changes in the
 underlying schema data structure.
 """
 
+# TODO: merge with generic?
+
 from .. import models
 from .. import NAME_PATTERN
 
@@ -142,8 +144,55 @@ class BioEntityShortcut:
     pass
 
 
-class BioSampleShortcut:
-    pass
+class BioSampleShortcut(ShortcutMixin):
+    """When navigating with the ``biomedsheets.shortcuts`` through the
+    sheets, this is the type that you end up instead of raw ``TestSample``
+    objects
+
+    Objects of this class are pre-configured with a specific ``TestSample``
+    child type (e.g., NGS library or MSProteinPool) where the primary
+    active will be picked.
+    """
+
+    def __init__(self, bio_entity, bio_sample, selector):
+        #: Containing shortcut to ``BioEntity``
+        self.bio_entity = bio_entity
+        #: Raw ``BioEntity``
+        self.bio_sample = bio_sample
+        #: Wrapped for Shortcut Mixin
+        self.wrapped = bio_sample
+        # Check selector for being valid
+        if selector not in models.TEST_SAMPLE_CHILDREN:
+            raise InvalidSelector(
+                'Invalid test sample selector {}'.format(selector))
+        #: Selector for ``TestSample`` children
+        self.selector = selector
+        #: The selected ``TestSample`` with the selected ``TestSample`` child
+        self.test_sample = self._get_test_sample()
+        #: The selected ``TestSample`` child
+        self.assay_sample = self.test_sample.assay_sample
+
+    def _get_test_sample(self):
+        """Return appropriate ``TestSampleShortcut`` raise an exception"""
+        values = {
+            models.KEY_NGS_LIBRARY: lambda x: x.ngs_libraries.values(),
+            models.KEY_MS_PROTEIN_POOL: lambda x: x.ms_protein_pools.values(),
+        }
+        for test_sample in self.bio_sample.test_samples.values():
+            attr_lst = values.get(self.selector, lambda x: [])(test_sample)
+            for entity in attr_lst:
+                if not entity.disabled:
+                    return TestSampleShortcut(self, test_sample, self.selector)
+        raise MissingDataEntity(
+            'Could not find data entity for type {} in {}'.format(
+                self.selector, self.test_sample))
+
+    def __repr__(self):
+        return 'BioSampleShortcut({})'.format(', '.join(map(str, [
+            self.bio_sample, self.selector, self.test_sample, self.assay_sample])))
+
+    def __str__(self):
+        return repr(self)
 
 
 class TestSampleShortcut:
