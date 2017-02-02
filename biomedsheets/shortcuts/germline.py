@@ -360,9 +360,17 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         self.donors = list(self._iter_donors())
         #: :py:class:`Cohort` object with the pedigrees and donors built from the sample sheet
         self.cohort = CohortBuilder(self.donors).run()
-        #: Mapping from DNA NGS library name to pedigree
-        self.index_ngs_library_to_pedigree = OrderedDict(
-            self._index_ngs_library_to_pedigree())
+        #: Mapping from index DNA NGS library name to pedigree
+        self.index_ngs_library_to_pedigree = OrderedDict(self._index_ngs_library_to_pedigree())
+        #: Mapping from any DNA NGS library name in pedigree to pedigree
+        self.donor_ngs_library_to_pedigree = OrderedDict([
+            (donor.dna_ngs_library.name, pedigree)
+            for pedigree in self.cohort.pedigrees
+            for donor in pedigree.donors if donor.dna_ngs_library])
+        #: Mapping from DNA NGS library name to donor
+        self.index_ngs_library_to_donor = OrderedDict([
+            (donor.dna_ngs_library.name, donor)
+            for donor in self.donors if donor.dna_ngs_library])
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
