@@ -94,6 +94,13 @@ class GermlineTSVReader(BaseTSVReader):
 
     def check_tsv_line(self, mapping, lineno):
         """Cancer sample sheet--specific valiation"""
+        # Check for hyphen in patient or sample name
+        if '-' in mapping['patientName']:
+            raise GermlineTSVSheetException('Hyphen not allowed in patientName column')
+        if '-' in mapping['fatherName']:
+            raise GermlineTSVSheetException('Hyphen not allowed in fatherName column')
+        if '-' in mapping['motherName']:
+            raise GermlineTSVSheetException('Hyphen not allowed in motherName column')
         # Check "libraryType" field
         if mapping['libraryType'] and mapping['libraryType'] not in LIBRARY_TYPES:
             raise GermlineTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(

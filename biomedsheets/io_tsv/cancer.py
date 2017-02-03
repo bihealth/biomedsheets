@@ -61,6 +61,11 @@ class CancerTSVReader(BaseTSVReader):
 
     def check_tsv_line(self, mapping, lineno):
         """Cancer sample sheet--specific valiation"""
+        # Check for hyphen in patient or sample name
+        if '-' in mapping['patientName']:
+            raise CancerTSVSheetException('Hyphen not allowed in patientName column')
+        if '-' in mapping['sampleName']:
+            raise CancerTSVSheetException('Hyphen not allowed in sampleName column')
         # Check "isTumor" field, convert to bool
         if mapping['isTumor'] not in BOOL_VALUES.keys():
             raise CancerTSVSheetException(
