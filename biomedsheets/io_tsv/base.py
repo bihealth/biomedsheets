@@ -95,8 +95,7 @@ class BaseTSVReader:
         self.next_pk = 1
 
     def read_json_data(self):
-        """Read from file-like object ``self.f``, use file name in case of
-        problems
+        """Read from file-like object ``self.f``, use file name in case of problems
 
         :raises:GermlineTSVSheetException in case of problems
         """
@@ -198,6 +197,7 @@ class BaseTSVReader:
 
     def postprocess_json_data(self, json_data):
         """Postprocess JSON data"""
+        return json_data
 
     def _build_bio_entity_json(self, sub_records):
         """Build JSON for bio_entities entry"""
