@@ -97,9 +97,9 @@ class GermlineTSVReader(BaseTSVReader):
         # Check for hyphen in patient or sample name
         if '-' in mapping['patientName']:
             raise GermlineTSVSheetException('Hyphen not allowed in patientName column')
-        if '-' in mapping['fatherName']:
+        if mapping['fatherName'] and '-' in mapping['fatherName']:
             raise GermlineTSVSheetException('Hyphen not allowed in fatherName column')
-        if '-' in mapping['motherName']:
+        if mapping['motherName'] and '-' in mapping['motherName']:
             raise GermlineTSVSheetException('Hyphen not allowed in motherName column')
         # Check "libraryType" field
         if mapping['libraryType'] and mapping['libraryType'] not in LIBRARY_TYPES:
