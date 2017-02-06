@@ -60,6 +60,9 @@ SEX_VALUES = {
     'F': 'female',
     'U': 'unknown',
     'u': 'unknown',
+    '0': 'unknown',
+    '1': 'male',
+    '2': 'female',
     None: 'unknown,'
 }
 
@@ -71,6 +74,9 @@ AFFECTED_VALUES = {
     'n': 'unaffected',
     'U': 'unknown',
     'u': 'unknown',
+    '0': 'unknown',
+    '1': 'unaffected',
+    '2': 'affected',
     None: 'unknown,'
 }
 

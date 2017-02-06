@@ -63,9 +63,15 @@ class Pedigree:
 
     def update_shortcuts(self):
         """Update the shortcut members"""
-        self.affecteds = [d for d in self.donors if d.is_affected]
-        if self.index is None and self.affecteds:
-            self.index = self.affecteds[0]
+        if len(self.donors) == 1:
+            # For singletons, use the single individual as index regardless of affection state.  This allows the
+            # usage of cancer sample sheets in variant_calling.
+            self.affecteds = []
+            self.index = self.donors[0]
+        else:
+            self.affecteds = [d for d in self.donors if d.is_affected]
+            if self.index is None and self.affecteds:
+                self.index = self.affecteds[0]
         self.founders = [d for d in self.donors if d.is_founder]
         self.name_to_donor = {d.name for d in self.donors}
         self.pk_to_donor = {d.pk for d in self.donors}
@@ -226,7 +232,7 @@ class GermlineDonor(GenericBioEntity):
     @property
     def is_affected(self):
         """Return whether or not the donor is affected"""
-        return self.extra_infos[KEY_IS_AFFECTED] == "affected"
+        return self.extra_infos.get(KEY_IS_AFFECTED, 'unaffected') == 'affected'
 
     @property
     def father_pk(self):
