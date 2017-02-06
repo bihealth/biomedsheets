@@ -55,8 +55,8 @@ They are as follows:
 1. ``patientName`` -- name of the patient, used for identifying the patient in the sample sheet.
 2. ``fatherName`` -- name of the patient's father, dot (``.``) for founder
 3. ``mother`` -- name of the patient's mother, dot (``.``) for founder
-4. ``sex`` -- flag for sex, one of ``M``: male, ``F``: female, ``.``: unknown/missing
-5. ``affected`` -- flag for being affected, one of ``Y``: yes, ``N``: no, ``.``: unknown/missing
+4. ``sex`` -- flag for sex, one of ``M``: male, ``F``: female, ``.``: unknown/missing, or ``0``, ``1``, ``2``, as in PED
+5. ``affected`` -- flag for being affected, one of ``Y``: yes, ``N``: no, ``.``: unknown/missing, or ``0``, ``1``, ``2``, as in PED
 6. ``folderName`` -- a folder name to search the library's FASTQ files for, ``.`` if not sequenced
    A list of base folders to search for the folder names is given in the configuration, so no full path is given here.
 7. ``hpoTerms`` -- a comma-separated list of HPO terms

@@ -6,7 +6,7 @@ description     The [Data] section is similar to a PEDigree file
 
 [Data]
 patientName fatherName  motherName  sex affected  libraryType folderName  hpoTerms
-12-345      12-346      12-347      M   Y         WGS         12-345      HP:0009946,HP:0009899
-12-348      12-346      12-347      M   N         WGS         12-348      .
-12-346      .           .           M   N         .           .           .
-12-347      .           .           F   N         WGS         12-347      .
+12-345      12-346      12-347      1   2         WGS         12-345      HP:0009946,HP:0009899
+12-348      12-346      12-347      1   1         WGS         12-348      .
+12-346      .           .           1   1         .           .           .
+12-347      .           .           2   1         WGS         12-347      .
