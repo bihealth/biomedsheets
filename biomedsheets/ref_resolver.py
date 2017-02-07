@@ -11,7 +11,7 @@ from requests.exceptions import HTTPError
 import requests_file
 
 try:
-    import yaml
+    import ruamel.yaml as yaml
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -136,15 +136,6 @@ class RefResolver:
 
     def _load_json(self, response):
         if YAML_AVAILABLE:
-            # From http://stackoverflow.com/a/21912744/84349
-            class OrderedLoader(yaml.Loader):
-                pass
-            def construct_mapping(loader, node):
-                loader.flatten_mapping(node)
-                return self.dict_class(loader.construct_pairs(node))
-            OrderedLoader.add_constructor(
-                yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG,
-                construct_mapping)
-            return yaml.load(response.text, OrderedLoader)
+            return yaml.load_roundtrip(response.text)
         else:
             return response.json(object_pairs_hook=self.dict_class)
