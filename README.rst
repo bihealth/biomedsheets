@@ -2,15 +2,41 @@
 BioMed Sheets
 =============
 
-------
-Action
-------
+This project contains the documentation for the BioMedical sample sheets project.
+Further, it contains the implementation of a Python API for I/O and comfortable access to the sample sheets and some CLI tools.
+
+------------
+Installation
+------------
+
+It's best to start a new virtualenv
 
 ::
 
-    validate  -- validate schema JSON
-    expand    -- expand "$ref" entries in JSON
+    $ virtualenv -p python3 venv
+    $ source venv/bin/activate
+    $ pip install -r requirements_dev.txt
+    $ python setup.py develop
 
-    xlsx-sheet  -- fill sheet with XLSX data (XLSX+json -> json)
-    xlsx-create -- create XLSX file of sheet type
-    sheet-xlsx  -- create XLSX file from sheet
+Use ``python setup.py install`` if you want to copy the files instead of creating a link only.
+
+----------------------
+Building Documentation
+----------------------
+
+After installation (``requirements_dev.txt`` contains the appropriate Sphinx version)
+
+::
+
+    $ cd docs
+    $ make clean html
+
+Now, open ``docs/build/html/index.html``.
+
+-------------
+Running Tests
+-------------
+
+::
+
+    $ py.test
