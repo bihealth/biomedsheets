@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from .. import ref_resolver
 from .. import io
+from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -121,9 +122,10 @@ class BaseTSVReader:
                      body[0].replace('\t', ', ')))
         return self._create_sheet_json(proc_header, body)
 
-    def read_sheet(self):
+    def read_sheet(self, name_generator=None):
         """Read into JSON and construct ``models.Sheet``"""
-        return io.SheetBuilder(self.read_json_data()).run()
+        self.name_generator = name_generator or name_generator_for_scheme(NAMING_DEFAULT)
+        return io.SheetBuilder(self.read_json_data()).run(name_generator=name_generator)
 
     def _split_lines(self, lines):
         """Split string array lines into header and body"""

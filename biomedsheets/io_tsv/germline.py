@@ -8,6 +8,7 @@ from .base import (
     LIBRARY_TYPES, LIBRARY_TO_EXTRACTION, EXTRACTION_TYPES, KEY_TITLE, KEY_DESCRIPTION,
     BOOL_VALUES, DELIM, NCBI_TAXON_HUMAN,
     std_field, TSVSheetException, BaseTSVReader)
+from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -133,10 +134,10 @@ class GermlineTSVReader(BaseTSVReader):
         }
         # Update bio entities motherPk and fatherPk attributes
         for bio_entity in json_data['bioEntities'].values():
-            if bio_entity['extraInfo'].get('fatherName'):
+            if bio_entity['extraInfo'].get('fatherName', '0') != '0':  # marker for founder
                 bio_entity['extraInfo']['fatherPk'] = bio_entity_name_to_pk[
                     bio_entity['extraInfo']['fatherName']]
-            if bio_entity['extraInfo'].get('motherName'):
+            if bio_entity['extraInfo'].get('motherName', '0') != '0':  # marker for founder
                 bio_entity['extraInfo']['motherPk'] = bio_entity_name_to_pk[
                     bio_entity['extraInfo']['motherName']]
         return json_data
@@ -146,9 +147,9 @@ class GermlineTSVReader(BaseTSVReader):
         result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
         # Check fatherName and motherName entries and assign to result
         self._check_consistency(records, 'fatherName')
-        if records[0]['fatherName']:
+        if records[0].get('fatherName', '0') != '0':
             result['extraInfo']['fatherName'] = records[0]['fatherName']
-        if records[0]['motherName']:
+        if records[0].get('motherName', '0') != '0':
             result['extraInfo']['motherName'] = records[0]['motherName']
         # Check sex and isAffected entries and assign to result
         result['extraInfo']['sex'] = records[0]['sex']
@@ -165,12 +166,12 @@ class GermlineTSVReader(BaseTSVReader):
             raise ValueError('Inconsistent {} entries in records: {}'.format(key, values))
 
 
-def read_germline_tsv_sheet(f, fname=None):
+def read_germline_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):
     """Read compact germline TSV format from file-like object ``f``
 
     :return: models.Sheet
     """
-    return GermlineTSVReader(f, fname).read_sheet()
+    return GermlineTSVReader(f, fname).read_sheet(name_generator_for_scheme(naming_scheme))
 
 
 def read_germline_tsv_json_data(f, fname=None):

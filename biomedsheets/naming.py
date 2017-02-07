@@ -10,6 +10,18 @@ NAME_PATTERN_DEFAULT = "{full_secondary_id}-{pk}"
 #: Name pattern with secondary id only
 NAME_PATTERN_SECONDARY_ID = "{full_secondary_id}"
 
+#: Naming scheme "{secondary_id}-{pk}"
+NAMING_SECONDARY_ID_PK = 'secondary_id_pk'
+
+#: Naming scheme "{secondary_id}"
+NAMING_ONLY_SECONDARY_ID = 'only_secondary_id'
+
+#: Default naming scheme
+NAMING_DEFAULT = NAMING_SECONDARY_ID_PK
+
+#: Valid naming schemes
+NAMING_SCHEMES = (NAMING_SECONDARY_ID_PK, NAMING_ONLY_SECONDARY_ID)
+
 
 class NameGenerator:
     """Base class for name generators for BioMed Sheet entities"""
@@ -37,3 +49,14 @@ class PatternNameGenerator(NameGenerator):
 #: Default name generator is a :py:class:`PatternNameGenerator` with
 #: :py:data:`NAME_PATTERN_DEFAULT` as the value.
 DEFAULT_NAME_GENERATOR = PatternNameGenerator(NAME_PATTERN_DEFAULT)
+
+
+def name_generator_for_scheme(scheme):
+    """Return ``PatternNameGenerator`` for the given naming ``scheme``"""
+    if scheme not in NAMING_SCHEMES:
+        raise ValueError('No known naming scheme {}'.format(scheme))
+    mapping = {
+        NAMING_SECONDARY_ID_PK: PatternNameGenerator(NAME_PATTERN_DEFAULT),
+        NAMING_ONLY_SECONDARY_ID: PatternNameGenerator(NAME_PATTERN_SECONDARY_ID),
+    }
+    return mapping[scheme]
