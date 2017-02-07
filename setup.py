@@ -26,7 +26,7 @@ test_requirements = [
 ]
 
 setup(
-    name='biosheets',
+    name='biomedsheets',
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description=(
