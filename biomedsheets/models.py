@@ -4,7 +4,7 @@
 
 from collections import OrderedDict
 
-from . import NAME_PATTERN
+from .naming import DEFAULT_NAME_GENERATOR
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -121,27 +121,30 @@ class SheetEntry:
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, dict_type=OrderedDict):
+                 extra_infos=None, dict_type=OrderedDict,
+                 name_generator=DEFAULT_NAME_GENERATOR):
         #: Primary key of the bio entity, globally unique
         self.pk = pk
         #: Flag for explicit disabling of objects
         self.disabled = disabled
-        #: ``str`` with secondary id of the bio entity, unique in the sheet
+        #: ``str`` with secondary id fragment of the bio entity, unique in the sheet
         self.secondary_id = secondary_id
         #: Extra IDs
         self.extra_ids = list(extra_ids or [])
         #: Extra info, ``dict``-like object
         self.extra_infos = dict_type(extra_infos or [])
+        #: Name generator to use
+        self.name_generator = name_generator
 
     @property
-    def full_path(self):
+    def full_secondary_id(self):
         """Return full path from BioEntity to this entry"""
         raise NotImplementedError('Override me!')
 
     @property
     def name(self):
         """Abstract function for returning name"""
-        return NAME_PATTERN.format(secondary_id=self.full_path, pk=self.pk)
+        return self.name_generator(self)
 
     @property
     def enabled(self):
@@ -165,7 +168,7 @@ class BioEntity(SheetEntry, CrawlMixin):
         self.sub_entries = self.bio_samples
 
     @property
-    def full_path(self):
+    def full_secondary_id(self):
         return self.secondary_id
 
     def __repr__(self):
@@ -196,8 +199,8 @@ class BioSample(SheetEntry, CrawlMixin):
         self.sub_entries = self.test_samples
 
     @property
-    def full_path(self):
-        return '-'.join((self.bio_entity.full_path, self.secondary_id))
+    def full_secondary_id(self):
+        return '-'.join((self.bio_entity.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
         return 'BioSample({})'.format(', '.join(map(str, [
@@ -233,8 +236,8 @@ class TestSample(SheetEntry, CrawlMixin):
             self.ngs_libraries, self.ms_protein_pools)
 
     @property
-    def full_path(self):
-        return '-'.join((self.bio_sample.full_path, self.secondary_id))
+    def full_secondary_id(self):
+        return '-'.join((self.bio_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
         return 'TestSample({})'.format(', '.join(map(str, [
@@ -256,8 +259,8 @@ class NGSLibrary(SheetEntry):
         self.test_sample = test_sample
 
     @property
-    def full_path(self):
-        return '-'.join((self.test_sample.full_path, self.secondary_id))
+    def full_secondary_id(self):
+        return '-'.join((self.test_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
         return 'NGSLibrary({})'.format(', '.join(map(str, [
@@ -279,8 +282,8 @@ class MSProteinPool(SheetEntry):
         self.test_sample = test_sample
 
     @property
-    def full_path(self):
-        return '-'.join((self.test_sample.full_path, self.secondary_id))
+    def full_secondary_id(self):
+        return '-'.join((self.test_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
         return 'MSProteinPool({})'.format(', '.join(map(str, [
