@@ -134,12 +134,11 @@ class GermlineTSVReader(BaseTSVReader):
         }
         # Update bio entities motherPk and fatherPk attributes
         for bio_entity in json_data['bioEntities'].values():
-            if bio_entity['extraInfo'].get('fatherName', '0') != '0':  # marker for founder
-                bio_entity['extraInfo']['fatherPk'] = bio_entity_name_to_pk[
-                    bio_entity['extraInfo']['fatherName']]
-            if bio_entity['extraInfo'].get('motherName', '0') != '0':  # marker for founder
-                bio_entity['extraInfo']['motherPk'] = bio_entity_name_to_pk[
-                    bio_entity['extraInfo']['motherName']]
+            extra_info = bio_entity['extraInfo']
+            if extra_info.get('fatherName') and extra_info['fatherName'] != '0':
+                extra_info['fatherPk'] = bio_entity_name_to_pk[extra_info['fatherName']]
+            if extra_info.get('motherName') and extra_info['motherName'] != '0':
+                extra_info['motherPk'] = bio_entity_name_to_pk[extra_info['motherName']]
         return json_data
 
     def construct_bio_entity_dict(self, records):
@@ -147,16 +146,17 @@ class GermlineTSVReader(BaseTSVReader):
         result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
         # Check fatherName and motherName entries and assign to result
         self._check_consistency(records, 'fatherName')
-        if records[0].get('fatherName', '0') != '0':
-            result['extraInfo']['fatherName'] = records[0]['fatherName']
-        if records[0].get('motherName', '0') != '0':
-            result['extraInfo']['motherName'] = records[0]['motherName']
+        record = records[0]  # representative as it's consistent
+        if record.get('fatherName') and record['fatherName'] != '0':
+            result['extraInfo']['fatherName'] = record['fatherName']
+        if record.get('motherName') and record['motherName'] != '0':
+            result['extraInfo']['motherName'] = record['motherName']
         # Check sex and isAffected entries and assign to result
-        result['extraInfo']['sex'] = records[0]['sex']
-        result['extraInfo']['isAffected'] = records[0]['isAffected']
+        result['extraInfo']['sex'] = record['sex']
+        result['extraInfo']['isAffected'] = record['isAffected']
         # Check hpoTerms entries and assign to result
-        if records[0]['hpoTerms']:
-            result['extraInfo']['hpoTerms'] = records[0]['hpoTerms'].split(',')
+        if record['hpoTerms']:
+            result['extraInfo']['hpoTerms'] = record['hpoTerms'].split(',')
         return result
 
     @classmethod
