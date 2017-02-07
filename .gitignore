@@ -10,6 +10,7 @@ __pycache__
 coverage.xml
 .coverage
 htmlcov/
+dist/
 
 .vscode
 
