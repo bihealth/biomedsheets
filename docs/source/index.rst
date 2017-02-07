@@ -47,6 +47,7 @@ Open Questions
     :hidden:
 
     workflow_assumptions
+    entity_names
     schema_cancer
     schema_germline
 

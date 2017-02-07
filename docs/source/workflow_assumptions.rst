@@ -61,4 +61,4 @@ The following fields are required by all workflow steps that process HTS data.
 - TestSample
     - extractionType -- extracted sample, currently one of {``DNA``, ``RNA``, ``other``}
 - AssaySample
-    - libraryType -- library type, currently one of {``WES``, ``WGS``, ``Panel-seq``, ``mRNA-seq``, ``tRNA-seq``, ``other``}
+    - libraryType -- library type, currently one of {``WES``, ``WGS``, ``Panel_seq``, ``mRNA_seq``, ``total_RNA_seq``, ``other``}

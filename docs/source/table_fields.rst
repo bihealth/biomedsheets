@@ -13,7 +13,8 @@ Generally, the pk field is an integer primary key that is to be automaticaly gen
 The field secondary_id is an identifier assigned by the “data owner” (e.g., the collaboration partner).
 This identifier has to be unique within a given project but can be ambiguous globally.
 
-A possible best practice is to enforce the secondary_id to only consist of alphanumeric characters and underscores. Then, they should be constructed as:
+A possible best practice is to enforce the secondary_id to only consist of alphanumeric characters and underscores.
+Then, they should be constructed as (none of the ``<Field>`` values should contain a hyphen itself):
 
 ::
 
@@ -23,15 +24,15 @@ A possible best practice is to enforce the secondary_id to only consist of alpha
 
 Examples are:
 
-- BioEntity names: 2355, BIH-234
-- BioSample names:
+- BioEntity secondary ids: 2355, BIH-234
+- BioSample secondary ids:
     - 2355-B1 (first blood sample from patient 2355)
-    - BIH-234-N1 (first normal sample from patient BIH-234)
-    - BIH-234-T2 (second tumor sample from patient BIH-234)
-- TestSample names:
+    - BIH_234-N1 (first normal sample from patient BIH-234)
+    - BIH_234-T2 (second tumor sample from patient BIH-234)
+- TestSample secondary ids:
     - 2355-B1-DNA1 (first DNA extraction from first blood sample)
-    - BIH-234-T1-RNA1 (first RNA extraction from first tumor sample)
-    - BIH-234-T2-DNA2 (second DNA extraction from second tumor sample)
+    - BIH_234-T1-RNA1 (first RNA extraction from first tumor sample)
+    - BIH_234-T2-DNA2 (second DNA extraction from second tumor sample)
 
 Generally, the following are “core fields”.
 

@@ -17,10 +17,6 @@ The assumed setting is as follows.
 
     The requirement of one DNA HTS library for each sample and RNA only for tumor can be dropped in the future.
 
-.. note::
-
-    Allowing for other assays such as proteomics and metabolomics should be possible in the future.
-
 --------------------
 Matched Tumor Fields
 --------------------
