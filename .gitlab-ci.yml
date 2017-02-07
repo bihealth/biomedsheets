@@ -1,0 +1,14 @@
+image: python:3.4
+
+before_script:
+- apt-get update && apt-get install -y
+- pip3 install virtualenv
+- virtualenv venv
+- source venv/bin/activate
+- pip3 install --upgrade pip
+- pip3 install -r requirements_test.txt
+
+all_tests:
+  script:
+  - py.test --cov-report=term
+  when: on_success
