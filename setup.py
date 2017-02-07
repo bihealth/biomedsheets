@@ -7,6 +7,8 @@ from setuptools import setup
 import pip
 from pip.req import parse_requirements
 
+import versioneer
+
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
 with open('README.rst') as readme_file:
@@ -25,7 +27,8 @@ test_requirements = [
 
 setup(
     name='biosheets',
-    version='0.1.0',
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     description=(
         'Python 3 library for accessing and managing BioMedical sheets'),
     long_description=readme + '\n\n' + history,

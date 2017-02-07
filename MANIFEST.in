@@ -1,0 +1,2 @@
+include versioneer.py
+include biomedsheets/_version.py
