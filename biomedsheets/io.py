@@ -81,7 +81,8 @@ class SheetBuilder:
                 dict_type=dict_type,
                 name_generator=name_generator),
             json_data=self.json_data,
-            dict_type=dict_type)
+            dict_type=dict_type,
+            name_generator=name_generator)
 
     def _build_bio_entities(self, extra_infos_defs, bio_entities_json, dict_type, name_generator):
         """Build BioEntity list

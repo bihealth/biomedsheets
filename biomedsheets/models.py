@@ -104,6 +104,8 @@ class Sheet(CrawlMixin):
         self.bio_entities = dict_type(bio_entities or [])
         #: Create ``sub_entries`` shortcut for ``crawl()``
         self.sub_entries = self.bio_entities
+        #: Name generator used in the sheet
+        self.name_generator = name_generator
 
     def __repr__(self):
         return 'Sheet({})'.format(', '.join(map(str, [

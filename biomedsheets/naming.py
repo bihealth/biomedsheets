@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*
 """Helper code for name generation"""
 
+import re
+
+
 #: PK padding length
 DEFAULT_PK_PADDING_LENGTH = 6
 
@@ -22,6 +25,12 @@ NAMING_DEFAULT = NAMING_SECONDARY_ID_PK
 #: Valid naming schemes
 NAMING_SCHEMES = (NAMING_SECONDARY_ID_PK, NAMING_ONLY_SECONDARY_ID)
 
+#: Inverse mapping from name pattern to RE for going from name to secondary id and/or pk
+INVERSE_PATTERN_MAP = {
+    NAME_PATTERN_DEFAULT: r'^(?P<secondary_id>.*)-(?P<pk>[0-9]+)$',
+    NAME_PATTERN_SECONDARY_ID: r'^(?P<secondary_id>.*)$',
+}
+
 
 class NameGenerator:
     """Base class for name generators for BioMed Sheet entities"""
@@ -39,6 +48,19 @@ class PatternNameGenerator(NameGenerator):
         self.pattern = pattern
         #: The default padding length
         self.pk_padding_length = pk_padding_length
+        #: RE for mapping from name to secondary id or PK
+        if pattern not in INVERSE_PATTERN_MAP:
+            raise ValueError('Cannot map back from pattern {}'.format(pattern))
+        self.inverse_name_re = INVERSE_PATTERN_MAP[self.pattern]
+
+    def inverse(self, name, component='secondary_id'):
+        """Map from name to secondary_id/pk (given in ``component``)"""
+        assert component in ('secondary_id', 'pk')
+        match = re.match(self.inverse_name_re, name)
+        if not match:
+            raise ValueError('Could not match {}'.format(name))
+        return match.group(component)
+
 
     def __call__(self, obj):
         """Return generated name"""
