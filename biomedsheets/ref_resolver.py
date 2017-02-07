@@ -136,6 +136,6 @@ class RefResolver:
 
     def _load_json(self, response):
         if YAML_AVAILABLE:
-            return yaml.load_roundtrip(response.text)
+            return yaml.round_trip_load(response.text)
         else:
             return response.json(object_pairs_hook=self.dict_class)
