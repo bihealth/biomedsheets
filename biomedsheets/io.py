@@ -8,6 +8,7 @@ from collections import OrderedDict
 import json
 
 from . import models
+from .naming import DEFAULT_NAME_GENERATOR
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -69,20 +70,20 @@ class SheetBuilder:
         #: Validated BioMed Sheet data
         self.json_data = json_data
 
-    def run(self, dict_type=OrderedDict):
+    def run(self, dict_type=OrderedDict, name_generator=DEFAULT_NAME_GENERATOR):
         return models.Sheet(
             identifier=self.json_data.get('identifier', ''),
             title=self.json_data.get('title', ''),
             description=self.json_data.get('description', ''),
             bio_entities=self._build_bio_entities(
-                self.json_data.get('extraInfoDefs', dict_type()),
-                self.json_data.get('bioEntities', dict_type()),
-                dict_type),
+                extra_infos_defs=self.json_data.get('extraInfoDefs', dict_type()),
+                bio_entities_json=self.json_data.get('bioEntities', dict_type()),
+                dict_type=dict_type,
+                name_generator=name_generator),
             json_data=self.json_data,
             dict_type=dict_type)
 
-    def _build_bio_entities(self, extra_infos_defs, bio_entities_json,
-                            dict_type):
+    def _build_bio_entities(self, extra_infos_defs, bio_entities_json, dict_type, name_generator):
         """Build BioEntity list
         """
         for secondary_id, value in bio_entities_json.items():
@@ -93,22 +94,26 @@ class SheetBuilder:
                 extra_ids=value.get('extraIds', []),
                 extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_def=extra_infos_defs.get(
+                    extra_infos_defs=extra_infos_defs.get(
                         'bioEntity', dict_type()),
-                    dict_type=dict_type)),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
                 bio_samples=dict_type(self._build_bio_samples(
-                    extra_infos_defs, value.get(
-                        'bioSamples', dict_type()), dict_type)),
+                    extra_infos_defs=extra_infos_defs,
+                    bio_samples_json=value.get('bioSamples', dict_type()),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
                 dict_type=dict_type)
             yield (secondary_id, bio_entity)
 
-    def _build_extra_infos(self, extra_infos_def, extra_infos, dict_type):
+    @classmethod
+    def _build_extra_infos(cls, extra_infos_defs, extra_infos, dict_type, name_generator):
         """Interpret extraInfo stuff, including type conversion"""
         for key, value in extra_infos.items():
-            yield (key, ExtraInfoBuilder(extra_infos_def[key]).build(value))
+            yield (key, ExtraInfoBuilder(extra_infos_defs[key]).build(value))
 
     def _build_bio_samples(
-            self, extra_infos_defs, bio_samples_json, dict_type):
+            self, extra_infos_defs, bio_samples_json, dict_type, name_generator):
         """Build models.BioSample object, root JSON is required for attribute
         description
         """
@@ -120,17 +125,18 @@ class SheetBuilder:
                 extra_ids=value.get('extraIds', []),
                 extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_def=extra_infos_defs.get(
-                        'bioSample', dict_type()),
-                    dict_type=dict_type)),
+                    extra_infos_defs=extra_infos_defs.get('bioSample', dict_type()),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
                 test_samples=dict_type(self._build_test_samples(
                     extra_infos_defs, value.get('testSamples', dict_type()),
-                    dict_type)),
-                dict_type=dict_type)
+                    dict_type, name_generator)),
+                dict_type=dict_type,
+                name_generator=name_generator)
             yield (secondary_id, bio_sample)
 
     def _build_test_samples(
-            self, extra_infos_defs, test_samples_json, dict_type):
+            self, extra_infos_defs, test_samples_json, dict_type, name_generator):
         """Build models.TestSample object
         """
         for secondary_id, value in test_samples_json.items():
@@ -141,24 +147,27 @@ class SheetBuilder:
                 extra_ids=value.get('extraIds', []),
                 extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_def=extra_infos_defs.get(
+                    extra_infos_defs=extra_infos_defs.get(
                         'testSample', dict_type()),
-                    dict_type=dict_type)),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
                 ngs_libraries=dict_type(self._build_ngs_libraries(
                     extra_infos_defs=extra_infos_defs,
                     ngs_libraries_json=value.get(
                         'ngsLibraries', dict_type()),
-                    dict_type=dict_type)),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
                 ms_protein_pools=dict_type(self._build_ms_protein_pools(
                     extra_infos_defs=extra_infos_defs,
-                    ms_protein_pools_json=value.get(
-                        'msProteinPools', dict_type()),
-                    dict_type=dict_type)),
-                dict_type=dict_type)
+                    ms_protein_pools_json=value.get('msProteinPools', dict_type()),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
+                dict_type=dict_type,
+                name_generator=name_generator)
             yield (secondary_id, test_sample)
 
     def _build_ngs_libraries(
-            self, extra_infos_defs, ngs_libraries_json, dict_type):
+            self, extra_infos_defs, ngs_libraries_json, dict_type, name_generator):
         """Build models.NGSLibrary objects
         """
         for secondary_id, value in ngs_libraries_json.items():
@@ -169,14 +178,15 @@ class SheetBuilder:
                 extra_ids=value.get('extraIds', []),
                 extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_def=extra_infos_defs.get(
-                        'ngsLibrary', dict_type()),
-                    dict_type=dict_type)),
-                dict_type=dict_type)
+                    extra_infos_defs=extra_infos_defs.get('ngsLibrary', dict_type()),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
+                dict_type=dict_type,
+                name_generator=name_generator)
             yield (secondary_id, ngs_library)
 
     def _build_ms_protein_pools(
-            self, extra_infos_defs, ms_protein_pools_json, dict_type):
+            self, extra_infos_defs, ms_protein_pools_json, dict_type, name_generator):
         """Build models.MSProteinPool objects
         """
         for secondary_id, value in ms_protein_pools_json.items():
@@ -187,8 +197,9 @@ class SheetBuilder:
                 extra_ids=value.get('extraIds', []),
                 extra_infos=dict_type(self._build_extra_infos(
                     extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_def=extra_infos_defs.get(
-                        'msProteinPool', dict_type()),
-                    dict_type=dict_type)),
-                dict_type=dict_type)
+                    extra_infos_defs=extra_infos_defs.get('msProteinPool', dict_type()),
+                    dict_type=dict_type,
+                    name_generator=name_generator)),
+                dict_type=dict_type,
+                name_generator=name_generator)
             yield (secondary_id, ms_protein_pool)
