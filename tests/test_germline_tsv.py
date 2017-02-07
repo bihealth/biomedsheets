@@ -24,10 +24,10 @@ def tsv_sheet_germline_header():
 
     [Data]
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
-    12-345\t12-346\t12-347\tM\tY\tWGS\t12-345\tHP:0009946,HP:0009899
-    12-348\t12-346\t12-347\tM\tN\tWGS\t12-348\t.
-    12-346\t.\t.\tM\tN\t.\t.\t.
-    12-347\t.\t.\tF\tN\tWGS\t12-347\t.
+    12_345\t12_346\t12_347\tM\tY\tWGS\t12_345\tHP:0009946,HP:0009899
+    12_348\t12_346\t12_347\tM\tN\tWGS\t12_348\t.
+    12_346\t.\t.\tM\tN\t.\t.\t.
+    12_347\t.\t.\tF\tN\tWGS\t12_347\t.
     """.lstrip()))
     return f
 
@@ -37,10 +37,10 @@ def tsv_sheet_germline_no_header():
     """Tumor TSV sheet without header"""
     f = io.StringIO(textwrap.dedent("""
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
-    12-345\t12-346\t12-347\tM\tY\tWGS\t12-345\tHP:0009946,HP:0009899
-    12-348\t12-346\t12-347\tM\tN\tWGS\t12-348\t.
-    12-346\t.\t.\tM\tN\t.\t.\t.
-    12-347\t.\t.\tF\tN\tWGS\t12-347\t.
+    12_345\t12_346\t12_347\tM\tY\tWGS\t12_345\tHP:0009946,HP:0009899
+    12_348\t12_346\t12_347\tM\tN\tWGS\t12_348\t.
+    12_346\t.\t.\tM\tN\t.\t.\t.
+    12_347\t.\t.\tF\tN\tWGS\t12_347\t.
     """.lstrip()))
     return f
 
@@ -142,12 +142,12 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
         }
     },
     "bioEntities": {
-        "12-345": {
+        "12_345": {
             "pk": 1,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
-                "fatherName": "12-346",
-                "motherName": "12-347",
+                "fatherName": "12_346",
+                "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "affected",
                 "hpoTerms": [
@@ -171,7 +171,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 4,
                                     "extraInfo": {
-                                        "folderName": "12-345",
+                                        "folderName": "12_345",
                                         "libraryType": "WGS"
                                     }
                                 }
@@ -181,12 +181,12 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 }
             }
         },
-        "12-348": {
+        "12_348": {
             "pk": 5,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
-                "fatherName": "12-346",
-                "motherName": "12-347",
+                "fatherName": "12_346",
+                "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "unaffected",
                 "fatherPk": 9,
@@ -206,7 +206,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 8,
                                     "extraInfo": {
-                                        "folderName": "12-348",
+                                        "folderName": "12_348",
                                         "libraryType": "WGS"
                                     }
                                 }
@@ -216,7 +216,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 }
             }
         },
-        "12-346": {
+        "12_346": {
             "pk": 9,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
@@ -225,7 +225,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
             },
             "bioSamples": {}
         },
-        "12-347": {
+        "12_347": {
             "pk": 10,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
@@ -246,7 +246,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 13,
                                     "extraInfo": {
-                                        "folderName": "12-347",
+                                        "folderName": "12_347",
                                         "libraryType": "WGS"
                                     }
                                 }
@@ -356,12 +356,12 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
         }
     },
     "bioEntities": {
-        "12-345": {
+        "12_345": {
             "pk": 1,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
-                "fatherName": "12-346",
-                "motherName": "12-347",
+                "fatherName": "12_346",
+                "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "affected",
                 "hpoTerms": [
@@ -385,7 +385,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 4,
                                     "extraInfo": {
-                                        "folderName": "12-345",
+                                        "folderName": "12_345",
                                         "libraryType": "WGS"
                                     }
                                 }
@@ -395,12 +395,12 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 }
             }
         },
-        "12-348": {
+        "12_348": {
             "pk": 5,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
-                "fatherName": "12-346",
-                "motherName": "12-347",
+                "fatherName": "12_346",
+                "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "unaffected",
                 "fatherPk": 9,
@@ -420,7 +420,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 8,
                                     "extraInfo": {
-                                        "folderName": "12-348",
+                                        "folderName": "12_348",
                                         "libraryType": "WGS"
                                     }
                                 }
@@ -430,7 +430,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 }
             }
         },
-        "12-346": {
+        "12_346": {
             "pk": 9,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
@@ -439,7 +439,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
             },
             "bioSamples": {}
         },
-        "12-347": {
+        "12_347": {
             "pk": 10,
             "extraInfo": {
                 "ncbiTaxon": "NCBITaxon_9606",
@@ -460,7 +460,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 13,
                                     "extraInfo": {
-                                        "folderName": "12-347",
+                                        "folderName": "12_347",
                                         "libraryType": "WGS"
                                     }
                                 }
