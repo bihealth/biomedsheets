@@ -2,6 +2,12 @@
 BioMed Sheets
 =============
 
+.. image:: https://gitlab.bihealth.org/cubi/biomedsheets/badges/master/build.svg
+    :target: https://gitlab.bihealth.org/cubi/biomedsheets/commits/master
+
+.. image:: https://gitlab.bihealth.org/cubi/biomedsheets/badges/master/coverage.svg
+    :target: https://gitlab.bihealth.org/cubi/biomedsheets/commits/master
+
 This project contains the documentation for the BioMedical sample sheets project.
 Further, it contains the implementation of a Python API for I/O and comfortable access to the sample sheets and some CLI tools.
 

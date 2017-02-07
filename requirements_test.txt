@@ -1,0 +1,11 @@
+# Requirements for testing of biomedsheets
+
+# Base Requirements
+-r requirements.txt
+
+# Wonderful py.test library, style checker etc.
+pytest==3.0.6
+flake8==3.2.1
+pytest-flake8==0.8.1
+coverage==4.3.4
+pytest-cov==2.4.0
