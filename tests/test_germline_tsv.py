@@ -158,7 +158,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 2,
                     "extraInfo": {},
                     "testSamples": {
@@ -193,7 +193,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 6,
                     "extraInfo": {},
                     "testSamples": {
@@ -233,7 +233,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "isAffected": "unaffected"
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 11,
                     "extraInfo": {},
                     "testSamples": {
@@ -372,7 +372,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 2,
                     "extraInfo": {},
                     "testSamples": {
@@ -407,7 +407,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 6,
                     "extraInfo": {},
                     "testSamples": {
@@ -447,7 +447,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "isAffected": "unaffected"
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 11,
                     "extraInfo": {},
                     "testSamples": {
