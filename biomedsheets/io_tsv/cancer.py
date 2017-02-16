@@ -37,6 +37,7 @@ CANCER_EXTRA_INFO_DEFS = OrderedDict([
         std_field('extractionType'),
     ])),
     ('ngsLibrary', OrderedDict([
+        std_field('seqPlatform'),
         std_field('libraryType'),
         std_field('folderName'),
     ])),

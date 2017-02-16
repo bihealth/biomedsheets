@@ -67,3 +67,7 @@ They are as follows:
     This column can be left out.
 
 Note that the name of ``BioSample``, ``TestSample``, and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``.
+
+Optionally, the following fields can be added:
+
+- ``seqPlatform`` can be one of ``Illumina`` and ``PacBio``, default is ``Illumina``

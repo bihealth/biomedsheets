@@ -88,6 +88,16 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
             }
         },
         "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
             "libraryType": {
                 "docs": "Rough classificiation of the library type",
                 "key": "libraryType",
@@ -130,6 +140,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES1": {
                                     "pk": 4,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-N1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -153,6 +164,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES1": {
                                     "pk": 7,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -168,6 +180,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "mRNA_seq1": {
                                     "pk": 9,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-RNA1-mRNAseq1",
                                         "libraryType": "mRNA_seq"
                                     }
@@ -199,6 +212,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES1": {
                                     "pk": 13,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-N1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -222,6 +236,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES1": {
                                     "pk": 16,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -237,6 +252,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES2": {
                                     "pk": 18,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-RNA1-RNAseq1",
                                         "libraryType": "WES"
                                     }
@@ -260,6 +276,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "WES1": {
                                     "pk": 21,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T2-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -275,6 +292,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                 "mRNA_seq1": {
                                     "pk": 23,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T2-RNA1-mRNAseq1",
                                         "libraryType": "mRNA_seq"
                                     }
@@ -323,6 +341,16 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
             }
         },
         "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
             "libraryType": {
                 "docs": "Rough classificiation of the library type",
                 "key": "libraryType",
@@ -365,6 +393,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES1": {
                                     "pk": 4,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-N1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -388,6 +417,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES1": {
                                     "pk": 7,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -403,6 +433,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "mRNA_seq1": {
                                     "pk": 9,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-RNA1-mRNAseq1",
                                         "libraryType": "mRNA_seq"
                                     }
@@ -434,6 +465,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES1": {
                                     "pk": 13,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-N1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -457,6 +489,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES1": {
                                     "pk": 16,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -472,6 +505,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES2": {
                                     "pk": 18,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T1-RNA1-RNAseq1",
                                         "libraryType": "WES"
                                     }
@@ -495,6 +529,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "WES1": {
                                     "pk": 21,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T2-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
@@ -510,6 +545,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                 "mRNA_seq1": {
                                     "pk": 23,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "P001-T2-RNA1-mRNAseq1",
                                         "libraryType": "mRNA_seq"
                                     }

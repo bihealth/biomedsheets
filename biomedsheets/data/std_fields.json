@@ -146,6 +146,17 @@
                 ]
             },
 
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
+
             "libraryName": {
                 "docs": "Free-text key for specifying the library type",
                 "key": "libraryName",
