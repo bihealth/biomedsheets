@@ -72,6 +72,8 @@ class Pedigree:
             self.affecteds = [d for d in self.donors if d.is_affected]
             if self.index is None and self.affecteds:
                 self.index = self.affecteds[0]
+            else:  # fallback to first in list
+                self.index = self.donors[0]
         self.founders = [d for d in self.donors if d.is_founder]
         self.name_to_donor = {d.name for d in self.donors}
         self.pk_to_donor = {d.pk for d in self.donors}
