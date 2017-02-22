@@ -377,6 +377,8 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         self.index_ngs_library_to_donor = OrderedDict([
             (donor.dna_ngs_library.name, donor)
             for donor in self.donors if donor.dna_ngs_library])
+        #: Mapping from library name to object
+        self.library_name_to_library = OrderedDict(self._library_name_to_library())
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
@@ -392,3 +394,11 @@ class GermlineCaseSheet(ShortcutSampleSheet):
                 raise ValueError('Pedigree index has no DNA library! {}/{}'.format(
                     pedigree.index, pedigree))
             yield pedigree.index.dna_ngs_library.name, pedigree
+
+    def _library_name_to_library(self):
+        """Yield mapping from library name to library"""
+        for donor in self.donors:
+            for bio_sample in donor.bio_samples.values():
+                for test_sample in bio_sample.test_samples.values():
+                    for ngs_library in test_sample.ngs_libraries.values():
+                        yield ngs_library.name, ngs_library
