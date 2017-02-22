@@ -104,7 +104,8 @@ class SheetBuilder:
                     bio_samples_json=value.get('bioSamples', dict_type()),
                     dict_type=dict_type,
                     name_generator=name_generator)),
-                dict_type=dict_type)
+                dict_type=dict_type,
+                name_generator=name_generator)
             yield (secondary_id, bio_entity)
 
     @classmethod
