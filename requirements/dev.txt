@@ -1,10 +1,7 @@
 # Requirements for developing biomedsheets
 
-# Include base requirements
--r requirements.txt
-
 # Include test requirements
--r requirements_test.txt
+-r test.txt
 
 # Custom sphinx that allows for prettier embedding of multi-line string constants
 -e git+ssh://git@github.com/holtgrewe/sphinx.git@autodata/human-readable#egg=sphinx

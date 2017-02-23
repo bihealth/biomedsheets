@@ -1,7 +1,7 @@
 # Requirements for testing of biomedsheets
 
 # Base Requirements
--r requirements.txt
+-r base.txt
 
 # Wonderful py.test library, style checker etc.
 pytest==3.0.6

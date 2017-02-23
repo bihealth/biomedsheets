@@ -1,0 +1,16 @@
+# JSON schema and JSON path helpers
+jsonschema==2.5.1
+jsonpath-rw==1.4.0
+
+# YAML parsing
+ruamel.yaml==0.13.13
+
+# Kenneth Reitz' wonderful requests module
+requests==2.12.4
+requests-file==1.4.1
+
+# Dependencies of the packages from above
+typing==3.5.3.0
+decorator==4.0.11
+ply==3.10
+six==1.10.0
