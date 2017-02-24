@@ -34,13 +34,24 @@ def tsv_sheet_germline_header():
 
 @pytest.fixture
 def tsv_sheet_germline_no_header():
-    """Tumor TSV sheet without header"""
+    """Germline TSV sheet without header"""
     f = io.StringIO(textwrap.dedent("""
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
     12_345\t12_346\t12_347\tM\tY\tWGS\t12_345\tHP:0009946,HP:0009899
     12_348\t12_346\t12_347\tM\tN\tWGS\t12_348\t.
     12_346\t.\t.\tM\tN\t.\t.\t.
     12_347\t.\t.\tF\tN\tWGS\t12_347\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def tsv_sheet_germline_platform_name():
+    """Germline TSV sheet with seqPlatform name"""
+    f = io.StringIO(textwrap.dedent("""
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms\tseqPlatform
+    12_347\t.\t.\tF\tN\tWGS\t12_347\t.\tIllumina
+    12_347\t.\t.\tF\tN\tWGS\t12_347\t.\tPacBio
     """.lstrip()))
     return f
 
@@ -121,6 +132,16 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
             }
         },
         "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
             "libraryType": {
                 "docs": "Rough classificiation of the library type",
                 "key": "libraryType",
@@ -158,7 +179,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 2,
                     "extraInfo": {},
                     "testSamples": {
@@ -171,6 +192,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 4,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "12_345",
                                         "libraryType": "WGS"
                                     }
@@ -193,7 +215,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 6,
                     "extraInfo": {},
                     "testSamples": {
@@ -206,6 +228,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 8,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "12_348",
                                         "libraryType": "WGS"
                                     }
@@ -233,7 +256,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                 "isAffected": "unaffected"
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 11,
                     "extraInfo": {},
                     "testSamples": {
@@ -246,6 +269,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                                 "WGS1": {
                                     "pk": 13,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "12_347",
                                         "libraryType": "WGS"
                                     }
@@ -335,6 +359,16 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
             }
         },
         "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
             "libraryType": {
                 "docs": "Rough classificiation of the library type",
                 "key": "libraryType",
@@ -372,7 +406,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 2,
                     "extraInfo": {},
                     "testSamples": {
@@ -385,6 +419,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 4,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "12_345",
                                         "libraryType": "WGS"
                                     }
@@ -407,7 +442,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "motherPk": 10
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 6,
                     "extraInfo": {},
                     "testSamples": {
@@ -420,6 +455,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 8,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
                                         "folderName": "12_348",
                                         "libraryType": "WGS"
                                     }
@@ -447,7 +483,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                 "isAffected": "unaffected"
             },
             "bioSamples": {
-                "DNA1": {
+                "N1": {
                     "pk": 11,
                     "extraInfo": {},
                     "testSamples": {
@@ -460,6 +496,166 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                                 "WGS1": {
                                     "pk": 13,
                                     "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "12_347",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}""".lstrip()
+
+
+# Expected value when platform name is given
+EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME = r"""
+{
+    "identifier": "file://<unknown>",
+    "title": "Germline Sample Sheet",
+    "description": "Sample Sheet constructed from germline compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            },
+            "fatherPk": {
+                "docs": "Primary key of mother",
+                "key": "fatherPk",
+                "type": "string"
+            },
+            "motherPk": {
+                "docs": "Primary key of mother",
+                "key": "motherPk",
+                "type": "string"
+            },
+            "fatherName": {
+                "docs": "secondary_id of father, used for construction only",
+                "key": "fatherName",
+                "type": "string"
+            },
+            "motherName": {
+                "key": "motherName",
+                "docs": "secondary_id of mother, used for construction only",
+                "type": "string"
+            },
+            "sex": {
+                "docs": "Biological sex of individual",
+                "key": "sex",
+                "type": "enum",
+                "choices": [
+                    "male",
+                    "female",
+                    "unknown"
+                ]
+            },
+            "isAffected": {
+                "docs": "Flag for marking individiual as (un-)affected",
+                "key": "isAffected",
+                "type": "enum",
+                "choices": [
+                    "affected",
+                    "unaffected",
+                    "unknown"
+                ]
+            },
+            "hpoTerms": {
+                "docs": "HPO terms for individual",
+                "key": "hpoTerms",
+                "type": "array",
+                "entry": "string",
+                "pattern": "^HPO:[0-9]+$"
+            }
+        },
+        "bioSample": {},
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "12_347": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606",
+                "sex": "female",
+                "isAffected": "unaffected"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 2,
+                    "extraInfo": {},
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "12_347",
+                                        "libraryType": "WGS"
+                                    }
+                                }
+                            }
+                        },
+                        "DNA2": {
+                            "pk": 5,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WGS2": {
+                                    "pk": 6,
+                                    "extraInfo": {
+                                        "seqPlatform": "PacBio",
                                         "folderName": "12_347",
                                         "libraryType": "WGS"
                                     }
@@ -486,6 +682,12 @@ def test_read_germline_sheet_no_header(tsv_sheet_germline_no_header):
         sheet.json_data, indent='    ')
 
 
+def test_read_germline_sheet_platform_name(tsv_sheet_germline_platform_name):
+    sheet = io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_platform_name)
+    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(
+        sheet.json_data, indent='    ')
+
+
 def test_read_tumor_json_header(tsv_sheet_germline_header):
     sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_header)
     assert EXPECTED_GERMLINE_SHEET_JSON_HEADER == json.dumps(
@@ -495,4 +697,10 @@ def test_read_tumor_json_header(tsv_sheet_germline_header):
 def test_read_tumor_json_no_header(tsv_sheet_germline_no_header):
     sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_no_header)
     assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER == json.dumps(
+        sheet_struc, indent='    ')
+
+
+def test_read_tumor_json_platform_name(tsv_sheet_germline_platform_name):
+    sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_platform_name)
+    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(
         sheet_struc, indent='    ')

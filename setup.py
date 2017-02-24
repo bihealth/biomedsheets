@@ -3,7 +3,7 @@
 
 import os
 
-from setuptools import setup
+from setuptools import setup, find_packages
 import pip
 from pip.req import parse_requirements
 
@@ -35,9 +35,7 @@ setup(
     author='Manuel Holtgrewe',
     author_email='manuel.holtgrewe@bihealth.de',
     url='https://github.com/holtgrewe/biosheets',
-    packages=[
-        'biomedsheets',
-    ],
+    packages=find_packages(),
     package_dir={
         'biomedsheets': 'biomedsheets',
     },

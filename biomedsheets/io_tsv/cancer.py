@@ -10,6 +10,7 @@ from .base import (
     std_field, TSVSheetException, BaseTSVReader)
 from .. import io
 from .. import ref_resolver
+from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -36,6 +37,7 @@ CANCER_EXTRA_INFO_DEFS = OrderedDict([
         std_field('extractionType'),
     ])),
     ('ngsLibrary', OrderedDict([
+        std_field('seqPlatform'),
         std_field('libraryType'),
         std_field('folderName'),
     ])),
@@ -99,12 +101,12 @@ class CancerTSVReader(BaseTSVReader):
         return result
 
 
-def read_cancer_tsv_sheet(f, fname=None):
+def read_cancer_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):
     """Read compact cancer TSV format from file-like object ``f``
 
     :return: models.Sheet
     """
-    return CancerTSVReader(f, fname).read_sheet()
+    return CancerTSVReader(f, fname).read_sheet(name_generator_for_scheme(naming_scheme))
 
 
 def read_cancer_tsv_json_data(f, fname=None):

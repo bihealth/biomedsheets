@@ -7,7 +7,7 @@
 -r requirements_test.txt
 
 # Custom sphinx that allows for prettier embedding of multi-line string constants
--e git://github.com/holtgrewe/sphinx.git@autodata/human-readable#egg=sphinx
+-e git+ssh://git@github.com/holtgrewe/sphinx.git@autodata/human-readable#egg=sphinx
 
 # Prettier CLI for py.test
 pytest-sugar==0.8.0

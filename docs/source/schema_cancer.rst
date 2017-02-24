@@ -59,3 +59,7 @@ They are as follows:
    A list of base folders to search for the folder names is given in the configuration, so no full path is given here.
 
 Note that the name of the ``TestSample`` and and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``.
+
+Optionally, the following fields can be added:
+
+- ``seqPlatform`` can be one of ``Illumina`` and ``PacBio``, default is ``Illumina``

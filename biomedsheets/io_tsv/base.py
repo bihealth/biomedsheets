@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 from .. import ref_resolver
 from .. import io
+from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -42,6 +43,21 @@ KEY_TITLE = 'title'
 
 #: Key for the TSV header, field "description"
 KEY_DESCRIPTION = 'description'
+
+#: Platform "Illumina"
+PLATFORM_ILLUMINA = 'Illumina'
+
+#: Platform "PacBio"
+PLATFORM_PACBIO = 'PacBio'
+
+#: Platform "other"
+PLATFORM_OTHER = 'other'
+
+#: Platform default
+PLATFORM_DEFAULT = PLATFORM_ILLUMINA
+
+#: Known platforms
+PLATFORM_NAMES = (PLATFORM_ILLUMINA, PLATFORM_PACBIO, PLATFORM_OTHER)
 
 #: Constants for interpreting booleans
 BOOL_VALUES = {
@@ -113,17 +129,21 @@ class BaseTSVReader:
             body = lines
         # Process header and then create a models.Sheet
         proc_header = self._process_header(header)
-        if not body or set(body[0].split('\t')) != set(self.__class__.tsv_header):
+        header = body[0].split('\t')
+        common_columns = set(body[0].split('\t')) & set(self.__class__.tsv_header)
+        missing_columns = set(self.__class__.tsv_header) - set(body[0].split('\t'))
+        if not body or missing_columns:
             raise TSVSheetException(
                 ('Empty or invalid data column names in germline TSV sheet '
-                 'file {}. Must be {{{}}} but is {{{}}}').format(
+                 'file {}. Must be superset of {{{}}} but is missing {{{}}}').format(
                      self.fname, ', '.join(self.__class__.tsv_header),
-                     body[0].replace('\t', ', ')))
+                     ', '.join(missing_columns)))
         return self._create_sheet_json(proc_header, body)
 
-    def read_sheet(self):
+    def read_sheet(self, name_generator=None):
         """Read into JSON and construct ``models.Sheet``"""
-        return io.SheetBuilder(self.read_json_data()).run()
+        self.name_generator = name_generator or name_generator_for_scheme(NAMING_DEFAULT)
+        return io.SheetBuilder(self.read_json_data()).run(name_generator=name_generator)
 
     def _split_lines(self, lines):
         """Split string array lines into header and body"""
@@ -292,6 +312,7 @@ class BaseTSVReader:
         return OrderedDict([
             ('pk', self.next_pk - 1),
             ('extraInfo', OrderedDict([
+                ('seqPlatform', record.get('seqPlatform', PLATFORM_DEFAULT)),
                 ('folderName', record['folderName']),
                 ('libraryType', record['libraryType']),
             ])),
