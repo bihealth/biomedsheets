@@ -91,25 +91,41 @@ class Pedigree:
         return repr(self)
 
 
-def write_ped(pedigree, path):
+def _append_pedigree_to_ped(pedigree, f):
     family = 'FAM_' + pedigree.index.name
+    for donor in pedigree.donors:
+        affected = {
+            'affected': '2', 'unaffected': '1', 'unknown': '0'
+        }[donor.extra_infos['isAffected']]
+        sex = {'male': '1', 'female': '2', 'unknown': '0'}[
+            donor.extra_infos['sex']]
+        father = '0'
+        if donor.father_pk:
+            if hasattr(pedigree.pk_to_donor[donor.father_pk],
+                       'dna_ngs_library'):
+                father = pedigree.pk_to_donor[
+                    donor.father_pk].dna_ngs_library.name
+        mother = '0'
+        if donor.mother_pk:
+            if hasattr(pedigree.pk_to_donor[donor.mother_pk],
+                       'dna_ngs_library'):
+                mother = pedigree.pk_to_donor[
+                    donor.mother_pk].dna_ngs_library.name
+        if hasattr(donor, 'dna_ngs_library'):
+            print('\t'.join(
+                (family, donor.dna_ngs_library.name, father, mother,
+                 sex, affected)), file=f)
+
+
+def write_pedigree_to_ped(pedigree, path):
     with open(path, 'wt') as f:
-        for donor in pedigree.donors:
-            affected = {
-                'affected': '2', 'unaffected': '1', 'unknown': '0'
-            }[donor.extra_infos['isAffected']]
-            sex = {'male': '1', 'female': '2', 'unknown': '0'}[donor.extra_infos['sex']]
-            father = '0'
-            if donor.father_pk:
-                if hasattr(pedigree.pk_to_donor[donor.father_pk], 'dna_ngs_library'):
-                    father = pedigree.pk_to_donor[donor.father_pk].dna_ngs_library.name
-            mother = '0'
-            if donor.mother_pk:
-                if hasattr(pedigree.pk_to_donor[donor.mother_pk], 'dna_ngs_library'):
-                    mother = pedigree.pk_to_donor[donor.mother_pk].dna_ngs_library.name
-            if hasattr(donor, 'dna_ngs_library'):
-                print('\t'.join(
-                    (family, donor.dna_ngs_library.name, father, mother, sex, affected)), file=f)
+        _append_pedigree_to_ped(pedigree, f)
+
+
+def write_pedigrees_to_ped(pedigrees, path):
+    with open(path, 'wt') as f:
+        for pedigree in pedigrees:
+            _append_pedigree_to_ped(pedigree, f)
 
 
 class Cohort:

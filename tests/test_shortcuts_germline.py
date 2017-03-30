@@ -79,7 +79,7 @@ def test_pedigree(sheet_germline):
     assert [d.name for d in pedigree.affecteds] == ['index1-000001']
     assert [d.name for d in pedigree.founders] == ['father1-000005', 'mother1-000009']
     assert list(pedigree.name_to_donor) == ['index1-000001', 'father1-000005', 'mother1-000009']
-    assert list(pedigree.pk_to_donor) == [1, 5, 9]
+    assert list(pedigree.pk_to_donor) == ['1', '5', '9']
     assert list(pedigree.secondary_id_to_donor) == ['index1', 'father1', 'mother1']
 
 
