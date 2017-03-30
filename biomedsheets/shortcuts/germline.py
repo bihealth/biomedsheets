@@ -79,7 +79,7 @@ class Pedigree:
                 self.index = self.donors[0]
         self.founders = [d for d in self.donors if d.is_founder]
         self.name_to_donor = OrderedDict([(d.name, d) for d in self.donors])
-        self.pk_to_donor = OrderedDict([(d.pk, d) for d in self.donors])
+        self.pk_to_donor = OrderedDict([(str(d.pk), d) for d in self.donors])
         self.secondary_id_to_donor = OrderedDict([
             (d.secondary_id, d) for d in self.donors])
 
@@ -89,6 +89,27 @@ class Pedigree:
 
     def __str__(self):
         return repr(self)
+
+
+def write_ped(pedigree, path):
+    family = 'FAM_' + pedigree.index.name
+    with open(path, 'wt') as f:
+        for donor in pedigree.donors:
+            affected = {
+                'affected': '2', 'unaffected': '1', 'unknown': '0'
+            }[donor.extra_infos['isAffected']]
+            sex = {'male': '1', 'female': '2', 'unknown': '0'}[donor.extra_infos['sex']]
+            father = '0'
+            if donor.father_pk:
+                if hasattr(pedigree.pk_to_donor[donor.father_pk], 'dna_ngs_library'):
+                    father = pedigree.pk_to_donor[donor.father_pk].dna_ngs_library.name
+            mother = '0'
+            if donor.mother_pk:
+                if hasattr(pedigree.pk_to_donor[donor.mother_pk], 'dna_ngs_library'):
+                    mother = pedigree.pk_to_donor[donor.mother_pk].dna_ngs_library.name
+            if hasattr(donor, 'dna_ngs_library'):
+                print('\t'.join(
+                    (family, donor.dna_ngs_library.name, father, mother, sex, affected)), file=f)
 
 
 class Cohort:
