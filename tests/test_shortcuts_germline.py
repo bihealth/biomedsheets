@@ -60,6 +60,13 @@ def test_germline_case_sheet(sheet_germline):
 
 def test_germline_donor(sheet_germline):
     """Tests for the GermlineDonor objects"""
+    index1 = sheet_germline.cohort.indices[0]
+    assert index1.father_pk == '5'
+    assert index1.father
+    assert index1.father.name == 'father1-000005'
+    assert index1.mother_pk == '9'
+    assert index1.mother
+    assert index1.mother.name == 'mother1-000009'
 
 
 def test_pedigree(sheet_germline):

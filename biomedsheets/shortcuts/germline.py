@@ -170,14 +170,17 @@ class Cohort:
                 'secondary id')
 
     def _checked_update(self, dest, other, msg_token):
-        """Check overlap of keys between ``dest`` and ``other``, update and return dest
+        """Check overlap of keys between ``dest`` and ``other``, update and
+        return dest
 
         In case of error, use ``msg_token`` for exception message.
         """
         overlap = set(dest.keys()) & set(other.keys())
         if overlap:
-            tpl = 'Duplicate {}s when building cohort shortcuts: {}'  # pramga: no cover
-            raise ValueError(tpl.format(msg_token, list(sorted(overlap))))  # pramga: no cover
+            tpl = ('Duplicate {}s when building '
+                   'cohort shortcuts: {}')  # pramga: no cover
+            raise ValueError(  # pramga: no cover
+                tpl.format(msg_token, list(sorted(overlap))))
         dest.update(other)
         return dest
 
@@ -198,7 +201,14 @@ class CohortBuilder:
         """Return :py:class:`Cohort` object with :py:class:`Pedigree` sub
         structure
         """
-        return Cohort(self._yield_pedigrees())
+        cohort = Cohort(self._yield_pedigrees())
+        for pedigree in cohort.pedigrees:
+            for donor in pedigree.donors:
+                if donor.father_pk:
+                    donor._father = cohort.pk_to_donor[int(donor.father_pk)]
+                if donor.mother_pk:
+                    donor._mother = cohort.pk_to_donor[int(donor.mother_pk)]
+        return cohort
 
     def _yield_pedigrees(self):
         """Yield Pedigree objects built from self.donors"""
