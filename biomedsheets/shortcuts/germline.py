@@ -176,8 +176,8 @@ class Cohort:
         """
         overlap = set(dest.keys()) & set(other.keys())
         if overlap:
-            tpl = 'Duplicate {}s when building cohort shortcuts: {}'
-            raise ValueError(tpl.format(msg_token, list(sorted(overlap))))
+            tpl = 'Duplicate {}s when building cohort shortcuts: {}'  # pramga: no cover
+            raise ValueError(tpl.format(msg_token, list(sorted(overlap))))  # pramga: no cover
         dest.update(other)
         return dest
 

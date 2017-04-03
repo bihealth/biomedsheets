@@ -77,4 +77,27 @@ def test_pedigree(sheet_germline):
 
 
 def test_cohorts(sheet_germline):
-    """Tests for Cohort objects"""
+    """Tests for Cohort object"""
+    cohort = sheet_germline.cohort
+    assert len(cohort.pedigrees) == 2
+    assert set(d.name for d in cohort.indices) == {'index1-000001', 'index2-000013'}
+    assert set(d.name for d in cohort.affecteds) == {'index1-000001', 'index2-000013'}
+    assert set(cohort.name_to_pedigree) == {
+        'father1-000005',
+        'father2-000017',
+        'index1-000001',
+        'index2-000013',
+        'mother1-000009',
+        'mother2-000021'}
+    assert set(cohort.pk_to_pedigree) == {1, 17, 5, 21, 9, 13}
+    assert set(cohort.secondary_id_to_pedigree) == {'index1', 'father1', 'index2', 'mother1', 'father2', 'mother2'}
+    assert set(cohort.name_to_donor) == {
+        'father1-000005',
+        'father2-000017',
+        'index1-000001',
+        'index2-000013',
+        'mother1-000009',
+        'mother2-000021'}
+    assert set(cohort.secondary_id_to_donor) == {'index1', 'father1', 'mother2', 'index2', 'mother1', 'father2'}
+    assert cohort.member_count == 6
+    assert cohort.pedigree_count == 2
