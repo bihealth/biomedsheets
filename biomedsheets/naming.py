@@ -37,7 +37,7 @@ class NameGenerator:
 
     def __call__(self, obj):
         """Return generated name"""
-        raise NotImplementedError('Abstract method called!')
+        raise NotImplementedError('Abstract method called!')  # pragma: no cover
 
 
 class PatternNameGenerator(NameGenerator):
@@ -50,7 +50,7 @@ class PatternNameGenerator(NameGenerator):
         self.pk_padding_length = pk_padding_length
         #: RE for mapping from name to secondary id or PK
         if pattern not in INVERSE_PATTERN_MAP:
-            raise ValueError('Cannot map back from pattern {}'.format(pattern))
+            raise ValueError('Cannot map back from pattern {}'.format(pattern))  # pragma: no cover
         self.inverse_name_re = INVERSE_PATTERN_MAP[self.pattern]
 
     def inverse(self, name, component='secondary_id'):
@@ -75,7 +75,7 @@ DEFAULT_NAME_GENERATOR = PatternNameGenerator(NAME_PATTERN_DEFAULT)
 def name_generator_for_scheme(scheme):
     """Return ``PatternNameGenerator`` for the given naming ``scheme``"""
     if scheme not in NAMING_SCHEMES:
-        raise ValueError('No known naming scheme {}'.format(scheme))
+        raise ValueError('No known naming scheme {}'.format(scheme))  # pragma: no cover
     mapping = {
         NAMING_SECONDARY_ID_PK: PatternNameGenerator(NAME_PATTERN_DEFAULT),
         NAMING_ONLY_SECONDARY_ID: PatternNameGenerator(NAME_PATTERN_SECONDARY_ID),
