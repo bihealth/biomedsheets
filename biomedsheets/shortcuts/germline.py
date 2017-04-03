@@ -5,8 +5,8 @@
 from collections import OrderedDict
 
 from .base import (
-    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA,
-    MissingDataEntity, ShortcutSampleSheet, BioSampleShortcut, TestSampleShortcut,
+    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity,
+    ShortcutSampleSheet, BioSampleShortcut, TestSampleShortcut,
     NGSLibraryShortcut)
 from .generic import GenericBioEntity
 from ..union_find import UnionFind
@@ -33,15 +33,17 @@ class Pedigree:
 
     The individuals are represented by :py:class:`GermlineDonor` objects.
 
-    Note that the shortcut members are set upon creation.  When members are modified after the
-    construction, the ``update_shortcuts()`` method must be called.
+    Note that the shortcut members are set upon creation.  When members are
+    modified after the construction, the ``update_shortcuts()`` method must
+    be called.
     """
 
     def __init__(self, donors=None, index=None):
         #: Members of the pedigree
         self.donors = list(donors or [])
-        #: Index patient in the pedigree, there can only be one, even if there are multiple
-        #: affected individuals.  Usually, the first affected patient in a study is used
+        #: Index patient in the pedigree, there can only be one, even if
+        #: there are multiple affected individuals.  Usually, the first
+        #: affected patient in a study is used
         self.index = index
         #: All affected individuals
         self.affecteds = []
@@ -64,8 +66,9 @@ class Pedigree:
     def update_shortcuts(self):
         """Update the shortcut members"""
         if len(self.donors) == 1:
-            # For singletons, use the single individual as index regardless of affection state.
-            # This allows the usage of cancer sample sheets in variant_calling.
+            # For singletons, use the single individual as index regardless
+            # of affection state.  This allows the usage of cancer sample
+            # sheets in variant_calling.
             self.affecteds = []
             self.index = self.donors[0]
         else:
@@ -75,24 +78,28 @@ class Pedigree:
             else:  # fallback to first in list
                 self.index = self.donors[0]
         self.founders = [d for d in self.donors if d.is_founder]
-        self.name_to_donor = {d.name for d in self.donors}
-        self.pk_to_donor = {d.pk for d in self.donors}
-        self.secondary_id_to_donor = {d.secondary_id for d in self.donors}
+        self.name_to_donor = OrderedDict([(d.name, d) for d in self.donors])
+        self.pk_to_donor = OrderedDict([(d.pk, d) for d in self.donors])
+        self.secondary_id_to_donor = OrderedDict([
+            (d.secondary_id, d) for d in self.donors])
 
     def __repr__(self):
-        return 'Pedigree({})'.format(', '.join(map(str, [self.donors, self.index])))
+        return 'Pedigree({})'.format(', '.join(map(str, [
+            self.donors, self.index])))
 
     def __str__(self):
         return repr(self)
 
 
 class Cohort:
-    """Class for accessing information about a set of :py:class:`Pedigree`: objects.
+    """Class for accessing information about a set of :py:class:`Pedigree`:
+    objects.
 
     Pedigrees are assumed to not overlap.
 
-    Note that the shortcut members are set upon creation.  When pedigrees are modified after the
-    construction, the ``update_shortcuts()`` method must be called.
+    Note that the shortcut members are set upon creation.  When pedigrees are
+    modified after the construction, the ``update_shortcuts()`` method must
+    be called.
     """
 
     def __init__(self, pedigrees=None):
@@ -142,19 +149,24 @@ class Cohort:
         for pedigree in self.pedigrees:
             # Update {name,pk,secondary_id} to pedigree mapping
             self._checked_update(
-                self.name_to_pedigree, {d.name: pedigree for d in pedigree.donors}, 'name')
+                self.name_to_pedigree,
+                {d.name: pedigree for d in pedigree.donors}, 'name')
             self._checked_update(
-                self.pk_to_pedigree, {d.pk: pedigree for d in pedigree.donors}, 'pk')
+                self.pk_to_pedigree,
+                {d.pk: pedigree for d in pedigree.donors}, 'pk')
             self._checked_update(
-                self.secondary_id_to_pedigree, {d.secondary_id: pedigree for d in pedigree.donors},
+                self.secondary_id_to_pedigree,
+                {d.secondary_id: pedigree for d in pedigree.donors},
                 'secondary id')
             # Update {name,pk,secondary_id} to donor mapping
             self._checked_update(
-                self.name_to_donor, {d.name: d for d in pedigree.donors}, 'name')
+                self.name_to_donor,
+                {d.name: d for d in pedigree.donors}, 'name')
             self._checked_update(
                 self.pk_to_donor, {d.pk: d for d in pedigree.donors}, 'pk')
             self._checked_update(
-                self.secondary_id_to_donor, {d.secondary_id: d for d in pedigree.donors},
+                self.secondary_id_to_donor, {
+                    d.secondary_id: d for d in pedigree.donors},
                 'secondary id')
 
     def _checked_update(self, dest, other, msg_token):
@@ -164,8 +176,8 @@ class Cohort:
         """
         overlap = set(dest.keys()) & set(other.keys())
         if overlap:
-            raise ValueError('Duplicate {}s when building cohort shortcuts: {}'.format(
-                msg_token, list(sorted(overlap))))
+            tpl = 'Duplicate {}s when building cohort shortcuts: {}'
+            raise ValueError(tpl.format(msg_token, list(sorted(overlap))))
         dest.update(other)
         return dest
 
@@ -174,7 +186,8 @@ class CohortBuilder:
     """Helper class for building a :py:class:`Cohort` object from an iterable of
     :py:class:`GermlineDonor` objects
 
-    Also initialize the internal father and mother attributes of :py:class:`GermlineDonor`
+    Also initialize the internal father and mother attributes of
+    :py:class:`GermlineDonor`
     """
 
     def __init__(self, donors):
@@ -182,7 +195,8 @@ class CohortBuilder:
         self.donors = list(donors)
 
     def run(self):
-        """Return :py:class:`Cohort` object with :py:class:`Pedigree` sub structure
+        """Return :py:class:`Cohort` object with :py:class:`Pedigree` sub
+        structure
         """
         return Cohort(self._yield_pedigrees())
 
@@ -191,9 +205,10 @@ class CohortBuilder:
         # Use Union-Find data structure for gathering pedigree donors
         union_find = UnionFind()
         for donor in self.donors:
-            for parent_pk in (pk for pk in (donor.father_pk, donor.mother_pk) if pk):
-                # String conversion is necessary because "fatherPk" and "motherPk" are given with
-                # type "str" in std_fields.json
+            for parent_pk in (
+                    pk for pk in (donor.father_pk, donor.mother_pk) if pk):
+                # String conversion is necessary because "fatherPk" and
+                # "motherPk" are given with type "str" in std_fields.json
                 union_find.union(str(donor.pk), parent_pk)
         # Partition the donors
         partition = OrderedDict()
@@ -214,9 +229,11 @@ class GermlineDonor(GenericBioEntity):
 
     def __init__(self, shortcut_sheet, bio_entity):
         super().__init__(shortcut_sheet, bio_entity)
-        # ``GermlineDonor`` object for father, access via property, set in ``CohortBuilder``
+        # ``GermlineDonor`` object for father, access via property, set in
+        # ``CohortBuilder``
         self._father = None
-        # ``GermlineDonor`` object for mother, access via property, set in ``CohortBuilder``
+        # ``GermlineDonor`` object for mother, access via property, set in
+        # ``CohortBuilder``
         self._mother = None
         #: The primary bio sample with DNA
         self.dna_bio_sample = self._get_primary_dna_bio_sample()
@@ -234,7 +251,8 @@ class GermlineDonor(GenericBioEntity):
     @property
     def is_affected(self):
         """Return whether or not the donor is affected"""
-        return self.extra_infos.get(KEY_IS_AFFECTED, 'unaffected') == 'affected'
+        return self.extra_infos.get(
+            KEY_IS_AFFECTED, 'unaffected') == 'affected'
 
     @property
     def father_pk(self):
@@ -250,16 +268,18 @@ class GermlineDonor(GenericBioEntity):
     def father(self):
         """Return mother ``GermlineDonor`` object or ``None``"""
         if not self._father and self.father_pk:
-            raise AttributeError('Father object not yet set, although PK available.  '
-                                 'Not processed through CohortBuilder?')
+            raise AttributeError(
+                'Father object not yet set, although PK available.  '
+                'Not processed through CohortBuilder?')
         return self._father
 
     @property
     def mother(self):
         """Return mother ``GermlineDonor`` object or ``None``"""
         if not self._mother and self.mother_pk:
-            raise AttributeError('Mother object not yet set, although PK available.  '
-                                 'Not processed through CohortBuilder?')
+            raise AttributeError(
+                'Mother object not yet set, although PK available.  '
+                'Not processed through CohortBuilder?')
         return self._mother
 
     @property
@@ -270,17 +290,19 @@ class GermlineDonor(GenericBioEntity):
     def _get_primary_dna_bio_sample(self):
         """Spider through ``self.bio_entity`` and return primary bio sample
         """
-        sample = next(self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True), None)
+        sample = next(
+            self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True), None)
         if sample:
             return BioSampleShortcut(self, sample, 'ngs_library')
         else:
             return None
 
     def _get_primary_rna_bio_sample(self):
-        """Spider through ``self.bio_entity`` and return primary bio sample with RNA data, if any;
-        ``None`` otherwise
+        """Spider through ``self.bio_entity`` and return primary bio sample
+        with RNA data, if any; ``None`` otherwise
         """
-        sample = next(self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True), None)
+        sample = next(
+            self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True), None)
         if sample:
             return BioSampleShortcut(self, sample, 'ngs_library')
         else:
@@ -292,18 +314,20 @@ class GermlineDonor(GenericBioEntity):
         if (self.dna_bio_sample and
                 self.dna_bio_sample.bio_sample.test_samples):
             return TestSampleShortcut(self.dna_bio_sample, next(iter(
-                self.dna_bio_sample.bio_sample.test_samples.values())), 'ngs_library')
+                self.dna_bio_sample.bio_sample.test_samples.values())),
+                'ngs_library')
         else:
             return None
 
     def _get_primary_rna_test_sample(self):
-        """Spider through ``self.bio_entity`` and return primary RNA testsample, if any;
-        ``None`` otherwise
+        """Spider through ``self.bio_entity`` and return primary RNA
+        testsample, if any; ``None`` otherwise
         """
         if (self.rna_bio_sample and
                 self.rna_bio_sample.bio_sample.test_samples):
             return TestSampleShortcut(self.rna_bio_sample, next(iter(
-                self.rna_bio_sample.bio_sample.test_samples.values())), 'ngs_library')
+                self.rna_bio_sample.bio_sample.test_samples.values())),
+                'ngs_library')
         else:
             return None
 
@@ -328,7 +352,8 @@ class GermlineDonor(GenericBioEntity):
             return None
 
     def _iter_all_bio_samples(self, ext_type, allow_none):
-        """Yield all bio samples with a test sample of the given extraction type
+        """Yield all bio samples with a test sample of the given extraction
+        type
 
         Require yielding of at least one unless ``allow_none``
         """
@@ -344,9 +369,9 @@ class GermlineDonor(GenericBioEntity):
                     yield bio_sample
                     break  # each bio_sample only once
         if not yielded_any and not allow_none:
-            raise MissingDataEntity(
-                ('Could not find a TestSample with {} == {} for BioEntity {}'.format(
-                    KEY_EXTRACTION_TYPE, ext_type, self.bio_entity)))
+            msg = 'Could not find a TestSample with {} == {} for BioEntity {}'
+            raise MissingDataEntity(msg.format(
+                KEY_EXTRACTION_TYPE, ext_type, self.bio_entity))
 
     def __repr__(self):
         return 'GermlineDonor({})'.format(', '.join(map(
@@ -365,10 +390,12 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         super().__init__(sheet)
         #: List of donors in the sample sheet
         self.donors = list(self._iter_donors())
-        #: :py:class:`Cohort` object with the pedigrees and donors built from the sample sheet
+        #: :py:class:`Cohort` object with the pedigrees and donors built from
+        #: the sample sheet
         self.cohort = CohortBuilder(self.donors).run()
         #: Mapping from index DNA NGS library name to pedigree
-        self.index_ngs_library_to_pedigree = OrderedDict(self._index_ngs_library_to_pedigree())
+        self.index_ngs_library_to_pedigree = OrderedDict(
+            self._index_ngs_library_to_pedigree())
         #: Mapping from any DNA NGS library name in pedigree to pedigree
         self.donor_ngs_library_to_pedigree = OrderedDict([
             (donor.dna_ngs_library.name, pedigree)
@@ -379,7 +406,8 @@ class GermlineCaseSheet(ShortcutSampleSheet):
             (donor.dna_ngs_library.name, donor)
             for donor in self.donors if donor.dna_ngs_library])
         #: Mapping from library name to object
-        self.library_name_to_library = OrderedDict(self._library_name_to_library())
+        self.library_name_to_library = OrderedDict(
+            self._library_name_to_library())
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
@@ -390,10 +418,12 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         """Build mapping from NGS library name to pedigree"""
         for pedigree in self.cohort.pedigrees:
             if not pedigree.index:
-                raise ValueError('Found pedigree without index! {}'.format(pedigree))
+                raise ValueError(  # pragma: no cover
+                    'Found pedigree without index! {}'.format(pedigree))
             if not pedigree.index.dna_ngs_library:
-                raise ValueError('Pedigree index has no DNA library! {}/{}'.format(
-                    pedigree.index, pedigree))
+                raise ValueError(  # pragma: no cover
+                    'Pedigree index has no DNA library! {}/{}'.format(
+                        pedigree.index, pedigree))
             yield pedigree.index.dna_ngs_library.name, pedigree
 
     def _library_name_to_library(self):
