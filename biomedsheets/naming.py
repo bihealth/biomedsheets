@@ -61,7 +61,6 @@ class PatternNameGenerator(NameGenerator):
             raise ValueError('Could not match {}'.format(name))
         return match.group(component)
 
-
     def __call__(self, obj):
         """Return generated name"""
         padded_pk = str(obj.pk).rjust(self.pk_padding_length, '0')

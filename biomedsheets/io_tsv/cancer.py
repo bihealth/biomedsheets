@@ -5,11 +5,7 @@
 from collections import OrderedDict
 
 from .base import (
-    LIBRARY_TYPES, LIBRARY_TO_EXTRACTION, EXTRACTION_TYPES, KEY_TITLE, KEY_DESCRIPTION,
-    BOOL_VALUES, DELIM, NCBI_TAXON_HUMAN,
-    std_field, TSVSheetException, BaseTSVReader)
-from .. import io
-from .. import ref_resolver
+    LIBRARY_TYPES, BOOL_VALUES, NCBI_TAXON_HUMAN, std_field, TSVSheetException, BaseTSVReader)
 from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'

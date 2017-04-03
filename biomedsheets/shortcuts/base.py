@@ -329,5 +329,3 @@ class MSProteinPoolShortcut(TestSampleChildShortcut):
         super().__init__(test_sample, ms_protein_pool)
         #: Wrapped raw ``MSProteinPool``
         self.ms_protein_pool = ms_protein_pool
-
-

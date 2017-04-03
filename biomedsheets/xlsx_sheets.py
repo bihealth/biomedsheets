@@ -8,8 +8,6 @@ import re
 from openpyxl import Workbook, load_workbook
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from . import models
-
 
 class SetupColumnSizesMixin:
 
@@ -401,7 +399,7 @@ class SheetWriter(SheetIOBase, SetupColumnSizesMixin):
         for test_sample in bio_sample.test_samples.values():
             yield from self._test_sample_rows(
                 test_sample, base + cells)
-    
+
     def _test_sample_rows(self, test_sample, base):
         keys = self.extra_info_defs.get('testSample', {}).keys()
         cells = [test_sample.pk, test_sample.secondary_id]

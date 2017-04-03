@@ -130,7 +130,6 @@ class BaseTSVReader:
         # Process header and then create a models.Sheet
         proc_header = self._process_header(header)
         header = body[0].split('\t')
-        common_columns = set(body[0].split('\t')) & set(self.__class__.tsv_header)
         missing_columns = set(self.__class__.tsv_header) - set(body[0].split('\t'))
         if not body or missing_columns:
             raise TSVSheetException(

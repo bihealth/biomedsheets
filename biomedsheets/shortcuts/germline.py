@@ -64,8 +64,8 @@ class Pedigree:
     def update_shortcuts(self):
         """Update the shortcut members"""
         if len(self.donors) == 1:
-            # For singletons, use the single individual as index regardless of affection state.  This allows the
-            # usage of cancer sample sheets in variant_calling.
+            # For singletons, use the single individual as index regardless of affection state.
+            # This allows the usage of cancer sample sheets in variant_calling.
             self.affecteds = []
             self.index = self.donors[0]
         else:
@@ -295,7 +295,6 @@ class GermlineDonor(GenericBioEntity):
                 self.dna_bio_sample.bio_sample.test_samples.values())), 'ngs_library')
         else:
             return None
-
 
     def _get_primary_rna_test_sample(self):
         """Spider through ``self.bio_entity`` and return primary RNA testsample, if any;

@@ -132,5 +132,3 @@ class GenericBioEntity(ShortcutMixin):
         """
         for name, bio_sample in self.bio_entity.bio_samples.items():
             yield name, self.__class__.bio_sample_class(self, bio_sample)
-
-
