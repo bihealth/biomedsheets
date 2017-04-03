@@ -6,6 +6,12 @@ BioMed Sheets Changelog
 develop
 -------
 
+- Fixing shortcuts to father/mother during cohort loading
+- Cleanup code (according to Flake 8)
+- Adding more tests, replacing examples by TSV files
+- Removing protein pools
+- Adding Sphinx-based ocumentation
+- Restructuring requirements txt files
 - Configurable entity name generation.
   This allows to use secondary id only for naming, e.g.
 - Fixing ``requirements*.txt`` files for always using SSH
