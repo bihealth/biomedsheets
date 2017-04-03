@@ -12,7 +12,4 @@ TODO Items
 - Perform BioMed validation in addition to JSON-schema validation
 - Cache ExtraInfoBuilder instances
 - Add hidden columns with primary key for reidentification of records
-- Spider for any NGS libraries and MS protein pools in XLSX header generation
-- xlsx_sheets.SheetWriter._setup_validation() does nothing
-- proper mapping to XLSX values in SheetWriter (number vs string vs. list)
 - more validation when loading compact TSV files (cross-record)
