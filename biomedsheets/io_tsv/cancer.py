@@ -61,24 +61,26 @@ class CancerTSVReader(BaseTSVReader):
         """Cancer sample sheet--specific valiation"""
         # Check for hyphen in patient or sample name
         if '-' in mapping['patientName']:
-            raise CancerTSVSheetException('Hyphen not allowed in patientName column')
+            raise CancerTSVSheetException(
+                'Hyphen not allowed in patientName column')  # pragma: no cover
         if '-' in mapping['sampleName']:
-            raise CancerTSVSheetException('Hyphen not allowed in sampleName column')
+            raise CancerTSVSheetException(
+                'Hyphen not allowed in sampleName column')  # pragma: no cover
         # Check "isTumor" field, convert to bool
         if mapping['isTumor'] not in BOOL_VALUES.keys():
             raise CancerTSVSheetException(
                 'Invalid boolean value {} in line {} of data section of {}'.format(
-                    mapping['isTumor'], lineno + 2, self.fname))
+                    mapping['isTumor'], lineno + 2, self.fname))  # pragma: no cover
         mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
         # Check "libraryType" field
         if mapping['libraryType'] not in LIBRARY_TYPES:
             raise CancerTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
-                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
+                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))  # pragma: no cover
         # Check other fields for being non-empty
         for key in self.__class__.tsv_header:
             if mapping[key] is None:
                 raise CancerTSVSheetException('Field {} empty in line {} of {}'.format(
-                    key, lineno + 2, self.fname))
+                    key, lineno + 2, self.fname))  # pragma: no cover
         # TODO: we should perform more validation here in the future
 
     def construct_bio_entity_dict(self, records):
@@ -89,7 +91,7 @@ class CancerTSVReader(BaseTSVReader):
     def check_bio_sample_records(self, records):
         if len(set(r['isTumor'] for r in records)) != 1:
             raise TSVSheetException(
-                'Inconsistent "isTumor" flag for records')
+                'Inconsistent "isTumor" flag for records')  # pragma: no cover
 
     def construct_bio_sample_dict(self, records):
         result = super().construct_bio_sample_dict(records)

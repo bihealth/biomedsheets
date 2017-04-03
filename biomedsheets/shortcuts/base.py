@@ -138,8 +138,7 @@ class BioSampleShortcut(ShortcutMixin):
     objects
 
     Objects of this class are pre-configured with a specific ``TestSample``
-    child type (e.g., NGS library or MSProteinPool) where the primary
-    active will be picked.
+    child type (e.g., NGS library) where the primary active will be picked.
     """
 
     def __init__(self, bio_entity, bio_sample, selector):
@@ -164,7 +163,6 @@ class BioSampleShortcut(ShortcutMixin):
         """Return appropriate ``TestSampleShortcut`` raise an exception"""
         values = {
             models.KEY_NGS_LIBRARY: lambda x: x.ngs_libraries.values(),
-            models.KEY_MS_PROTEIN_POOL: lambda x: x.ms_protein_pools.values(),
         }
         for test_sample in self.bio_sample.test_samples.values():
             attr_lst = values.get(self.selector, lambda x: [])(test_sample)
@@ -189,8 +187,7 @@ class TestSampleShortcut:
     objects
 
     Objects of this class are pre-configured with a specific ``TestSample``
-    child type (e.g., NGS library or MSProteinPool) where the primary
-    active will be picked.
+    child type (e.g., NGS library) where the primary active one will be picked.
     """
 
     def __init__(self, bio_sample, test_sample, selector):
@@ -242,11 +239,9 @@ class TestSampleShortcut:
         """Return ``TestSample`` child or raise an exception"""
         values = {
             models.KEY_NGS_LIBRARY: lambda x: x.ngs_libraries.values(),
-            models.KEY_MS_PROTEIN_POOL: lambda x: x.ms_protein_pools.values(),
         }
         constructors = {
             models.KEY_NGS_LIBRARY: NGSLibraryShortcut,
-            models.KEY_MS_PROTEIN_POOL: MSProteinPoolShortcut,
         }
         attr_lst = values.get(self.selector, lambda x: [])(self.test_sample)
         for entity in attr_lst:
@@ -319,13 +314,3 @@ class NGSLibraryShortcut(TestSampleChildShortcut):
         super().__init__(test_sample, ngs_library)
         #: Wrapped raw ``NGSLibrary``
         self.ngs_library = ngs_library
-
-
-class MSProteinPoolShortcut(TestSampleChildShortcut):
-    """Shortcut to MSProteinPool
-    """
-
-    def __init__(self, test_sample, ms_protein_pool):
-        super().__init__(test_sample, ms_protein_pool)
-        #: Wrapped raw ``MSProteinPool``
-        self.ms_protein_pool = ms_protein_pool

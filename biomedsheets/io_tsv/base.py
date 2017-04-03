@@ -120,7 +120,7 @@ class BaseTSVReader:
         if not lines:
             raise TSVSheetException(
                 'Problem loading germline TSV sheet in file {}'.format(
-                    self.fname))
+                    self.fname))  # pragma: no cover
         # Decide between the case with or without header
         if lines[0].startswith('['):
             header, body = self._split_lines(lines)
@@ -136,7 +136,7 @@ class BaseTSVReader:
                 ('Empty or invalid data column names in germline TSV sheet '
                  'file {}. Must be superset of {{{}}} but is missing {{{}}}').format(
                      self.fname, ', '.join(self.__class__.tsv_header),
-                     ', '.join(missing_columns)))
+                     ', '.join(missing_columns)))  # pragma: no cover
         return self._create_sheet_json(proc_header, body)
 
     def read_sheet(self, name_generator=None):
@@ -180,7 +180,7 @@ class BaseTSVReader:
             if len(arr) != len(names):
                 raise TSVSheetException(
                     'Invalid number of entries in line {} of data section of {}: {} vs {}'.format(
-                        lineno + 2, self.fname, arr, names))
+                        lineno + 2, self.fname, arr, names))  # pragma: no cover
             mapping = dict(zip(names, arr))
             self.check_tsv_line(mapping, lineno)
             records.append(mapping)
@@ -192,7 +192,7 @@ class BaseTSVReader:
 
         Override in sub classes
         """
-        raise NotImplementedError('Implement me!')
+        raise NotImplementedError('Override in sub class')  # pragma: no cover
 
     def _create_sheet_json_from_records(self, header_dict, records):
         """Create a new models.Sheet object from TSV records"""

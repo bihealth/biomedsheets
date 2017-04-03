@@ -102,11 +102,14 @@ class GermlineTSVReader(BaseTSVReader):
         """Cancer sample sheet--specific valiation"""
         # Check for hyphen in patient or sample name
         if '-' in mapping['patientName']:
-            raise GermlineTSVSheetException('Hyphen not allowed in patientName column')
+            raise GermlineTSVSheetException(
+                'Hyphen not allowed in patientName column')  # pragma: no cover
         if mapping['fatherName'] and '-' in mapping['fatherName']:
-            raise GermlineTSVSheetException('Hyphen not allowed in fatherName column')
+            raise GermlineTSVSheetException(
+                'Hyphen not allowed in fatherName column')  # pragma: no cover
         if mapping['motherName'] and '-' in mapping['motherName']:
-            raise GermlineTSVSheetException('Hyphen not allowed in motherName column')
+            raise GermlineTSVSheetException(
+                'Hyphen not allowed in motherName column')  # pragma: no cover
         # Check "libraryType" field
         if mapping['libraryType'] and mapping['libraryType'] not in LIBRARY_TYPES:
             raise GermlineTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
@@ -115,13 +118,13 @@ class GermlineTSVReader(BaseTSVReader):
         if mapping['sex'] not in SEX_VALUES.keys():
             raise GermlineTSVSheetException(
                 'Invalid "sex" value {} in line {} of data section of {}'.format(
-                    mapping['sex'], lineno + 2, self.fname))
+                    mapping['sex'], lineno + 2, self.fname))  # pragma: no cover
         mapping['sex'] = SEX_VALUES[mapping['sex']]
         # Check "affected"
         if mapping['isAffected'] not in AFFECTED_VALUES.keys():
             raise GermlineTSVSheetException(
                 'Invalid "isAffected" value {} in line {} of data section of {}'.format(
-                    mapping['isAffected'], lineno + 2, self.fname))
+                    mapping['isAffected'], lineno + 2, self.fname))  # pragma: no cover
         mapping['isAffected'] = AFFECTED_VALUES[mapping['isAffected']]
 
     def postprocess_json_data(self, json_data):
@@ -162,7 +165,8 @@ class GermlineTSVReader(BaseTSVReader):
     def _check_consistency(cls, records, key):
         values = list(sorted(set(r[key] for r in records)))
         if len(values) > 1:
-            raise ValueError('Inconsistent {} entries in records: {}'.format(key, values))
+            raise ValueError(
+                'Inconsistent {} entries in records: {}'.format(key, values))  # pragma: no cover
 
 
 def read_germline_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):

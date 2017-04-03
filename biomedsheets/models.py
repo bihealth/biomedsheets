@@ -15,12 +15,9 @@ KEY_DISABLED = 'disabled'
 
 #: Key for selecting an ``NGSLibrary`` object
 KEY_NGS_LIBRARY = 'ngs_library'
-#: Key for selecting an ``MSProteinPool`` object
-KEY_MS_PROTEIN_POOL = 'ms_protein_pool'
 
 #: Frozen set of valid ``TestSample`` child types
-TEST_SAMPLE_CHILDREN = frozenset((
-    KEY_NGS_LIBRARY, KEY_MS_PROTEIN_POOL))
+TEST_SAMPLE_CHILDREN = frozenset((KEY_NGS_LIBRARY,))
 
 
 class BioMedSheetsBaseException(Exception):
@@ -222,8 +219,8 @@ class TestSample(SheetEntry, CrawlMixin):
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, ngs_libraries=None, ms_protein_pools=None,
-                 dict_type=OrderedDict, bio_sample=None, name_generator=DEFAULT_NAME_GENERATOR):
+                 extra_infos=None, ngs_libraries=None, dict_type=OrderedDict, bio_sample=None,
+                 name_generator=DEFAULT_NAME_GENERATOR):
         super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
                          name_generator)
         #: Containing BioSample
@@ -233,14 +230,8 @@ class TestSample(SheetEntry, CrawlMixin):
         # Assign owner pointer in NGS libraries to self
         for ngs_library in self.ngs_libraries.values():
             ngs_library.test_sample = self
-        #: List of ``MSProteinPools`` objects described for the ``TestSample``
-        self.ms_protein_pools = dict_type(ms_protein_pools)
-        # Assign owner pointer in MS protein pools to self
-        for ms_protein_pool in self.ms_protein_pools.values():
-            ms_protein_pool.test_sample = self
         # ``sub_entries`` shortcut, check for duplicates
-        self.sub_entries = self._merge_sub_entries(
-            self.ngs_libraries, self.ms_protein_pools)
+        self.sub_entries = self._merge_sub_entries(self.ngs_libraries)
 
     @property
     def full_secondary_id(self):
@@ -249,7 +240,7 @@ class TestSample(SheetEntry, CrawlMixin):
     def __repr__(self):
         return 'TestSample({})'.format(', '.join(map(str, [
             self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos, self.ngs_libraries, self.ms_protein_pools])))
+            self.extra_infos, self.ngs_libraries])))
 
     def __str__(self):
         return repr(self)
@@ -273,30 +264,6 @@ class NGSLibrary(SheetEntry):
 
     def __repr__(self):
         return 'NGSLibrary({})'.format(', '.join(map(str, [
-            self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos])))
-
-    def __str__(self):
-        return repr(self)
-
-
-class MSProteinPool(SheetEntry):
-    """Represent one Mass-spec protein pool
-    """
-
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None, extra_infos=None,
-                 dict_type=OrderedDict, test_sample=None, name_generator=DEFAULT_NAME_GENERATOR):
-        super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator)
-        #: Owning TestSample
-        self.test_sample = test_sample
-
-    @property
-    def full_secondary_id(self):
-        return '-'.join((self.test_sample.full_secondary_id, self.secondary_id))
-
-    def __repr__(self):
-        return 'MSProteinPool({})'.format(', '.join(map(str, [
             self.pk, self.disabled, self.secondary_id, self.extra_ids,
             self.extra_infos])))
 

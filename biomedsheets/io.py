@@ -159,11 +159,6 @@ class SheetBuilder:
                         'ngsLibraries', dict_type()),
                     dict_type=dict_type,
                     name_generator=name_generator)),
-                ms_protein_pools=dict_type(self._build_ms_protein_pools(
-                    extra_infos_defs=extra_infos_defs,
-                    ms_protein_pools_json=value.get('msProteinPools', dict_type()),
-                    dict_type=dict_type,
-                    name_generator=name_generator)),
                 dict_type=dict_type,
                 name_generator=name_generator)
             yield (secondary_id, test_sample)
@@ -186,22 +181,3 @@ class SheetBuilder:
                 dict_type=dict_type,
                 name_generator=name_generator)
             yield (secondary_id, ngs_library)
-
-    def _build_ms_protein_pools(
-            self, extra_infos_defs, ms_protein_pools_json, dict_type, name_generator):
-        """Build models.MSProteinPool objects
-        """
-        for secondary_id, value in ms_protein_pools_json.items():
-            ms_protein_pool = models.MSProteinPool(
-                pk=value['pk'],
-                disabled=value.get('disabled', False),
-                secondary_id=secondary_id,
-                extra_ids=value.get('extraIds', []),
-                extra_infos=dict_type(self._build_extra_infos(
-                    extra_infos=value.get('extraInfo', dict_type()),
-                    extra_infos_defs=extra_infos_defs.get('msProteinPool', dict_type()),
-                    dict_type=dict_type,
-                    name_generator=name_generator)),
-                dict_type=dict_type,
-                name_generator=name_generator)
-            yield (secondary_id, ms_protein_pool)
