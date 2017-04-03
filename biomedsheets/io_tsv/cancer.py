@@ -5,7 +5,8 @@
 from collections import OrderedDict
 
 from .base import (
-    LIBRARY_TYPES, BOOL_VALUES, NCBI_TAXON_HUMAN, std_field, TSVSheetException, BaseTSVReader)
+    LIBRARY_TYPES, BOOL_VALUES, NCBI_TAXON_HUMAN, std_field,
+    TSVSheetException, BaseTSVReader)
 from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -19,7 +20,8 @@ CANCER_DEFAULT_DESCRIPTION = (
     'compact TSV file')
 
 #: Cancer TSV header
-CANCER_TSV_HEADER = ('patientName', 'sampleName', 'isTumor', 'libraryType', 'folderName')
+CANCER_TSV_HEADER = (
+    'patientName', 'sampleName', 'isTumor', 'libraryType', 'folderName')
 
 #: Fixed "extraInfoDefs" field for cancer compact TSV
 CANCER_EXTRA_INFO_DEFS = OrderedDict([
@@ -47,7 +49,7 @@ class CancerTSVSheetException(TSVSheetException):
 class CancerTSVReader(BaseTSVReader):
     """Helper class for reading cancer TSV file
 
-    Prefer using ``read_germline_tsv_*()`` for shortcut
+    Prefer using ``read_cancer_tsv_*()`` for shortcut
     """
 
     tsv_header = CANCER_TSV_HEADER
@@ -68,19 +70,22 @@ class CancerTSVReader(BaseTSVReader):
                 'Hyphen not allowed in sampleName column')  # pragma: no cover
         # Check "isTumor" field, convert to bool
         if mapping['isTumor'] not in BOOL_VALUES.keys():
-            raise CancerTSVSheetException(
-                'Invalid boolean value {} in line {} of data section of {}'.format(
-                    mapping['isTumor'], lineno + 2, self.fname))  # pragma: no cover
+            raise CancerTSVSheetException(  # pragma: no cover
+                ('Invalid boolean value {} in line {} '
+                 'of data section of {}').format(
+                    mapping['isTumor'], lineno + 2, self.fname))
         mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
         # Check "libraryType" field
         if mapping['libraryType'] not in LIBRARY_TYPES:
-            raise CancerTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
-                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))  # pragma: no cover
+            raise CancerTSVSheetException(  # pragma: no cover
+                'Invalid library type {}, must be in {{{}}}'.format(
+                    mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
         # Check other fields for being non-empty
         for key in self.__class__.tsv_header:
             if mapping[key] is None:
-                raise CancerTSVSheetException('Field {} empty in line {} of {}'.format(
-                    key, lineno + 2, self.fname))  # pragma: no cover
+                raise CancerTSVSheetException(
+                    'Field {} empty in line {} of {}'.format(
+                        key, lineno + 2, self.fname))  # pragma: no cover
         # TODO: we should perform more validation here in the future
 
     def construct_bio_entity_dict(self, records):
@@ -104,7 +109,8 @@ def read_cancer_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):
 
     :return: models.Sheet
     """
-    return CancerTSVReader(f, fname).read_sheet(name_generator_for_scheme(naming_scheme))
+    return CancerTSVReader(f, fname).read_sheet(
+        name_generator_for_scheme(naming_scheme))
 
 
 def read_cancer_tsv_json_data(f, fname=None):

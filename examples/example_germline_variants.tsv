@@ -1,0 +1,12 @@
+[Metadata]
+schema          germline_variants
+schema_version  v1
+title           Example germline study
+description     The study shows a quartett (two siblings, one affected, two parents)
+
+[Data]
+patientName	fatherName	motherName	sex	isAffected	libraryType	folderName	hpoTerms
+12_345	12_346	12_347	M	Y	WGS	12_345	HP:0009946,HP:0009899
+12_348	12_346	12_347	M	N	WGS	12_348	.
+12_346	.	.	M	N	.	.	.
+12_347	.	.	F	N	WGS	12_347	.

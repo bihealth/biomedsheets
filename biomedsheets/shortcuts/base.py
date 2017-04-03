@@ -33,14 +33,10 @@ from .. import models
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
-#: Token for identifying a rare disease sequencing experiment
-RARE_DISEASE = 'rare_disease'
+#: Token for identifying a germline variants sequencing experiment
+SHEET_TYPE_GERMLINE_VARIANTS = 'germline_variants'
 #: Token for identifying a cancer matched tumor/normal study
-CANCER_MATCHED = 'cancer_matched'
-#: Token for identifying a generic experiment
-GENERIC_EXPERIMENT = 'generic_experiment'
-#: Known sheet types with shortcuts
-SHEET_TYPES = (RARE_DISEASE, CANCER_MATCHED, GENERIC_EXPERIMENT)
+SHEET_TYPE_CANCER_MATCHED = 'cancer_matched'
 
 #: Extraction type "DNA"
 EXTRACTION_TYPE_DNA = 'DNA'
@@ -175,7 +171,8 @@ class BioSampleShortcut(ShortcutMixin):
 
     def __repr__(self):
         return 'BioSampleShortcut({})'.format(', '.join(map(str, [
-            self.bio_sample, self.selector, self.test_sample, self.assay_sample])))
+            self.bio_sample, self.selector, self.test_sample,
+            self.assay_sample])))
 
     def __str__(self):
         return repr(self)

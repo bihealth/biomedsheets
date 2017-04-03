@@ -1,0 +1,16 @@
+[Metadata]
+schema          cancer_matched
+schema_version  v1
+title           Example matched cancer tumor/normal study
+description     The study has two patients, P001 has one tumor sample, P002 has two
+
+[Data]
+patientName	sampleName	isTumor	libraryType	folderName
+P001	N1	N	WES	P001-N1-DNA1-WES1
+P001	T1	Y	WES	P001-T1-DNA1-WES1
+P001	T1	Y	mRNA_seq	P001-T1-RNA1-mRNAseq1
+P002	N1	N	WES	P001-N1-DNA1-WES1
+P002	T1	Y	WES	P001-T1-DNA1-WES1
+P002	T1	Y	WES	P001-T1-RNA1-RNAseq1
+P002	T2	Y	WES	P001-T2-DNA1-WES1
+P002	T2	Y	mRNA_seq	P001-T2-RNA1-mRNAseq1

@@ -81,7 +81,8 @@ class TSVSheetException(SheetIOException):
 
 def std_field(name):
     """Return data structure for returning JSON pointer data structure"""
-    tpl = 'resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/{}'
+    tpl = ('resource://biomedsheets/data/std_fields.json#'
+           '/extraInfoDefs/template/{}')
     return (name, OrderedDict([('$ref', tpl.format(name))]))
 
 
@@ -111,15 +112,16 @@ class BaseTSVReader:
         self.next_pk = 1
 
     def read_json_data(self):
-        """Read from file-like object ``self.f``, use file name in case of problems
+        """Read from file-like object ``self.f``, use file name in case of
+        problems
 
-        :raises:GermlineTSVSheetException in case of problems
+        :raises:TSVSheetException in case of problems
         """
         # Read lines from file and check for file not being empty
         lines = [l.strip() for l in self.f]
         if not lines:
             raise TSVSheetException(
-                'Problem loading germline TSV sheet in file {}'.format(
+                'Problem loading TSV sheet in file {}'.format(
                     self.fname))  # pragma: no cover
         # Decide between the case with or without header
         if lines[0].startswith('['):
@@ -130,19 +132,22 @@ class BaseTSVReader:
         # Process header and then create a models.Sheet
         proc_header = self._process_header(header)
         header = body[0].split('\t')
-        missing_columns = set(self.__class__.tsv_header) - set(body[0].split('\t'))
+        missing_columns = set(
+            self.__class__.tsv_header) - set(body[0].split('\t'))
         if not body or missing_columns:
             raise TSVSheetException(
-                ('Empty or invalid data column names in germline TSV sheet '
-                 'file {}. Must be superset of {{{}}} but is missing {{{}}}').format(
+                ('Empty or invalid data column names in TSV sheet file {}. '
+                 'Must be superset of {{{}}} but is missing {{{}}}').format(
                      self.fname, ', '.join(self.__class__.tsv_header),
                      ', '.join(missing_columns)))  # pragma: no cover
         return self._create_sheet_json(proc_header, body)
 
     def read_sheet(self, name_generator=None):
         """Read into JSON and construct ``models.Sheet``"""
-        self.name_generator = name_generator or name_generator_for_scheme(NAMING_DEFAULT)
-        return io.SheetBuilder(self.read_json_data()).run(name_generator=name_generator)
+        self.name_generator = name_generator or name_generator_for_scheme(
+            NAMING_DEFAULT)
+        return io.SheetBuilder(self.read_json_data()).run(
+            name_generator=name_generator)
 
     def _split_lines(self, lines):
         """Split string array lines into header and body"""
@@ -178,9 +183,10 @@ class BaseTSVReader:
             arr = [(x if x not in ('.', '') else None) for x in arr]
             # Check number of entries in line
             if len(arr) != len(names):
-                raise TSVSheetException(
-                    'Invalid number of entries in line {} of data section of {}: {} vs {}'.format(
-                        lineno + 2, self.fname, arr, names))  # pragma: no cover
+                msg = ('Invalid number of entries in line {} of data '
+                       'section of {}: {} vs {}')
+                raise TSVSheetException(msg.format(
+                    lineno + 2, self.fname, arr, names))  # pragma: no cover
             mapping = dict(zip(names, arr))
             self.check_tsv_line(mapping, lineno)
             records.append(mapping)
@@ -201,17 +207,22 @@ class BaseTSVReader:
         extra_defs = resolver.resolve(furl, self.__class__.extra_info_defs)
         json_data = OrderedDict([
             ('identifier', furl),
-            ('title', header_dict.get(KEY_TITLE, self.__class__.default_title)),
-            ('description', header_dict.get(KEY_DESCRIPTION, self.__class__.default_description)),
+            ('title', header_dict.get(
+                KEY_TITLE, self.__class__.default_title)),
+            ('description', header_dict.get(
+                KEY_DESCRIPTION, self.__class__.default_description)),
             ('extraInfoDefs', extra_defs),
             ('bioEntities', OrderedDict()),
         ])
         records_by_bio_entity = OrderedDict()  # records by bio entity
         for record in records:
-            records_by_bio_entity.setdefault(record[self.__class__.bio_entity_name_column], [])
-            records_by_bio_entity[record[self.__class__.bio_entity_name_column]].append(record)
+            records_by_bio_entity.setdefault(
+                record[self.__class__.bio_entity_name_column], [])
+            records_by_bio_entity[record[
+                self.__class__.bio_entity_name_column]].append(record)
         for bio_entity_name, records in records_by_bio_entity.items():
-            json_data['bioEntities'][bio_entity_name] = self._build_bio_entity_json(records)
+            json_data['bioEntities'][
+                bio_entity_name] = self._build_bio_entity_json(records)
         return self.postprocess_json_data(json_data)
 
     def postprocess_json_data(self, json_data):
@@ -221,19 +232,22 @@ class BaseTSVReader:
     def _build_bio_entity_json(self, sub_records):
         """Build JSON for bio_entities entry"""
         result = self.construct_bio_entity_dict(sub_records)
-        # If the sub class defines a sample name column then use it to further split up the
-        # sample names.  Otherwise, there can only be one sample name and its name must be
-        # defined in the class.
+        # If the sub class defines a sample name column then use it to further
+        # split up the sample names.  Otherwise, there can only be one sample
+        # name and its name must be defined in the class.
         if self.__class__.bio_sample_name_column:
             sample_records = OrderedDict()  # records by bio sample
             for record in sub_records:
                 sample_records.setdefault(record['sampleName'], [])
                 sample_records[record['sampleName']].append(record)
             for sample_name, entry in sample_records.items():
-                result['bioSamples'][sample_name] = self._build_bio_sample_json(entry)
+                result['bioSamples'][
+                    sample_name] = self._build_bio_sample_json(entry)
         else:
-            assert self.__class__.bio_sample_name, 'Must be given if bio_sample_name_column is not'
-            if any(r['libraryType'] for r in sub_records):  # skip if no record with libraryType
+            assert self.__class__.bio_sample_name, \
+                'Must be given if bio_sample_name_column is not'
+            # skip if no record with libraryType
+            if any(r['libraryType'] for r in sub_records):
                 result['bioSamples'][self.__class__.bio_sample_name] = (
                     self._build_bio_sample_json(sub_records))
         return result

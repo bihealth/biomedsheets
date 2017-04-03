@@ -14,12 +14,15 @@ import sys
 
 import pkg_resources
 
-from .io import SheetSchema, json_loads_ordered, SheetBuilder
+from .io import SheetSchema, json_loads_ordered
+from .io_tsv import read_cancer_tsv_json_data, read_germline_tsv_json_data
 from .ref_resolver import RefResolver
 from .validation import SchemaValidator
 from .shortcuts import (
-    SHEET_TYPES, RARE_DISEASE, CANCER_MATCHED, GENERIC_EXPERIMENT)
-from . import xlsx_sheets
+    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED)
+
+#: Choices for the TSV sheet type
+CHOICES_SHEET_TYPE = (SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -32,7 +35,7 @@ class AppBase:
         self.args = args
 
 
-class SheetAppBase(AppBase):
+class JsonSheetAppBase(AppBase):
     """Base class for working with sheets"""
 
     def __init__(self, args):
@@ -89,7 +92,7 @@ class SheetAppBase(AppBase):
         return errors
 
 
-class ValidateApp(SheetAppBase):
+class ValidateApp(JsonSheetAppBase):
     """App sub class for validation sub command"""
 
     def run(self):
@@ -99,7 +102,7 @@ class ValidateApp(SheetAppBase):
             print('Sheet passed validation, congratulation!', file=sys.stderr)
 
 
-class ExpandApp(SheetAppBase):
+class ExpandApp(JsonSheetAppBase):
     """App sub class for expanding "$ref" JSON pointers"""
 
     def run(self):
@@ -107,64 +110,29 @@ class ExpandApp(SheetAppBase):
         print('', file=self.args.output)
 
 
-class JSONToXLSXApp(SheetAppBase):
-    """App sub class for converting JSON to XLSX sheet"""
+class ConvertApp(AppBase):
+    """App sub class for converting shortcut TSV sheets to JSON sheets"""
 
     def run(self):
-        # Check whether JSON data is valid and break from function otherwise
-        if self.validate_and_print_errors():
-            return 1
-        # Build models.Sheet from JSON and write out to XLSX
-        print('Building BioMed Sheet...', file=sys.stderr)
-        sheet = SheetBuilder(self.resolved_json).run()
-        print('Write sheet to XLSX...', file=sys.stderr)
-        writer = xlsx_sheets.SheetWriter(sheet)
-        writer.write(self.args.output)
-
-
-class XLSXToJSONApp(SheetAppBase):
-    """App sub class for filling XLSX into a JSON sheet (write to another
-    JSON output sheet)
-    """
-
-    def run(self):
-        # Check whether JSON data is valid and break from function otherwise
-        if self.validate_and_print_errors():
-            return 1
-        # Build models.Sheet from JSON for the overall structure
-        print('Building BioMed Sheet...', file=sys.stderr)
-        tpl_sheet = SheetBuilder(self.resolved_json).run()
-        # Load XLSX file, using sheet for type definitions etc., and write
-        # out sheet again
-        print('Loading sheet from XLSX file...', file=sys.stderr)
-        sheet = xlsx_sheets.SheetLoader(tpl_sheet).load(self.input_xlsx)
-        print('Write sheet to XLSX...', file=sys.stderr)
-        writer = xlsx_sheets.SheetWriter(sheet)
-        writer.write(self.args.output)
-
-
-class XLSXCreateApp(AppBase):
-    """App sub class for fresh creation of Excel sample sheet"""
-
-    def run(self):
-        CREATORS = {
-            RARE_DISEASE: xlsx_sheets.RareDisaseSheetCreator,
-            CANCER_MATCHED: xlsx_sheets.CancerMatchedSheetCreator,
-            GENERIC_EXPERIMENT: xlsx_sheets.GenericExperimentSheetCreator,
+        funcs = {
+            'cancer_matched': read_cancer_tsv_json_data,
+            'germline_variants': read_germline_tsv_json_data,
         }
-        return CREATORS[self.args.experiment_type]().run(self.args.output)
+        json.dump(
+            funcs[self.args.type](self.args.input, self.args.input.name),
+            self.args.output,
+            indent='    ')
+        print('', file=self.args.output)
 
 
 def run(args):
     """Program entry point after parsing command line arguments"""
-    APPS = {
+    apps = {
         'validate': ValidateApp,
         'expand': ExpandApp,
-        'xlsx-create': XLSXCreateApp,
-        'json-xlsx': JSONToXLSXApp,
-        'xlsx-json': XLSXToJSONApp,
+        'convert': ConvertApp,
     }
-    return APPS[args.subparser](args).run()
+    return apps[args.subparser](args).run()
 
 
 def main(argv=None):
@@ -192,38 +160,17 @@ def main(argv=None):
         '-o', '--output', type=argparse.FileType('wt'), default=sys.stdout,
         help='Path to output file, defaults to stdout')
 
-    parser_xlsx_create = subparsers.add_parser(
-        'xlsx-create', help='Create XLSX sheet for schema')
-    parser_xlsx_create.add_argument(
-        '-t', '--experiment-type', type=str, choices=SHEET_TYPES,
-        required=True, help='Type of XLSX sheet to created')
-    parser_xlsx_create.add_argument(
-        '-o', '--output', type=str, required=True,
-        help='Path to XLSX sheet to create')
-
-    parser_json_xlsx = subparsers.add_parser(
-        'json-xlsx', help='Create XLSX from JSON schema')
-    parser_json_xlsx.add_argument(
-        '-i', '--input', type=str, required=True,
-        help='Path to BioMed Sheet (JSON or YAML) file')
-    parser_json_xlsx.add_argument(
-        '-o', '--output', type=str, required=True,
-        help='Path to XLSX sheet to create')
-
-    parser_xlsx_json = subparsers.add_parser(
-        'xlsx-json',
-        help=('Write data from XLSX in structure given by one JSON file '
-              'into another JSON file'))
-    parser_xlsx_json.add_argument(
-        '-i', '--input', type=str, required=True,
-        help='Path to BioMed Sheet (JSON or YAML) file')
-    parser_xlsx_json.add_argument(
-        '-x', '--input-xlsx', type=str, required=True,
-        help=('Path to BioMed Sheet XLSX file created by "xlsx-create" '
-              'command'))
-    parser_xlsx_json.add_argument(
-        '-o', '--output', type=str, required=True,
-        help='Path to JSON sheet to write to')
+    parser_convert = subparsers.add_parser(
+        'convert', help='Convert shortcut TSV sheet to JSON sample sheet')
+    parser_convert.add_argument(
+        '-t', '--type', choices=CHOICES_SHEET_TYPE, required=True,
+        help='Shortcut TSV sheet type')
+    parser_convert.add_argument(
+        '-i', '--input', type=argparse.FileType('rt'), required=True,
+        help='Path to input TSV file')
+    parser_convert.add_argument(
+        '-o', '--output', type=argparse.FileType('wt'), default=sys.stdout,
+        help='Path to output file, defaults to stdout')
 
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)

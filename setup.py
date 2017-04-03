@@ -49,7 +49,7 @@ setup(
     install_requires=requirements,
     license='MIT license',
     zip_safe=False,
-    keywords='biomed sheets',
+    keywords='biomedsheets',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
