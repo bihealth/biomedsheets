@@ -132,7 +132,7 @@ class CancerBioSample(GenericBioSample):
         if not self.dna_test_sample.test_sample.ngs_libraries:
             raise MissingDataEntity(
                 'Could not find an DNA NGS library for TestSample {}'.format(
-                    self.dna_test_sample.test_sample))
+                    self.dna_test_sample.test_sample))  # pragma: no cover
         else:
             return NGSLibraryShortcut(self.dna_test_sample, next(iter(
                 self.dna_test_sample.test_sample.ngs_libraries.values())))
@@ -155,14 +155,14 @@ class CancerBioSample(GenericBioSample):
         yielded_any = False
         for test_sample in self.bio_sample.test_samples.values():
             if KEY_EXTRACTION_TYPE not in test_sample.extra_infos:
-                raise MissingDataEntity(
+                raise MissingDataEntity(  # pragma: no cover
                     'Could not find "{}" flag in TestSample {}'.format(
                         KEY_EXTRACTION_TYPE, test_sample))
             elif test_sample.extra_infos[KEY_EXTRACTION_TYPE] == ext_type:
                 yielded_any = True
                 yield test_sample
         if not yielded_any and not allow_none:
-            raise MissingDataEntity(
+            raise MissingDataEntity(  # pragma: no cover
                 ('Could not find a TestSample with {} == {} for '
                  'BioSample {}'.format(
                      KEY_EXTRACTION_TYPE, ext_type, self.bio_sample)))
@@ -206,13 +206,13 @@ class CancerDonor(GenericBioEntity):
         """
         for bio_sample in self.bio_samples.values():
             if KEY_IS_TUMOR not in bio_sample.extra_infos:
-                raise MissingDataEntity(
+                raise MissingDataEntity(  # pragma: no cover
                     'Could not find "{}" flag in BioSample {}'.format(
                         KEY_IS_TUMOR, bio_sample))
             elif not bio_sample.extra_infos[KEY_IS_TUMOR]:
                 return bio_sample
 
-        raise MissingDataEntity(
+        raise MissingDataEntity(  # pragma: no cover
             'Could not find primary normal sample for BioEntity {}'.format(
                 self.bio_entity))
 
@@ -228,14 +228,14 @@ class CancerDonor(GenericBioEntity):
         yielded_any = False
         for bio_sample in self.bio_samples.values():
             if KEY_IS_TUMOR not in bio_sample.extra_infos:
-                raise MissingDataEntity(
+                raise MissingDataEntity(  # pragma: no cover
                     'Could not find "{}" flag in BioSample {}'.format(
                         KEY_IS_TUMOR, bio_sample))
             elif bio_sample.extra_infos[KEY_IS_TUMOR]:
                 yielded_any = True
                 yield bio_sample
         if not yielded_any:
-            raise MissingDataEntity(
+            raise MissingDataEntity(  # pragma: no cover
                 ('Could not find a BioSample with {} = true for '
                  'BioEntity {}'.format(KEY_IS_TUMOR, self.bio_entity)))
 

@@ -25,7 +25,8 @@ NAMING_DEFAULT = NAMING_SECONDARY_ID_PK
 #: Valid naming schemes
 NAMING_SCHEMES = (NAMING_SECONDARY_ID_PK, NAMING_ONLY_SECONDARY_ID)
 
-#: Inverse mapping from name pattern to RE for going from name to secondary id and/or pk
+#: Inverse mapping from name pattern to RE for going from name to secondary id
+#: and/or pk
 INVERSE_PATTERN_MAP = {
     NAME_PATTERN_DEFAULT: r'^(?P<secondary_id>.*)-(?P<pk>[0-9]+)$',
     NAME_PATTERN_SECONDARY_ID: r'^(?P<secondary_id>.*)$',
@@ -37,7 +38,8 @@ class NameGenerator:
 
     def __call__(self, obj):
         """Return generated name"""
-        raise NotImplementedError('Abstract method called!')  # pragma: no cover
+        raise NotImplementedError(  # pragma: no cover
+            'Abstract method called!')
 
 
 class PatternNameGenerator(NameGenerator):
@@ -50,7 +52,8 @@ class PatternNameGenerator(NameGenerator):
         self.pk_padding_length = pk_padding_length
         #: RE for mapping from name to secondary id or PK
         if pattern not in INVERSE_PATTERN_MAP:
-            raise ValueError('Cannot map back from pattern {}'.format(pattern))  # pragma: no cover
+            raise ValueError(  # pragma: no cover
+                'Cannot map back from pattern {}'.format(pattern))
         self.inverse_name_re = INVERSE_PATTERN_MAP[self.pattern]
 
     def inverse(self, name, component='secondary_id'):
@@ -64,7 +67,8 @@ class PatternNameGenerator(NameGenerator):
     def __call__(self, obj):
         """Return generated name"""
         padded_pk = str(obj.pk).rjust(self.pk_padding_length, '0')
-        return self.pattern.format(full_secondary_id=obj.full_secondary_id, pk=padded_pk)
+        return self.pattern.format(
+            full_secondary_id=obj.full_secondary_id, pk=padded_pk)
 
 
 #: Default name generator is a :py:class:`PatternNameGenerator` with
@@ -75,9 +79,11 @@ DEFAULT_NAME_GENERATOR = PatternNameGenerator(NAME_PATTERN_DEFAULT)
 def name_generator_for_scheme(scheme):
     """Return ``PatternNameGenerator`` for the given naming ``scheme``"""
     if scheme not in NAMING_SCHEMES:
-        raise ValueError('No known naming scheme {}'.format(scheme))  # pragma: no cover
+        raise ValueError(  # pragma: no cover
+            'No known naming scheme {}'.format(scheme))
     mapping = {
         NAMING_SECONDARY_ID_PK: PatternNameGenerator(NAME_PATTERN_DEFAULT),
-        NAMING_ONLY_SECONDARY_ID: PatternNameGenerator(NAME_PATTERN_SECONDARY_ID),
+        NAMING_ONLY_SECONDARY_ID: PatternNameGenerator(
+            NAME_PATTERN_SECONDARY_ID),
     }
     return mapping[scheme]

@@ -60,6 +60,7 @@ def test_sample_pair_shortcuts(sheet_cancer):
     """
     cancer_cases = shortcuts.CancerCaseSheet(sheet_cancer)
     pair = cancer_cases.donors[0].primary_pair
+    assert str(pair).startswith('CancerMatchedSamplePair(')
     assert pair.donor.name == 'EX_001-000001'
     # Tumor sample: test samples
     assert pair.tumor_sample.name == 'EX_001-T1-000005'
@@ -93,3 +94,25 @@ def test_sample_pairs_primary(sheet_cancer):
     assert cancer_cases.primary_sample_pairs[0].normal_sample.name == 'EX_001-N1-000002'
     assert cancer_cases.primary_sample_pairs[1].tumor_sample.name == 'EX_002-T1-000012'
     assert cancer_cases.primary_sample_pairs[1].normal_sample.name == 'EX_002-N1-000009'
+
+
+def test_cancer_donor(sheet_cancer):
+    """Test for ``CancerDonor``"""
+    cancer_cases = shortcuts.CancerCaseSheet(sheet_cancer)
+    donor = cancer_cases.donors[0]
+    assert str(donor).startswith('CancerDonor(')
+    assert donor.primary_pair
+    assert donor.primary_pair.tumor_sample.name == 'EX_001-T1-000005'
+    assert donor.primary_pair.normal_sample.name == 'EX_001-N1-000002'
+    assert len(donor.all_pairs) == 1
+
+
+def test_cancer_bio_sample(sheet_cancer):
+    """Test for ``CancerBioSample``"""
+    cancer_cases = shortcuts.CancerCaseSheet(sheet_cancer)
+    tumor_sample = cancer_cases.donors[0].primary_pair.tumor_sample
+    assert tumor_sample.name == 'EX_001-T1-000005'
+    assert tumor_sample.is_tumor
+    normal_sample = cancer_cases.donors[0].primary_pair.normal_sample
+    assert normal_sample.name == 'EX_001-N1-000002'
+    assert not normal_sample.is_tumor
