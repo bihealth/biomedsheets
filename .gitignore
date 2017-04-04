@@ -17,3 +17,5 @@ dist/
 /*.xlsx
 
 docs/build
+
+build/
