@@ -127,7 +127,8 @@ class SheetEntry:
         self.pk = pk
         #: Flag for explicit disabling of objects
         self.disabled = disabled
-        #: ``str`` with secondary id fragment of the bio entity, unique in the sheet
+        #: ``str`` with secondary id fragment of the bio entity, unique in the
+        #: sheet
         self.secondary_id = secondary_id
         #: Extra IDs
         self.extra_ids = list(extra_ids or [])
@@ -160,7 +161,8 @@ class BioEntity(SheetEntry, CrawlMixin):
                  extra_infos=None, bio_samples=None, dict_type=OrderedDict,
                  name_generator=DEFAULT_NAME_GENERATOR):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
+            name_generator)
         #: List of ``BioSample`` objects described for the ``BioEntity``
         self.bio_samples = dict_type(bio_samples or [])
         # Assign owner pointer in bio samples to self
@@ -190,7 +192,8 @@ class BioSample(SheetEntry, CrawlMixin):
                  extra_infos=None, test_samples=None, dict_type=OrderedDict,
                  bio_entity=None, name_generator=DEFAULT_NAME_GENERATOR):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
+            name_generator)
         #: Containing BioEntity
         self.bio_entity = bio_entity
         #: List of ``TestSample`` objects described for the ``BioSample``
@@ -219,10 +222,12 @@ class TestSample(SheetEntry, CrawlMixin):
     """
 
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, ngs_libraries=None, dict_type=OrderedDict, bio_sample=None,
+                 extra_infos=None, ngs_libraries=None, dict_type=OrderedDict,
+                 bio_sample=None,
                  name_generator=DEFAULT_NAME_GENERATOR):
-        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-                         name_generator)
+        super().__init__(
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
+            name_generator)
         #: Containing BioSample
         self.bio_sample = bio_sample
         #: List of ``NGSLibrary`` objects described for the ``TestSample``
@@ -253,14 +258,16 @@ class NGSLibrary(SheetEntry):
     def __init__(self, pk, disabled, secondary_id, extra_ids=None,
                  extra_infos=None, dict_type=OrderedDict, test_sample=None,
                  name_generator=DEFAULT_NAME_GENERATOR):
-        super().__init__(pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-                         name_generator)
+        super().__init__(
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
+            name_generator)
         #: Owning TestSample
         self.test_sample = test_sample
 
     @property
     def full_secondary_id(self):
-        return '-'.join((self.test_sample.full_secondary_id, self.secondary_id))
+        return '-'.join((
+            self.test_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
         return 'NGSLibrary({})'.format(', '.join(map(str, [

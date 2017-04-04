@@ -186,8 +186,8 @@ class Cohort:
 
 
 class CohortBuilder:
-    """Helper class for building a :py:class:`Cohort` object from an iterable of
-    :py:class:`GermlineDonor` objects
+    """Helper class for building a :py:class:`Cohort` object from an iterable
+    of :py:class:`GermlineDonor` objects
 
     Also initialize the internal father and mother attributes of
     :py:class:`GermlineDonor`

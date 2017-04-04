@@ -5,7 +5,8 @@
 from collections import OrderedDict
 
 from .base import (
-    LIBRARY_TYPES, NCBI_TAXON_HUMAN, std_field, TSVSheetException, BaseTSVReader)
+    LIBRARY_TYPES, NCBI_TAXON_HUMAN, std_field, TSVSheetException,
+    BaseTSVReader)
 from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -14,7 +15,8 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 GERMLINE_DEFAULT_TITLE = 'Germline Sample Sheet'
 
 #: Default description
-GERMLINE_DEFAULT_DESCRIPTION = 'Sample Sheet constructed from germline compact TSV file'
+GERMLINE_DEFAULT_DESCRIPTION = (
+    'Sample Sheet constructed from germline compact TSV file')
 
 #: Germline TSV header
 GERMLINE_TSV_HEADER = ('patientName', 'fatherName', 'motherName', 'sex',
@@ -111,20 +113,22 @@ class GermlineTSVReader(BaseTSVReader):
             raise GermlineTSVSheetException(
                 'Hyphen not allowed in motherName column')  # pragma: no cover
         # Check "libraryType" field
-        if mapping['libraryType'] and mapping['libraryType'] not in LIBRARY_TYPES:
-            raise GermlineTSVSheetException('Invalid library type {}, must be in {{{}}}'.format(
-                mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
+        if mapping['libraryType'] and (
+                mapping['libraryType'] not in LIBRARY_TYPES):
+            raise GermlineTSVSheetException(
+                'Invalid library type {}, must be in {{{}}}'.format(
+                    mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
         # Check "sex" field
         if mapping['sex'] not in SEX_VALUES.keys():
-            raise GermlineTSVSheetException(
-                'Invalid "sex" value {} in line {} of data section of {}'.format(
-                    mapping['sex'], lineno + 2, self.fname))  # pragma: no cover
+            raise GermlineTSVSheetException(  # pragma: no cover
+                ('Invalid "sex" value {} in line {} of data section of '
+                 '{}').format(mapping['sex'], lineno + 2, self.fname))
         mapping['sex'] = SEX_VALUES[mapping['sex']]
         # Check "affected"
         if mapping['isAffected'] not in AFFECTED_VALUES.keys():
-            raise GermlineTSVSheetException(
-                'Invalid "isAffected" value {} in line {} of data section of {}'.format(
-                    mapping['isAffected'], lineno + 2, self.fname))  # pragma: no cover
+            raise GermlineTSVSheetException(  # pragma: no cover
+                ('Invalid "isAffected" value {} in line {} of data section of '
+                 '{}').format(mapping['isAffected'], lineno + 2, self.fname))
         mapping['isAffected'] = AFFECTED_VALUES[mapping['isAffected']]
 
     def postprocess_json_data(self, json_data):
@@ -137,10 +141,12 @@ class GermlineTSVReader(BaseTSVReader):
         # Update bio entities motherPk and fatherPk attributes
         for bio_entity in json_data['bioEntities'].values():
             extra_info = bio_entity['extraInfo']
-            if extra_info.get('fatherName') and extra_info['fatherName'] != '0':
-                extra_info['fatherPk'] = bio_entity_name_to_pk[extra_info['fatherName']]
-            if extra_info.get('motherName') and extra_info['motherName'] != '0':
-                extra_info['motherPk'] = bio_entity_name_to_pk[extra_info['motherName']]
+            if extra_info.get('fatherName', '0') != '0':
+                extra_info['fatherPk'] = bio_entity_name_to_pk[
+                    extra_info['fatherName']]
+            if extra_info.get('motherName', '0') != '0':
+                extra_info['motherPk'] = bio_entity_name_to_pk[
+                    extra_info['motherName']]
         return json_data
 
     def construct_bio_entity_dict(self, records):
@@ -165,8 +171,8 @@ class GermlineTSVReader(BaseTSVReader):
     def _check_consistency(cls, records, key):
         values = list(sorted(set(r[key] for r in records)))
         if len(values) > 1:
-            raise ValueError(
-                'Inconsistent {} entries in records: {}'.format(key, values))  # pragma: no cover
+            raise ValueError(  # pragma: no cover
+                'Inconsistent {} entries in records: {}'.format(key, values))
 
 
 def read_germline_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):
@@ -174,7 +180,8 @@ def read_germline_tsv_sheet(f, fname=None, naming_scheme=NAMING_DEFAULT):
 
     :return: models.Sheet
     """
-    return GermlineTSVReader(f, fname).read_sheet(name_generator_for_scheme(naming_scheme))
+    return GermlineTSVReader(f, fname).read_sheet(
+        name_generator_for_scheme(naming_scheme))
 
 
 def read_germline_tsv_json_data(f, fname=None):
