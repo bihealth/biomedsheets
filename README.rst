@@ -2,11 +2,14 @@
 BioMed Sheets
 =============
 
-.. image:: https://gitlab.bihealth.org/cubi/biomedsheets/badges/master/build.svg
-    :target: https://gitlab.bihealth.org/cubi/biomedsheets/commits/master
+.. image:: https://travis-ci.org/bihealth/biomedsheets.svg?branch=master
+    :target: https://travis-ci.org/bihealth/biomedsheets
 
-.. image:: https://gitlab.bihealth.org/cubi/biomedsheets/badges/master/coverage.svg
-    :target: https://gitlab.bihealth.org/cubi/biomedsheets/commits/master
+.. image:: https://readthedocs.org/projects/biomedsheets/badge/?version=master
+    :target: http://biomedsheets.readthedocs.io/en/latest/?badge=latest
+
+.. image:: https://api.codacy.com/project/badge/Grade/842a296b23d5450eb7bc525621d7f5a2
+    :target: https://www.codacy.com/app/manuel-holtgrewe/biomedsheets?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bihealth/biomedsheets&amp;utm_campaign=Badge_Grade
 
 This project contains the documentation for the BioMedical sample sheets project.
 Further, it contains the implementation of a Python API for I/O and comfortable access to the sample sheets and some CLI tools.
