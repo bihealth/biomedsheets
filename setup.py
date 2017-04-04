@@ -32,7 +32,7 @@ setup(
     long_description=readme + '\n\n' + history,
     author='Manuel Holtgrewe',
     author_email='manuel.holtgrewe@bihealth.de',
-    url='https://github.com/holtgrewe/biosheets',
+    url='https://github.com/bihealth/biomedsheets',
     packages=find_packages(),
     package_dir={
         'biomedsheets': 'biomedsheets',

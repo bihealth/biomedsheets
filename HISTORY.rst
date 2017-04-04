@@ -6,6 +6,7 @@ BioMed Sheets Changelog
 develop
 -------
 
+- Auto-deployment to pypi
 - Fixing shortcuts to father/mother during cohort loading
 - Cleanup code (according to Flake 8)
 - Adding more tests, replacing examples by TSV files
