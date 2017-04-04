@@ -6,7 +6,7 @@ BioMed Sheets
     :target: https://travis-ci.org/bihealth/biomedsheets
 
 .. image:: https://readthedocs.org/projects/biomedsheets/badge/?version=master
-    :target: http://biomedsheets.readthedocs.io/en/latest/?badge=latest
+    :target: http://biomedsheets.readthedocs.io/en/master/?badge=master
 
 .. image:: https://api.codacy.com/project/badge/Grade/842a296b23d5450eb7bc525621d7f5a2
     :target: https://www.codacy.com/app/manuel-holtgrewe/biomedsheets?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bihealth/biomedsheets&amp;utm_campaign=Badge_Grade

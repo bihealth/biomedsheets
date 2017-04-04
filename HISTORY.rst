@@ -2,9 +2,9 @@
 BioMed Sheets Changelog
 =======================
 
--------
-develop
--------
+----
+v0.2
+----
 
 - Auto-deployment to pypi
 - Fixing shortcuts to father/mother during cohort loading
