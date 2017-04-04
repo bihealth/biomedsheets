@@ -39,13 +39,6 @@ biomedsheets.models.NGSLibrary
 .. autoclass:: biomedsheets.models.NGSLibrary
     :members:
 
----------------------------------
-biomedsheets.models.MSProteinPool
----------------------------------
-
-.. autoclass:: biomedsheets.models.MSProteinPool
-    :members:
-
 ------------------------------
 biomedsheets.models.CrawlMixin
 ------------------------------

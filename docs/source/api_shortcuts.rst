@@ -20,13 +20,6 @@ biomedsheets.shortcuts.NGSLibraryShortcut
 .. autoclass:: biomedsheets.shortcuts.NGSLibraryShortcut
     :members:
 
---------------------------------------------
-biomedsheets.shortcuts.MSProteinPoolShortcut
---------------------------------------------
-
-.. autoclass:: biomedsheets.shortcuts.MSProteinPoolShortcut
-    :members:
-
 -----------------------------------------
 biomedsheets.shortcuts.TestSampleShortcut
 -----------------------------------------

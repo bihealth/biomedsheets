@@ -1,0 +1,138 @@
+{
+    "identifier": "file://examples/example_cancer_matched.tsv",
+    "title": "Cancer Sample Sheet",
+    "description": "Sample Sheet constructed from cancer matched samples compact TSV file",
+    "extraInfoDefs": {
+        "bioEntity": {
+            "ncbiTaxon": {
+                "docs": "Reference to NCBI taxonomy",
+                "key": "taxon",
+                "type": "string",
+                "pattern": "^NCBITaxon_[1-9][0-9]*$"
+            }
+        },
+        "bioSample": {
+            "isTumor": {
+                "docs": "Boolean flag for distinguishing tumor/normal samples",
+                "key": "isTumor",
+                "type": "boolean"
+            }
+        },
+        "testSample": {
+            "extractionType": {
+                "docs": "Describes extracted",
+                "key": "extractionType",
+                "type": "enum",
+                "choices": [
+                    "DNA",
+                    "RNA",
+                    "other"
+                ]
+            }
+        },
+        "ngsLibrary": {
+            "seqPlatform": {
+                "docs": "Sequencing platform used",
+                "key": "kitName",
+                "type": "enum",
+                "choices": [
+                    "Illumina",
+                    "PacBio",
+                    "other"
+                ]
+            },
+            "libraryType": {
+                "docs": "Rough classificiation of the library type",
+                "key": "libraryType",
+                "type": "enum",
+                "choices": [
+                    "Panel-seq",
+                    "WES",
+                    "WGS",
+                    "mRNA-seq",
+                    "tRNA-seq",
+                    "other"
+                ]
+            },
+            "folderName": {
+                "docs": "Name of folder with FASTQ files",
+                "key": "folderName",
+                "type": "string"
+            }
+        }
+    },
+    "bioEntities": {
+        "P001": {
+            "pk": 1,
+            "extraInfo": {
+                "ncbiTaxon": "NCBITaxon_9606"
+            },
+            "bioSamples": {
+                "N1": {
+                    "pk": 2,
+                    "extraInfo": {
+                        "isTumor": false
+                    },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 3,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 4,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "P001-N1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "T1": {
+                    "pk": 5,
+                    "extraInfo": {
+                        "isTumor": true
+                    },
+                    "testSamples": {
+                        "DNA1": {
+                            "pk": 6,
+                            "extraInfo": {
+                                "extractionType": "DNA"
+                            },
+                            "ngsLibraries": {
+                                "WES1": {
+                                    "pk": 7,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "P001-T1-DNA1-WES1",
+                                        "libraryType": "WES"
+                                    }
+                                }
+                            }
+                        },
+                        "RNA1": {
+                            "pk": 8,
+                            "extraInfo": {
+                                "extractionType": "RNA"
+                            },
+                            "ngsLibraries": {
+                                "mRNA_seq1": {
+                                    "pk": 9,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "P001-T1-RNA1-mRNAseq1",
+                                        "libraryType": "mRNA_seq"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

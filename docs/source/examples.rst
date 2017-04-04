@@ -13,9 +13,9 @@ Sheet Examples
 --------------
 
 Below is an example JSON file with a cancer sample sheet.
-Note that the sheet only conatins one donor with two bio samples (primary tumor ``T1`` and metastasis ``M1``).
+Note that the sheet only contains one donor with two bio samples (normal sample ``N1`` and primary tumor ``T1``).
 
-.. literalinclude:: ../../examples/example_cancer.json
+.. literalinclude:: ../../examples/example_cancer_matched.json
     :language: json
 
 -------------
@@ -35,14 +35,11 @@ The output of the program is as follows::
 
     Donors
 
-    123001-BIH_001
+    P001-000001
 
     Libraries of all tumor/normal pairs
 
-    123001-BIH_001
-        normal DNA: 567001-BIH_001-N1-DNA1-WES1
-        tumor DNA:  567002-BIH_001-T1-DNA1-WES1
-        tumor RNA:  567004-BIH_001-T1-RNA1-RNAseq1
-    123001-BIH_001
-        normal DNA: 567001-BIH_001-N1-DNA1-WES1
-        tumor DNA:  567005-BIH_001-M1-DNA1-WES1
+      P001-000001
+        normal DNA: P001-N1-DNA1-WES1-000004
+        tumor DNA:  P001-T1-DNA1-WES1-000007
+        tumor RNA:  P001-T1-RNA1-mRNA_seq1-000009
