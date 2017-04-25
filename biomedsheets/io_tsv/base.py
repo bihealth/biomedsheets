@@ -267,7 +267,8 @@ class TSVHeaderParser:
                         line.split('\t')))
         return TSVHeader(metadata, custom_fields_infos)
 
-    def _process_custom_fields(self, arr):
+    @classmethod
+    def _process_custom_fields(cls, arr):
         if len(arr) != 9:
             raise TSVSheetException(
                 ('Invalid number of entries in [Custom Fields] line: {}, '
@@ -376,7 +377,8 @@ class BaseTSVReader:
         # Create the sheet from records
         return self._create_sheet_json_from_records(tsv_header, records)
 
-    def convert_tsv_line(self, mapping, tsv_header):
+    @classmethod
+    def convert_tsv_line(cls, mapping, tsv_header):
         """Convert fields in TSV line after conversion to mapping"""
         custom_field_infos = tsv_header.custom_field_infos
         table = {
@@ -427,7 +429,8 @@ class BaseTSVReader:
                     records, extra_info_defs)
         return self.postprocess_json_data(json_data)
 
-    def _augment_extra_info_defs(self, extra_info_defs, tsv_header):
+    @classmethod
+    def _augment_extra_info_defs(cls, extra_info_defs, tsv_header):
         """Augment extra definitions with TSV ``[Custom Fields]`` header.
         """
         for info in tsv_header.custom_field_infos.values():
@@ -494,8 +497,9 @@ class BaseTSVReader:
         return self._augment_bio_entity_json(
             bio_entity_json, records[0], extra_info_defs)
 
+    @classmethod
     def _augment_bio_entity_json(
-            self, bio_entity_json, record, extra_info_defs):
+            cls, bio_entity_json, record, extra_info_defs):
         """Augment test sample JSON"""
         for key in extra_info_defs['bioEntity']:
             if key not in bio_entity_json['extraInfo'] and record.get(key):
@@ -536,8 +540,9 @@ class BaseTSVReader:
             result['testSamples'][test_sample_name] = test_sample_json
         return result
 
+    @classmethod
     def _augment_test_sample_json(
-            self, test_sample_json, record, extra_info_defs):
+            cls, test_sample_json, record, extra_info_defs):
         """Augment test sample JSON"""
         for key in extra_info_defs['testSample']:
             if key not in test_sample_json['extraInfo'] and record.get(key):
@@ -561,8 +566,9 @@ class BaseTSVReader:
         return self._augment_bio_sample_json(
             bio_sample_json, records[0], extra_info_defs)
 
+    @classmethod
     def _augment_bio_sample_json(
-            self, bio_sample_json, record, extra_info_defs):
+            cls, bio_sample_json, record, extra_info_defs):
         """Augment test sample JSON"""
         for key in extra_info_defs['bioSample']:
             if key not in bio_sample_json['extraInfo'] and record.get(key):
@@ -574,8 +580,9 @@ class BaseTSVReader:
         result = self.construct_bio_ngs_library_dict(record, extra_info_defs)
         return self._augment_ngs_library_json(result, record, extra_info_defs)
 
+    @classmethod
     def _augment_ngs_library_json(
-            self, ngs_library_json, record, extra_info_defs):
+            cls, ngs_library_json, record, extra_info_defs):
         """Augment NGS library JSON"""
         for key in extra_info_defs['ngsLibrary']:
             if key not in ngs_library_json['extraInfo'] and key in record:
