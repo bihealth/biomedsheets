@@ -16,10 +16,10 @@ def tsv_sheet_germline():
     """Example TSV germline sheet"""
     f = io.StringIO(textwrap.dedent("""
     [Metadata]
-    schema          germline_variants
-    schema_version  v1
-    title           Example germline study
-    description     Simple study with two trios
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with two trios
 
     [Data]
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms

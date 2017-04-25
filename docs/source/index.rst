@@ -52,6 +52,7 @@ Open Questions
     entity_names
     schema_cancer
     schema_germline
+    schema_custom_fields
 
 .. toctree::
     :caption: API

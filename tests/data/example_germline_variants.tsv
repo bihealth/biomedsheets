@@ -1,8 +1,8 @@
 [Metadata]
-schema          germline_variants
-schema_version  v1
-title           Example germline study
-description     The study shows a quartett (two siblings, one affected, two parents)
+schema	germline_variants
+schema_version	v1
+title	Example germline study
+description	The study shows a quartett (two siblings, one affected, two parents)
 
 [Data]
 patientName	fatherName	motherName	sex	isAffected	libraryType	folderName	hpoTerms

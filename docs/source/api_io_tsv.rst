@@ -109,10 +109,10 @@ biomedsheets.io_tsv.CANCER_DEFAULT_DESCRIPTION
 .. autodata:: biomedsheets.io_tsv.CANCER_DEFAULT_DESCRIPTION
 
 ------------------------------------------------------
-biomedsheets.io_tsv.CANCER_TSV_HEADER
+biomedsheets.io_tsv.CANCER_BODY_HEADER
 ------------------------------------------------------
 
-.. autodata:: biomedsheets.io_tsv.CANCER_TSV_HEADER
+.. autodata:: biomedsheets.io_tsv.CANCER_BODY_HEADER
 
 ------------------------------------------------------
 biomedsheets.io_tsv.CANCER_EXTRA_INFO_DEFS
@@ -133,10 +133,10 @@ biomedsheets.io_tsv.GERMLINE_DEFAULT_DESCRIPTION
 .. autodata:: biomedsheets.io_tsv.GERMLINE_DEFAULT_DESCRIPTION
 
 ------------------------------------------------------
-biomedsheets.io_tsv.GERMLINE_TSV_HEADER
+biomedsheets.io_tsv.CANCER_BODY_HEADER
 ------------------------------------------------------
 
-.. autodata:: biomedsheets.io_tsv.GERMLINE_TSV_HEADER
+.. autodata:: biomedsheets.io_tsv.CANCER_BODY_HEADER
 
 ------------------------------------------------------
 biomedsheets.io_tsv.GERMLINE_EXTRA_INFO_DEFS

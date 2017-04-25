@@ -9,8 +9,5 @@
 # Prettier CLI for py.test
 pytest-sugar==0.8.0
 
-# Sphinx
-sphinx==1.5.5
-
 # Sphinx theme
 sphinx_rtd_theme==0.1.9
