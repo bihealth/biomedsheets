@@ -17,10 +17,10 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 def tsv_sheet_germline_header():
     f = io.StringIO(textwrap.dedent("""
     [Metadata]
-    schema          germline_variants
-    schema_version  v1
-    title           Example germline study
-    description     The study has two patients, P001 has one tumor sample, P002 has two
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tThe study has two patients, P001 has one tumor sample, P002 has two
 
     [Data]
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
@@ -60,8 +60,8 @@ def tsv_sheet_germline_platform_name():
 EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
 {
     "identifier": "file://<unknown>",
-    "title": "Germline Sample Sheet",
-    "description": "Sample Sheet constructed from germline compact TSV file",
+    "title": "Example germline study",
+    "description": "The study has two patients, P001 has one tumor sample, P002 has two",
     "extraInfoDefs": {
         "bioEntity": {
             "ncbiTaxon": {

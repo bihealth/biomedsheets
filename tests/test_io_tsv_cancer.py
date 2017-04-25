@@ -17,10 +17,10 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 def tsv_sheet_cancer_header():
     f = io.StringIO(textwrap.dedent("""
     [Metadata]
-    schema          tumor_matched
-    schema_version  v1
-    title           Example matched cancer tumor/normal study
-    description     The study has two patients, P001 has one tumor sample, P002 has two
+    schema\ttumor_matched
+    schema_version\tv1
+    title\tExample matched cancer tumor/normal study
+    description\tThe study has two patients, P001 has one tumor sample, P002 has two
 
     [Data]
     patientName\tsampleName\tisTumor\tlibraryType\tfolderName
@@ -57,8 +57,8 @@ def tsv_sheet_cancer_no_header():
 EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
 {
     "identifier": "file://<unknown>",
-    "title": "Cancer Sample Sheet",
-    "description": "Sample Sheet constructed from cancer matched samples compact TSV file",
+    "title": "Example matched cancer tumor/normal study",
+    "description": "The study has two patients, P001 has one tumor sample, P002 has two",
     "extraInfoDefs": {
         "bioEntity": {
             "ncbiTaxon": {

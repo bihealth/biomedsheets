@@ -18,9 +18,9 @@ GERMLINE_DEFAULT_TITLE = 'Germline Sample Sheet'
 GERMLINE_DEFAULT_DESCRIPTION = (
     'Sample Sheet constructed from germline compact TSV file')
 
-#: Germline TSV header
-GERMLINE_TSV_HEADER = ('patientName', 'fatherName', 'motherName', 'sex',
-                       'isAffected', 'folderName', 'hpoTerms', 'libraryType')
+#: Germline body TSV header
+GERMLINE_BODY_HEADER = ('patientName', 'fatherName', 'motherName', 'sex',
+                        'isAffected', 'folderName', 'hpoTerms', 'libraryType')
 
 #: Fixed "extraInfoDefs" field for germline compact TSV
 GERMLINE_EXTRA_INFO_DEFS = OrderedDict([
@@ -93,7 +93,7 @@ class GermlineTSVReader(BaseTSVReader):
     Prefer using ``read_germline_tsv_*()`` for shortcut
     """
 
-    tsv_header = GERMLINE_TSV_HEADER
+    body_header = GERMLINE_BODY_HEADER
     extra_info_defs = GERMLINE_EXTRA_INFO_DEFS
     default_title = GERMLINE_DEFAULT_TITLE
     default_description = GERMLINE_DEFAULT_DESCRIPTION
@@ -149,8 +149,8 @@ class GermlineTSVReader(BaseTSVReader):
                     extra_info['motherName']]
         return json_data
 
-    def construct_bio_entity_dict(self, records):
-        result = super().construct_bio_entity_dict(records)
+    def construct_bio_entity_dict(self, records, extra_info_defs):
+        result = super().construct_bio_entity_dict(records, extra_info_defs)
         result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
         # Check fatherName and motherName entries and assign to result
         self._check_consistency(records, 'fatherName')

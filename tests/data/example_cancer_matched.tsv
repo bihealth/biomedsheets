@@ -1,8 +1,8 @@
 [Metadata]
-schema          cancer_matched
-schema_version  v1
-title           Example matched cancer tumor/normal study
-description     The study has two patients, P001 has one tumor sample, P002 has two
+schema	cancer_matched
+schema_version	v1
+title	Example matched cancer tumor/normal study
+description	The study has two patients, P001 has one tumor sample, P002 has two
 
 [Data]
 patientName	sampleName	isTumor	libraryType	folderName

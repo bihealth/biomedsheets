@@ -19,8 +19,8 @@ CANCER_DEFAULT_DESCRIPTION = (
     'Sample Sheet constructed from cancer matched samples '
     'compact TSV file')
 
-#: Cancer TSV header
-CANCER_TSV_HEADER = (
+#: Cancer body TSV header
+CANCER_BODY_HEADER = (
     'patientName', 'sampleName', 'isTumor', 'libraryType', 'folderName')
 
 #: Fixed "extraInfoDefs" field for cancer compact TSV
@@ -52,7 +52,7 @@ class CancerTSVReader(BaseTSVReader):
     Prefer using ``read_cancer_tsv_*()`` for shortcut
     """
 
-    tsv_header = CANCER_TSV_HEADER
+    body_header = CANCER_BODY_HEADER
     extra_info_defs = CANCER_EXTRA_INFO_DEFS
     default_title = CANCER_DEFAULT_TITLE
     default_description = CANCER_DEFAULT_DESCRIPTION
@@ -73,7 +73,7 @@ class CancerTSVReader(BaseTSVReader):
             raise CancerTSVSheetException(  # pragma: no cover
                 ('Invalid boolean value {} in line {} '
                  'of data section of {}').format(
-                    mapping['isTumor'], lineno + 2, self.fname))
+                     mapping['isTumor'], lineno + 2, self.fname))
         mapping['isTumor'] = BOOL_VALUES[mapping['isTumor']]
         # Check "libraryType" field
         if mapping['libraryType'] not in LIBRARY_TYPES:
@@ -81,25 +81,25 @@ class CancerTSVReader(BaseTSVReader):
                 'Invalid library type {}, must be in {{{}}}'.format(
                     mapping['libraryType'], ', '.join(LIBRARY_TYPES)))
         # Check other fields for being non-empty
-        for key in self.__class__.tsv_header:
+        for key in self.__class__.body_header:
             if mapping[key] is None:
                 raise CancerTSVSheetException(
                     'Field {} empty in line {} of {}'.format(
                         key, lineno + 2, self.fname))  # pragma: no cover
         # TODO: we should perform more validation here in the future
 
-    def construct_bio_entity_dict(self, records):
-        result = super().construct_bio_entity_dict(records)
+    def construct_bio_entity_dict(self, records, extra_info_defs):
+        result = super().construct_bio_entity_dict(records, extra_info_defs)
         result['extraInfo']['ncbiTaxon'] = NCBI_TAXON_HUMAN
         return result
 
-    def check_bio_sample_records(self, records):
+    def check_bio_sample_records(self, records, extra_info_defs):
         if len(set(r['isTumor'] for r in records)) != 1:
             raise TSVSheetException(
                 'Inconsistent "isTumor" flag for records')  # pragma: no cover
 
-    def construct_bio_sample_dict(self, records):
-        result = super().construct_bio_sample_dict(records)
+    def construct_bio_sample_dict(self, records, extra_info_defs):
+        result = super().construct_bio_sample_dict(records, extra_info_defs)
         result['extraInfo']['isTumor'] = records[0]['isTumor']
         return result
 
