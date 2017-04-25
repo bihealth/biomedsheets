@@ -47,7 +47,7 @@ One important point here is the relation and separation between sample sheets an
 The aim of the sample sheets is to provide a useful computer-readable description of an experiment for processing the data with Bioinformatics workflows or further downstream analyses (e.g. in R or using Jupyter notebooks).
 This document describes a concept for such schemas and an implementation using JSON for the file format.
 
-Of course, sample sheets could also be stored in a RDBMS (e.g., Postgres), with a suitable database schema.
+Of course, sample sheets could also be stored in a RDBMS (Relational database management system, e.g., Postgres), with a suitable database schema.
 Often such databases would be part of a LIMS system.
 A sample sheet could serve as a poor Bioinformatician's LIMS system, if only some meta information for samples and their relation is to be tracked.
 However, the more complex part of such a LIMS system or even a hospital information management system are mostly not of direct relevance to the Bioinformatics analysis.
