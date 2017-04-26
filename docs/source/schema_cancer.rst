@@ -50,15 +50,15 @@ An example is shown below:
 
 They are as follows:
 
-1. ``patientName`` -- name of the patient, used for identifying the patient in the sample sheet.
-2. ``sampleName`` -- name of the sample, used for identifying the sample for the patient in the sample sheet (the combination of patient and sample must be unique in the sheet).
+1. ``patientName`` -- name of the patient, used for identifying the patient in the sample sheet as ``BioEntity`` in :ref:`high_level_overview`
+2. ``sampleName`` -- name of the sample, used for identifying the sample for the patient in the sample sheet (the combination of patient and sample must be unique in the sheet). sampleName translates to ``BioSample`` in :ref:`high_level_overview`.
 3. ``isTumor`` -- a flag identifying a sample as being from tumor, one of {``Y``, ``N``, ``1``, ``0``}
-4. ``extractionType`` -- a valid extraction type as in the JSON schema, which is one of ``DNA``, ``RNA`` or ``other``
-5. ``libraryType`` -- a valid libraryType, as in the JSON schema, e.g., ``WES`` or ``mRNA-seq``. Please refer to :ref:`examples` - libraryType
+4. ``extractionType`` -- a valid extraction type as in the JSON schema, which is one of ``DNA``, ``RNA`` or ``other``. This links to `TestSample` in the global overview :ref:`high_level_overview`.
+5. ``libraryType`` -- a valid libraryType, as in the JSON schema, e.g., ``WES`` or ``mRNA-seq``. Please refer to :ref:`examples` - libraryType. This entry will be translated to ``NGSLibrary`` defined in the global scheme (ref:`high_level_overview`).
 6. ``folderName`` -- a folder name to search the library's FASTQ files for.
    A list of base folders to search for the folder names is given in the configuration, so no full path is given here.
 
-Note that the name of the ``TestSample`` and and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``.
+Note that the name of the ``TestSample`` and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``, respectively.
 
 Optionally, the following fields can be added:
 
