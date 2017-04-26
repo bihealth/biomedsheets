@@ -8,7 +8,7 @@ A relatively simple schema with the essential information for genetic germline v
 The assumed setting is as follows.
 
 - Each bio entity is a patient/person/donor.
-- Each donor gives one normal (bio) sample (e.g., blood or saliva) and each sample has at one DNA library.
+- Each donor gives one normal (bio) sample (e.g., blood or saliva) and each sample has at least one DNA library.
 - The pedigree has to be described in a way such that all members who donated a sample are connected.
 - Within each pedigree, the flag for "affected" specifies the same genetic disease (i.e., in a polydactily family, only members affected with this phenotype are flagged as affected).
 
@@ -32,7 +32,7 @@ The following fields must be present for matched cancer sample sheets.
 Germline TSV Schema
 -------------------
 
-Additionally, there is an alternative to defining schemas in JSON format for germline variants sample sheets.
+Additionally, there is an alternative to define schemas in JSON format for germline variants sample sheets.
 Instead, a TSV-based schema can be used.
 
 Optionally, the schema can contain meta data, starting with ``[Metadata]`` INI-style section header (the data section has to start with ``[Data]``).
