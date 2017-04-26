@@ -9,6 +9,8 @@ The figure below gives an overview of the schema.
 Each box represents a table while the connections and labels specify the relation counts between them.
 The “core” schema is shown in yellow while the NGS-specific part is shown in blue.
 
+.. _overview_figure
+
 .. figure:: img/overview_tables.png
     :align: center
 
