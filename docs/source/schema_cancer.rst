@@ -53,8 +53,8 @@ They are as follows:
 1. ``patientName`` -- name of the patient, used for identifying the patient in the sample sheet.
 2. ``sampleName`` -- name of the sample, used for identifying the sample for the patient in the sample sheet (the combination of patient and sample must be unique in the sheet).
 3. ``isTumor`` -- a flag identifying a sample as being from tumor, one of {``Y``, ``N``, ``1``, ``0``}
-4. ``extractionType`` -- a valid extraction type as in the JSON schema
-5. ``libraryType`` -- a valid libraryType, as in the JSON schema
+4. ``extractionType`` -- a valid extraction type as in the JSON schema, which is one of ``DNA``, ``RNA`` or ``other``
+5. ``libraryType`` -- a valid libraryType, as in the JSON schema, e.g., ``WES`` or ``mRNA-seq``. Please refer to :ref:`examples` - libraryType
 6. ``folderName`` -- a folder name to search the library's FASTQ files for.
    A list of base folders to search for the folder names is given in the configuration, so no full path is given here.
 
