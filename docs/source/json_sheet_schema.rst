@@ -73,4 +73,43 @@ Step 4 is not implemented yet.
 On the one hand, custom fields allow for the definition of arbitrary "simple" values.
 Currently, it is possible to have boolean, numbers, strings, enums and lists of the atomic types.
 On the other hand, using JSON pointers, centrally defined field types can be used.
-This allows for easy sharing of data types and easier computation. 
+This allows for easy sharing of data types and easier computation.
+
+.. _predefined_fields:
+
+-----------------
+Predefined Fields
+-----------------
+
+The default JSON schema defines a set of fields that are probably applicable to a large set of experiments. As stated earlier new fields can be defined in a custom JSON file or "on the fly" in a TSV file that is used to feed the data to the pipeline.
+
+Predefined fields are:
+
+- BioEntity
+    - ncbiTaxon
+    - hpoTerms
+    - orphanetTerm
+    - fatherPk
+    - motherPk
+    - sex
+    - isAffected
+    - icd10entry
+    - icd10version
+- BioSample
+    - uberonCellSource
+    - tnmStage
+    - isTumor
+    - preservationType
+- TestSample
+    - extractionType
+- NGSLibrary
+    - libraryType
+    - seqPlatform
+    - libraryName
+    - panelName
+    - kitName
+    - kitType
+    - kitVersion
+    - folderName
+    - librarySizeMean
+    - librarySizeSD
