@@ -5,8 +5,8 @@ title           Example germline study
 description     The [Data] section is similar to a PEDigree file
 
 [Data]
-patientName fatherName  motherName  sex affected  extractionType  libraryType folderName  hpoTerms
-12_345      12_346      12_347      1   2         DNA             WGS         12-345      HP:0009946,HP:0009899
-12_348      12_346      12_347      1   1         DNA             WGS         12-348      .
-12_346      0           0           1   1         .               .           .           .
-12_347      0           0           2   1         DNA             WGS         12-347      .
+patientName	fatherName	motherName	sex	affected	extractionType	libraryType	folderName	hpoTerms
+12_345	12_346	12_347	1	2	DNA	WGS	12-345	HP:0009946,HP:0009899
+12_348	12_346	12_347	1	1	DNA	WGS	12-348	.
+12_346	0	0	1	1	.	.	.	.
+12_347	0	0	2	1	DNA	WGS	12-347	.
