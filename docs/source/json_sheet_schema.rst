@@ -81,7 +81,8 @@ This allows for easy sharing of data types and easier computation.
 Predefined Fields
 -----------------
 
-The default JSON schema defines a set of fields that are probably applicable to a large set of experiments. As stated earlier new fields can be defined in a custom JSON file or "on the fly" in a TSV file that is used to feed the data to the pipeline.
+The default JSON schema defines a set of fields that are probably applicable to a large set of experiments.
+As stated earlier new fields can be defined in a custom JSON file or "on the fly" in a TSV file that is used to feed the data to the pipeline.
 
 Predefined fields are:
 
