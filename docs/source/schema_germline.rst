@@ -53,20 +53,24 @@ An example is shown below:
 They are as follows:
 
 1. ``patientName`` -- name of the patient, used for identifying the patient in the sample sheet.
-2. ``fatherName`` -- name of the patient's father, dot (``.``) for founder
-3. ``mother`` -- name of the patient's mother, dot (``.``) for founder
+   This value will be translated into ``BioEntity`` defined in the global scheme (:ref:`high_level_overview`) and JSON schema (:ref:`examples`).
+2. ``fatherName`` -- name of the patient's father, dot (``0``) for founder
+3. ``mother`` -- name of the patient's mother, dot (``0``) for founder
 4. ``sex`` -- flag for sex, one of ``M``: male, ``F``: female, ``.``: unknown/missing, or ``0``, ``1``, ``2``, as in PED
 5. ``affected`` -- flag for being affected, one of ``Y``: yes, ``N``: no, ``.``: unknown/missing, or ``0``, ``1``, ``2``, as in PED
 6. ``folderName`` -- a folder name to search the library's FASTQ files for, ``.`` if not sequenced
    A list of base folders to search for the folder names is given in the configuration, so no full path is given here.
 7. ``hpoTerms`` -- a comma-separated list of HPO terms
-8. ``libraryType`` -- a rough classification of the library type {``WGS``, ``WES``, ``Panel-seq``}, ``.`` if not sequenced or unknown
-9. ``kitName/kitType`` -- type/name of the kit used (free text/controlled vocabulary), ``.`` if not sequenced or unknown; optional.
-   This column can be left out.
-10. ``kitVersion`` -- version of the kit used, ``.`` if not sequenced or unknown; optional.
+8. ``extractionType`` -- a valid extraction type as in the JSON schema (:ref:`examples`), which is one of ``DNA``, ``RNA`` or ``other``.
+   This links to `TestSample` in the global overview :ref:`high_level_overview`.
+9. ``libraryType`` -- a rough classification of the library type {``WGS``, ``WES``, ``Panel-seq``}, ``.`` if not sequenced or unknown.
+   This entry will be used to auto-generate ``NGSLibrary`` defined in the global scheme (ref:`high_level_overview`) and JSON schema (:ref:`examples`)
+10. ``kitName/kitType`` -- type/name of the kit used (free text/controlled vocabulary), ``.`` if not sequenced or unknown; optional.
+    This column can be left out.
+11. ``kitVersion`` -- version of the kit used, ``.`` if not sequenced or unknown; optional.
     This column can be left out.
 
-Note that the name of ``BioSample``, ``TestSample``, and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``.
+Note that the name of ``TestSample``, and ``NGSLibrary`` entities are missing, they will be auto-generated based on the ``extractionType`` and ``libraryType``, respectively.
 
 Optionally, the following fields can be added:
 

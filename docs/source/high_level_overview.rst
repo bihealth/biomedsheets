@@ -47,10 +47,31 @@ One important point here is the relation and separation between sample sheets an
 The aim of the sample sheets is to provide a useful computer-readable description of an experiment for processing the data with Bioinformatics workflows or further downstream analyses (e.g. in R or using Jupyter notebooks).
 This document describes a concept for such schemas and an implementation using JSON for the file format.
 
-Of course, sample sheets could also be stored in a RDBMS (e.g., Postgres), with a suitable database schema.
+Of course, sample sheets could also be stored in a RDBMS (Relational database management system, e.g., Postgres), with a suitable database schema.
 Often such databases would be part of a LIMS system.
 A sample sheet could serve as a poor Bioinformatician's LIMS system, if only some meta information for samples and their relation is to be tracked.
 However, the more complex part of such a LIMS system or even a hospital information management system are mostly not of direct relevance to the Bioinformatics analysis.
 
 Rather, the data from a laboratory or hospital IT system can be used to generate biomedical sample sheets.
 BioMed sample sheets further allow linking back from the bio entities, bio samples, test samples, ngs libraries to such systems by storing lists of URLs for each of the previous entities.
+
+-----------------------------------------
+Sample Sheets, JSON Schemas and TSV Files
+-----------------------------------------
+
+BiomedSheets comes to the user as a triad of files:
+
+- the JSON schema describing each single field mentioned in one of the other two files
+
+  - <docs> a short description
+  - <key> the name, which all tools and documentation will refer to
+  - <type> the data type of the content
+  - <choices> optional for all <type>s except enum, which is a list to choose from
+
+- the JSON file that actually contains the sample information.
+  Each field mentioned here needs to be defined in the JSON schema.
+
+- an optional TSV file that contains all sample information as in the JSON file mentioned before.
+  This file can be translated by BiomedSheets tools into JSON format and is intended to be the preferred way to input data as it is more facile to interact with as a human being.
+
+The latter TSV file can be also used to define new fields that are not :ref:`predefined <predefined_fields>` in germline, cancer or default JSON schemas.

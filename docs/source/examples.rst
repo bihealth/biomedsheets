@@ -23,7 +23,7 @@ Code Examples
 -------------
 
 The following Python program uses the ``biomedsheets`` module for loading the JSON sheet from above.
-It them prints the names of the donors and the names of the NGS libraries for the tumor/normal pairs.
+It then prints the names of the donors and the names of the NGS libraries for the tumor/normal pairs.
 
 .. literalinclude:: ../../examples/use_shortcut_cancer.py
 
