@@ -63,13 +63,15 @@ BiomedSheets comes to the user as a triad of files:
 
 - the JSON schema describing each single field mentioned in one of the other two files
 
-    - <docs> a short description
-    - <key> the name, which all tools and documentation will refer to
-    - <type> the data type of the content
-    - <choices> optional for all <type>s except enum, which is a list to choose from
+  - <docs> a short description
+  - <key> the name, which all tools and documentation will refer to
+  - <type> the data type of the content
+  - <choices> optional for all <type>s except enum, which is a list to choose from
 
-- the JSON file that actually contains the sample information. Each field mentioned here needs to be defined in the JSON schema.
+- the JSON file that actually contains the sample information.
+  Each field mentioned here needs to be defined in the JSON schema.
 
-- an optional TSV file that contains all sample information as in the JSON file mentioned before. This file can be translated by BiomedSheets tools into JSON format and is intended to be the preferred way to input data as it is more facile to interact with as a human being.
+- an optional TSV file that contains all sample information as in the JSON file mentioned before.
+  This file can be translated by BiomedSheets tools into JSON format and is intended to be the preferred way to input data as it is more facile to interact with as a human being.
 
 The latter TSV file can be also used to define new fields that are not :ref:`predefined <predefined_fields>` in germline, cancer or default JSON schemas.
