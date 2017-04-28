@@ -73,4 +73,12 @@ Step 4 is not implemented yet.
 On the one hand, custom fields allow for the definition of arbitrary "simple" values.
 Currently, it is possible to have boolean, numbers, strings, enums and lists of the atomic types.
 On the other hand, using JSON pointers, centrally defined field types can be used.
-This allows for easy sharing of data types and easier computat
+This allows for easy sharing of data types and easier computation.
+
+.. _predefined_fields:
+
+-----------------
+Predefined Fields
+-----------------
+
+.. note:: Once stabilized, the common fields will be documented here.

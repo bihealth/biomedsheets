@@ -9,11 +9,11 @@ Core Table Fields
 -----------------
 
 This section describes the common table fields.
-Generally, the pk field is an integer primary key that is to be automaticaly generated (i.e. autoincrement in RDBMS).
-The field secondary_id is an identifier assigned by the “data owner” (e.g., the collaboration partner).
+Generally, the ``pk`` field is an integer primary key that is to be automatically generated numbering each element uniquely despite its level in the hierarchy of all JSON elements (i.e. autoincrement in RDBMS).
+The field ``secondary_id`` is an identifier assigned by the "data owner" (e.g., the collaboration partner).
 This identifier has to be unique within a given project but can be ambiguous globally.
 
-A possible best practice is to enforce the secondary_id to only consist of alphanumeric characters and underscores.
+A possible best practice is to enforce the ``secondary_id`` to only consist of alphanumeric characters and underscores.
 Then, they should be constructed as (none of the ``<Field>`` values should contain a hyphen itself):
 
 ::
@@ -34,7 +34,7 @@ Examples are:
     - BIH_234-T1-RNA1 (first RNA extraction from first tumor sample)
     - BIH_234-T2-DNA2 (second DNA extraction from second tumor sample)
 
-Generally, the following are “core fields”.
+Generally, the following are “core fields” (pk: primary key, fk: foreign key).
 
 BioEntity
 =========
@@ -115,7 +115,7 @@ NGSLibrary
 - library_kind: controlled vocabulary with library preparation type, e.g., {‘WES’, ‘WGS’, ‘RNA-seq’, ‘other’} or a superset thereof; required field for describing library type
 - kit: controlled vocabulary describing kit and version used for targeted sequencing, or RNA amplifcation method
 
-NGSLIbraryOnFC
+NGSLibraryOnFC
 ==============
 
 - adapter_name: string, optional field describing name of used adapter barcode(s)

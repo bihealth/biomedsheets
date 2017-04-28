@@ -1,0 +1,17 @@
+[Metadata]
+schema	germline_variants
+schema_version	v1
+title	Example for germline variants sheet file
+description	This example shows how to add custom fields
+
+[Custom Fields]
+key	annotatedEntity	docs	type	minimum	maximum	unit	choices	pattern
+consentRetracted	bioEntity	boolean	Patient has retracted consent	.	.	.	.	.
+patientCenter	bioEntity	enum	Clinical center of patient origin	.	.	.	.	New_York,Rio,Tokyo,Berlin
+
+[Data]
+patientName	fatherName	motherName	sex	affected	extractionType	libraryType	folderName	hpoTerms	consentRetracted	patientCenter
+12_345	12_346	12_347	1	2	DNA	WGS	12-345	HP:0009946,HP:0009899	N	Berlin
+12_348	12_346	12_347	1	1	DNA	WGS	12-348	.	N	Berlin
+12_346	0	0	1	1	.	.	.	.	N	Berlin
+12_347	0	0	2	1	DNA	WGS	12-347	.	N	Berlin
