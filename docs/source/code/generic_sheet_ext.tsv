@@ -1,0 +1,28 @@
+[Metadata]
+schema	generic_experiment
+schema_version	v1
+title	Example generic experiment
+description	This is an example for a generic experiment.
+
+[Custom Fields]
+key	annotatedEntity	docs	type	minimum	maximum	unit	choices	pattern
+cellLine	bioEntity	Cell line name	enum	.	.	.	HELA,HEK	.
+treatment	bioEntity	Cell line treatment	enum	.	.	.	Ibrutinib,Nivolumap,control	.
+replicate	bioEntity	Replicate identifier	string	.	.	.	.	.
+
+[Data]
+bioEntity	bioSample	testSample	ngsLibrary	extractionType	libraryType	folderName	cellLine	treatment	replicate
+HELA_control_A	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_control_A-BS1-TS1-LIB1	HELA	control	A
+HELA_control_C	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_control_C-BS1-TS1-LIB1	HELA	control	C
+HELA_Ibrutinib_A	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_Ibrutinib_A-BS1-TS1-LIB1	HELA	Ibrutinib	A
+HELA_Ibrutinib_B	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_Ibrutinib_B-BS1-TS1-LIB1	HELA	Ibrutinib	B
+HELA_Nivolumap_A	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_Nivolumap_A-BS1-TS1-LIB1	HELA	Nivolumap	A
+HELA_Nivolumap_B	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_Nivolumap_B-BS1-TS1-LIB1	HELA	Nivolumap	B
+HELA_Nivolumap_C	BS1	TS1	LIB1	RNA	mRNA_seq	HELA_Nivolumap_C-BS1-TS1-LIB1	HELA	Nivolumap	C
+HEK_control_A	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_control_A-BS1-TS1-LIB1	HEK	control	A
+HEK_control_B	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_control_B-BS1-TS1-LIB1	HEK	control	B
+HEK_control_C	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_control_C-BS1-TS1-LIB1	HEK	control	C
+HEK_Ibrutinib_A	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_Ibrutinib_A-BS1-TS1-LIB1	HEK	Ibrutinib	A
+HEK_Ibrutinib_B	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_Ibrutinib_B-BS1-TS1-LIB1	HEK	Ibrutinib	B
+HEK_Nivolumap_B	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_Nivolumap_B-BS1-TS1-LIB1	HEK	Nivolumap	B
+HEK_Nivolumap_C	BS1	TS1	LIB1	RNA	mRNA_seq	HEK_Nivolumap_C-BS1-TS1-LIB1	HEK	Nivolumap	C

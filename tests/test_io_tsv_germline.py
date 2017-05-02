@@ -166,7 +166,6 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
         "12_345": {
             "pk": 1,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherName": "12_346",
                 "motherName": "12_347",
                 "sex": "male",
@@ -175,6 +174,7 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
                     "HP:0009946",
                     "HP:0009899"
                 ],
+                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherPk": 9,
                 "motherPk": 10
             },
@@ -206,11 +206,11 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
         "12_348": {
             "pk": 5,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherName": "12_346",
                 "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherPk": 9,
                 "motherPk": 10
             },
@@ -242,18 +242,18 @@ EXPECTED_GERMLINE_SHEET_JSON_HEADER = r"""
         "12_346": {
             "pk": 9,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "sex": "male",
-                "isAffected": "unaffected"
+                "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {}
         },
         "12_347": {
             "pk": 10,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "sex": "female",
-                "isAffected": "unaffected"
+                "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {
                 "N1": {
@@ -393,7 +393,6 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
         "12_345": {
             "pk": 1,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherName": "12_346",
                 "motherName": "12_347",
                 "sex": "male",
@@ -402,6 +401,7 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
                     "HP:0009946",
                     "HP:0009899"
                 ],
+                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherPk": 9,
                 "motherPk": 10
             },
@@ -433,11 +433,11 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
         "12_348": {
             "pk": 5,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherName": "12_346",
                 "motherName": "12_347",
                 "sex": "male",
                 "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606",
                 "fatherPk": 9,
                 "motherPk": 10
             },
@@ -469,18 +469,18 @@ EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER = r"""
         "12_346": {
             "pk": 9,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "sex": "male",
-                "isAffected": "unaffected"
+                "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {}
         },
         "12_347": {
             "pk": 10,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "sex": "female",
-                "isAffected": "unaffected"
+                "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {
                 "N1": {
@@ -621,9 +621,9 @@ EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME = r"""
         "12_347": {
             "pk": 1,
             "extraInfo": {
-                "ncbiTaxon": "NCBITaxon_9606",
                 "sex": "female",
-                "isAffected": "unaffected"
+                "isAffected": "unaffected",
+                "ncbiTaxon": "NCBITaxon_9606"
             },
             "bioSamples": {
                 "N1": {

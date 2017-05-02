@@ -71,6 +71,7 @@ Open Questions
     schema_cancer
     schema_germline
     schema_custom_fields
+    schema_generic
 
 .. toctree::
     :caption: API
