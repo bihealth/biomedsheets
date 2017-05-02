@@ -3,6 +3,15 @@ BioMed Sheets Changelog
 =======================
 
 ----
+HEAD
+----
+
+- Adding possibility for generic TSV sample sheets.
+- Many updates to make documentation more clear.
+- Various updates, fixing Codacy issues.
+- Adding routines for writing out PED file from germline sample sheets.
+
+----
 v0.2
 ----
 

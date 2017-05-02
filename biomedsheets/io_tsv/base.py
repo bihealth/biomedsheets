@@ -284,6 +284,8 @@ class BaseTSVReader:
 
     #: Iterable with TSV header
     body_header = None
+    #: Optional column in body header
+    optional_body_header_columns = ('seqPlatform',)
     #: Extra info definitions
     extra_info_defs = None
     #: Default title
@@ -296,6 +298,10 @@ class BaseTSVReader:
     bio_sample_name_column = None
     #: Default sample name if not given in the sample sheet
     bio_sample_name = None
+    #: Name of the test_sample name column
+    test_sample_name_column = None
+    #: Name of the ngs_library name column
+    ngs_library_name_column = None
     #: Single extraction type if given
     extraction_type = None
 
@@ -332,6 +338,16 @@ class BaseTSVReader:
                  'Must be superset of {{{}}} but is missing {{{}}}').format(
                      self.fname, ', '.join(self.__class__.body_header),
                      ', '.join(missing_columns)))  # pragma: no cover
+        # Check for unknown fields
+        extra_columns = (
+            set(body_header) -
+            set(self.__class__.body_header) -
+            set(tsv_header.custom_field_infos.keys()) -
+            set(self.__class__.optional_body_header_columns))
+        if extra_columns:
+            msg = 'Unexpected column seen in header row of body: {}'
+            raise TSVSheetException(
+                msg.format(', '.join(sorted(extra_columns))))
         return self._create_sheet_json(tsv_header, body)
 
     def read_sheet(self, name_generator=None):
@@ -466,8 +482,9 @@ class BaseTSVReader:
         if self.__class__.bio_sample_name_column:
             sample_records = OrderedDict()  # records by bio sample
             for record in sub_records:
-                sample_records.setdefault(record['sampleName'], [])
-                sample_records[record['sampleName']].append(record)
+                sample_name = record[self.__class__.bio_sample_name_column]
+                sample_records.setdefault(sample_name, [])
+                sample_records[sample_name].append(record)
             for sample_name, entry in sample_records.items():
                 result['bioSamples'][
                     sample_name] = self._build_bio_sample_json(
@@ -490,7 +507,6 @@ class BaseTSVReader:
         bio_entity_json = OrderedDict([
             ('pk', self.next_pk - 1),
             ('extraInfo', OrderedDict([
-                ('ncbiTaxon', NCBI_TAXON_HUMAN),
             ])),
             ('bioSamples', OrderedDict()),
         ])
@@ -517,12 +533,19 @@ class BaseTSVReader:
         counters_lib = dict((x, 1) for x in LIBRARY_TYPES)
         for record in records:
             extraction_type = LIBRARY_TO_EXTRACTION[record['libraryType']]
-            test_sample_name = '{}{}'.format(
-                extraction_type, counters_ext[extraction_type])
-            lib_name = '{}{}'.format(record['libraryType'],
-                                     counters_lib[record['libraryType']])
-            counters_ext[extraction_type] += 1
-            counters_lib[record['libraryType']] += 1
+            if self.__class__.test_sample_name_column:
+                test_sample_name = record[
+                    self.__class__.test_sample_name_column]
+            else:
+                test_sample_name = '{}{}'.format(
+                    extraction_type, counters_ext[extraction_type])
+                counters_ext[extraction_type] += 1
+            if self.__class__.ngs_library_name_column:
+                lib_name = record[self.__class__.ngs_library_name_column]
+            else:
+                lib_name = '{}{}'.format(record['libraryType'],
+                                         counters_lib[record['libraryType']])
+                counters_lib[record['libraryType']] += 1
             pk = self.next_pk
             self.next_pk += 1
             test_sample_json = OrderedDict([

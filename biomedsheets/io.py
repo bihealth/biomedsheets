@@ -40,6 +40,7 @@ class ExtraInfoBuilder:
         self.builders = {
             'boolean': bool,
             'string': str,
+            'pattern': str,
             'integer': int,
             'number': float,
             'enum': str,

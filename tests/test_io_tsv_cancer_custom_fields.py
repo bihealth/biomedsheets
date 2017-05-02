@@ -53,15 +53,15 @@ def tsv_sheet_cancer_header():
 def tsv_sheet_cancer_no_header():
     """Tumor TSV sheet without header"""
     f = io.StringIO(textwrap.dedent("""
-    patientName\tsampleName\tisTumor\tlibraryType\tfolderName\tncbiTaxon\tmycnCn\tinssStage\tshimada4Class\tlohChr1p\tpatientStatus\ttimeToEventDays\ttimeToDeathDays
-    P001\tN1\tN\tWES\tP001-N1-DNA1-WES1\t.\t1\tfavorable\ttrue\tNo_disease_event\t.\t.
-    P001\tT1\tY\tWES\tP001-T1-DNA1-WES1\t2\t1\tfavorable\ttrue\tNo_disease_event\t.\t.
-    P001\tT1\tY\tmRNA_seq\tP001-T1-RNA1-mRNAseq1\t2\t1\tfavorable\ttrue\tNo_disease_event\t.\t.
-    P002\tN1\tN\tWES\tP001-N1-DNA1-WES1\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.
-    P002\tT1\tY\tWES\tP001-T1-DNA1-WES1\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.
-    P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.
-    P002\tT2\tY\tWES\tP001-T2-DNA1-WES1\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.
-    P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.
+    patientName\tsampleName\tisTumor\tlibraryType\tfolderName\tncbiTaxon\tmycnCn\tinssStage\tshimada4Class\tlohChr1p\tpatientStatus\ttimeToEventDays\ttimeToDeathDays\ttestSampleNice\tngsLibraryNice
+    P001\tN1\tN\tWES\tP001-N1-DNA1-WES1\tNCBITaxon_9606\t.\t1\tfavorable\ttrue\tNo_disease_event\t.\t.\ttrue\ttrue
+    P001\tT1\tY\tWES\tP001-T1-DNA1-WES1\tNCBITaxon_9606\t2\t1\tfavorable\ttrue\tNo_disease_event\t.\t.\ttrue\tfalse
+    P001\tT1\tY\tmRNA_seq\tP001-T1-RNA1-mRNAseq1\tNCBITaxon_9606\t2\t1\tfavorable\ttrue\tNo_disease_event\t.\t.\ttrue\ttrue
+    P002\tN1\tN\tWES\tP001-N1-DNA1-WES1\tNCBITaxon_9606\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.\tfalse\ttrue
+    P002\tT1\tY\tWES\tP001-T1-DNA1-WES1\tNCBITaxon_9606\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
+    P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1\tNCBITaxon_9606\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.\tfalse\tfalse
+    P002\tT2\tY\tWES\tP001-T2-DNA1-WES1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
+    P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
     """.lstrip()))
     return f
 
@@ -429,7 +429,11 @@ def test_read_cancer_sheet_custom_fields_header(tsv_sheet_cancer_header):
 def test_read_cancer_sheet_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_no_header)
-    assert 'Invalid number of entries in line' in str(e_info.value)
+    EXPECTED = (
+        'Unexpected column seen in header row of body: inssStage, lohChr1p, '
+        'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
+        'testSampleNice, timeToDeathDays, timeToEventDays')
+    assert EXPECTED == str(e_info.value)
 
 
 def test_read_cancer_json_custom_fields_header(tsv_sheet_cancer_header):
@@ -441,4 +445,8 @@ def test_read_cancer_json_custom_fields_header(tsv_sheet_cancer_header):
 def test_read_cancer_json_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
-    assert 'Invalid number of entries in line' in str(e_info.value)
+    EXPECTED = (
+        'Unexpected column seen in header row of body: inssStage, lohChr1p, '
+        'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
+        'testSampleNice, timeToDeathDays, timeToEventDays')
+    assert EXPECTED == str(e_info.value)
