@@ -1,0 +1,12 @@
+[Metadata]
+schema	generic_experiment
+schema_version	v1
+title	Example generic experiment
+description	This is an example for a generic experiment.
+
+[Data]
+bioEntity	bioSample	testSample	ngsLibrary	extractionType	libraryType	folderName
+E001	BS1	TS1	LIB1	RNA	total_RNA_seq	E001-BS1-TS1-LIB1
+E001	BS2	TS1	LIB1	RNA	total_RNA_seq	E001-BS2-TS1-LIB1
+E002	BS1	TS1	LIB1	RNA	total_RNA_seq	E002-BS1-TS1-LIB1
+E002	BS1	TS1	LIB2	RNA	total_RNA_seq	E001-BS1-TS1-LIB2
