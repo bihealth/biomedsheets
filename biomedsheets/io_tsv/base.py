@@ -19,7 +19,7 @@ DELIM = '\t'
 
 #: Known schemas
 TSV_SCHEMAS = (
-    'cancer_matched', 'germline_variants')
+    'cancer_matched', 'germline_variants', 'generic')
 
 #: Known file format versions
 FILE_FORMAT_VERSIONS = ('v1',)

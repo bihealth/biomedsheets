@@ -15,14 +15,19 @@ import sys
 import pkg_resources
 
 from .io import SheetSchema, json_loads_ordered
-from .io_tsv import read_cancer_tsv_json_data, read_germline_tsv_json_data
+from .io_tsv import (
+    read_cancer_tsv_json_data, read_germline_tsv_json_data,
+    read_generic_tsv_json_data)
 from .ref_resolver import RefResolver
 from .validation import SchemaValidator
 from .shortcuts import (
-    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED)
+    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED,
+    SHEET_TYPE_GENERIC)
 
 #: Choices for the TSV sheet type
-CHOICES_SHEET_TYPE = (SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED)
+CHOICES_SHEET_TYPE = (
+    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED,
+    SHEET_TYPE_GENERIC)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -115,8 +120,9 @@ class ConvertApp(AppBase):
 
     def run(self):
         funcs = {
-            'cancer_matched': read_cancer_tsv_json_data,
-            'germline_variants': read_germline_tsv_json_data,
+            SHEET_TYPE_GERMLINE_VARIANTS: read_germline_tsv_json_data,
+            SHEET_TYPE_CANCER_MATCHED: read_cancer_tsv_json_data,
+            SHEET_TYPE_GENERIC: read_generic_tsv_json_data,
         }
         json.dump(
             funcs[self.args.type](self.args.input, self.args.input.name),

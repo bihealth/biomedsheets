@@ -27,8 +27,6 @@ Also note that none of the shortcut objects will reflect changes in the
 underlying schema data structure.
 """
 
-# TODO: merge with generic?
-
 from .. import models
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -37,6 +35,8 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 SHEET_TYPE_GERMLINE_VARIANTS = 'germline_variants'
 #: Token for identifying a cancer matched tumor/normal study
 SHEET_TYPE_CANCER_MATCHED = 'cancer_matched'
+#: Token for identifying a generic sample sheet
+SHEET_TYPE_GENERIC = 'generic'
 
 #: Extraction type "DNA"
 EXTRACTION_TYPE_DNA = 'DNA'
