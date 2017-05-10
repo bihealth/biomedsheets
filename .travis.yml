@@ -21,6 +21,7 @@ deploy:
       QnhBUTV5bjhZL2NZbjlNMlU4cENBblR1dldhcjhnc0VLbHdqUUJnaHE5Q3R6dWx5R0F3UStTcXpH
       QlhHYUJGVzNURFkzaWhPdm1JNy9ITGdUYTFEN1ZFelJWRFA5NGwzOTA3R3M4VnpWYXBSUldKQzA9
   distributions: sdist bdist_wheel
+  skip_upload_docs: true
 env:
 - TOXENV=py35
 - TOXENV=py34
