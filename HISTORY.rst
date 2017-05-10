@@ -3,7 +3,7 @@ BioMed Sheets Changelog
 =======================
 
 ----
-HEAD
+v0.3
 ----
 
 - Adding possibility for generic TSV sample sheets.
