@@ -65,7 +65,7 @@ class RefResolver:
         else:
             raise RefResolutionException(
                 'Can only resolve in dict and list container objects and '
-                'the atomic types int, bool, foat, and str.')
+                'the atomic types int, bool, float, and str.')
 
     def _resolve_dict_entry(self, doc_uri, main_doc, obj):
         """Implementation of a dict objects"""
