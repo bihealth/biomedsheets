@@ -36,6 +36,13 @@ class CancerCaseSheetOptions:
         #: Allow missing tumor sample, leads to empty pair list
         self.allow_missing_tumor = allow_missing_tumor
 
+    def __str__(self):
+        args = (self.allow_missing_normal, self.allow_missing_tumor)
+        return 'CancerCaseSheetOptions({})'.format(', '.join(map(str, args)))
+
+    def __repr__(self):
+        return str(self)
+
 
 class CancerCaseSheet(ShortcutSampleSheet):
     """Shortcut for "matched tumor/normal" view on bio-medical sample sheets
@@ -217,11 +224,10 @@ class CancerDonor(GenericBioEntity):
     def _iter_all_pairs(self):
         """Iterate all tumor/normal pair"""
         normal_bio_sample = self._get_primary_normal_bio_sample()
-        if not normal_bio_sample:
-            return  # none found, generate empty list
-        for tumor_bio_sample in self._iter_tumor_bio_samples():
-            yield CancerMatchedSamplePair(
-                self, tumor_bio_sample, normal_bio_sample)
+        if normal_bio_sample:
+            for tumor_bio_sample in self._iter_tumor_bio_samples():
+                yield CancerMatchedSamplePair(
+                    self, tumor_bio_sample, normal_bio_sample)
 
     def _get_primary_normal_bio_sample(self):
         """Return primary normal ``BioSample``
@@ -262,14 +268,15 @@ class CancerDonor(GenericBioEntity):
             elif bio_sample.extra_infos[KEY_IS_TUMOR]:
                 yielded_any = True
                 yield bio_sample
-        # Having no tumor sample is an error by default but this behaviour
-        # can be switched off.
-        tpl = 'Could not find a BioSample with {} = true for BioEntity {}'
-        msg = tpl.format(KEY_IS_TUMOR, self.bio_entity)
-        if not yielded_any and not self.sheet.options.allow_missing_tumor:
-            raise MissingDataEntity(msg)  # pragma: no cover
-        else:
-            warn(msg, MissingDataWarning)
+        if not yielded_any:
+            # Having no tumor sample is an error by default but this behaviour
+            # can be switched off.
+            tpl = 'Could not find a BioSample with {} = true for BioEntity {}'
+            msg = tpl.format(KEY_IS_TUMOR, self.bio_entity)
+            if not self.sheet.options.allow_missing_tumor:
+                raise MissingDataEntity(msg)  # pragma: no cover
+            else:
+                warn(msg, MissingDataWarning)
 
     def __repr__(self):
         return 'CancerDonor({})'.format(', '.join(map(
