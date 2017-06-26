@@ -219,7 +219,10 @@ class CancerDonor(GenericBioEntity):
 
     def _get_primary_pair(self):
         """Return primary ``CancerMatchedSamplePair``"""
-        return next(self._iter_all_pairs())
+        try:
+            return next(self._iter_all_pairs())
+        except StopIteration:
+            return None
 
     def _iter_all_pairs(self):
         """Iterate all tumor/normal pair"""
