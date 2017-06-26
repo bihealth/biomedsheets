@@ -3,11 +3,12 @@
 """
 
 from collections import OrderedDict
+from warnings import warn
 
 from .base import (
     EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA,
-    MissingDataEntity, ShortcutSampleSheet, TestSampleShortcut,
-    NGSLibraryShortcut)
+    MissingDataEntity, MissingDataWarning, ShortcutSampleSheet,
+    TestSampleShortcut, NGSLibraryShortcut)
 from .generic import (GenericBioEntity, GenericBioSample)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -20,12 +21,33 @@ KEY_IS_TUMOR = 'isTumor'
 KEY_EXTRACTION_TYPE = 'extractionType'
 
 
+class CancerCaseSheetOptions:
+    """Options for parsing cancer case sheets"""
+
+    @classmethod
+    def create_defaults(klass):
+        return CancerCaseSheetOptions(
+            allow_missing_normal=False,
+            allow_missing_tumor=False)
+
+    def __init__(self, *, allow_missing_normal, allow_missing_tumor):
+        #: Allow missing normal sample, leads to empty pair list
+        self.allow_missing_normal = allow_missing_normal
+        #: Allow missing tumor sample, leads to empty pair list
+        self.allow_missing_tumor = allow_missing_tumor
+
+
 class CancerCaseSheet(ShortcutSampleSheet):
     """Shortcut for "matched tumor/normal" view on bio-medical sample sheets
+
+    Note that by default, at least one normal and one tumor sample must be
+    given.  This can be changed by setting the ``options`` on creation.
     """
 
-    def __init__(self, sheet):
+    def __init__(self, sheet, options=None):
         super().__init__(sheet)
+        #: Configuration
+        self.options = options or CancerCaseSheetOptions.create_defaults()
         #: List of donors in the sample sheet
         self.donors = list(self._iter_donors())
         #: List of primary matched tumor/normal sample pairs in the sheet
@@ -195,6 +217,8 @@ class CancerDonor(GenericBioEntity):
     def _iter_all_pairs(self):
         """Iterate all tumor/normal pair"""
         normal_bio_sample = self._get_primary_normal_bio_sample()
+        if not normal_bio_sample:
+            return  # none found, generate empty list
         for tumor_bio_sample in self._iter_tumor_bio_samples():
             yield CancerMatchedSamplePair(
                 self, tumor_bio_sample, normal_bio_sample)
@@ -211,10 +235,14 @@ class CancerDonor(GenericBioEntity):
                         KEY_IS_TUMOR, bio_sample))
             elif not bio_sample.extra_infos[KEY_IS_TUMOR]:
                 return bio_sample
-
-        raise MissingDataEntity(  # pragma: no cover
-            'Could not find primary normal sample for BioEntity {}'.format(
-                self.bio_entity))
+        # Having no normal sample is an error by default but this behaviour
+        # can be switched off.
+        tpl = 'Could not find primary normal sample for BioEntity {}'
+        msg = tpl.format(self.bio_entity)
+        if not self.sheet.options.allow_missing_normal:  # pragma: no cover
+            raise MissingDataEntity(msg)
+        else:
+            warn(msg, MissingDataWarning)
 
     def _iter_tumor_bio_samples(self):
         """Return iterable over all cancer bio samples
@@ -234,10 +262,14 @@ class CancerDonor(GenericBioEntity):
             elif bio_sample.extra_infos[KEY_IS_TUMOR]:
                 yielded_any = True
                 yield bio_sample
-        if not yielded_any:
-            raise MissingDataEntity(  # pragma: no cover
-                ('Could not find a BioSample with {} = true for '
-                 'BioEntity {}'.format(KEY_IS_TUMOR, self.bio_entity)))
+        # Having no tumor sample is an error by default but this behaviour
+        # can be switched off.
+        tpl = 'Could not find a BioSample with {} = true for BioEntity {}'
+        msg = tpl.format(KEY_IS_TUMOR, self.bio_entity)
+        if not yielded_any and not self.sheet.options.allow_missing_tumor:
+            raise MissingDataEntity(msg)  # pragma: no cover
+        else:
+            warn(msg, MissingDataWarning)
 
     def __repr__(self):
         return 'CancerDonor({})'.format(', '.join(map(
