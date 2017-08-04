@@ -3,11 +3,11 @@ jsonschema==2.5.1
 jsonpath-rw==1.4.0
 
 # YAML parsing
-ruamel.yaml==0.15.18
+ruamel.yaml>=0.15.18
 
 # Kenneth Reitz' wonderful requests module
-requests==2.12.4
-requests-file==1.4.1
+requests>=2.12.4
+requests-file>=1.4.1
 
 # Dependencies of the packages from above
 typing==3.5.3.0

@@ -64,11 +64,18 @@ class CancerCaseSheet(ShortcutSampleSheet):
         #: Mapping of all sample pairs by name of primary DNA test sample
         self.all_sample_pairs_by_tumor_dna_test_sample = OrderedDict(
             (pair.tumor_sample.dna_test_sample.name, pair)
-            for pair in self.all_sample_pairs)
+            for pair in self.all_sample_pairs
+            if pair.tumor_sample and pair.tumor_sample.dna_test_sample)
         #: Mapping of all sample pairs by name of primary DNA library name
         self.all_sample_pairs_by_tumor_dna_ngs_library = OrderedDict(
             (pair.tumor_sample.dna_ngs_library.name, pair)
-            for pair in self.all_sample_pairs)
+            for pair in self.all_sample_pairs
+            if pair.tumor_sample.dna_ngs_library)
+        #: Mapping of all sample pairs by name of primary RNA library name
+        self.all_sample_pairs_by_tumor_rna_ngs_library = OrderedDict(
+            (pair.tumor_sample.rna_ngs_library.name, pair)
+            for pair in self.all_sample_pairs
+            if pair.tumor_sample.rna_ngs_library)
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
@@ -141,8 +148,12 @@ class CancerBioSample(GenericBioSample):
         """Spider through ``self.bio_sample`` and return primary DNA test
         sample
         """
-        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_DNA, False))
-        return TestSampleShortcut(self, sample, 'ngs_library')
+        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_DNA, True),
+                      None)
+        if sample:
+            return TestSampleShortcut(self, sample, 'ngs_library')
+        else:
+            return None
 
     def _get_primary_rna_test_sample(self):
         """Spider through ``self.bio_sample`` and return primary RNA test
@@ -158,13 +169,12 @@ class CancerBioSample(GenericBioSample):
     def _get_primary_dna_ngs_library(self):
         """Get primary DNA NGS library from self.dna_test_sample
         """
-        if not self.dna_test_sample.test_sample.ngs_libraries:
-            raise MissingDataEntity(
-                'Could not find an DNA NGS library for TestSample {}'.format(
-                    self.dna_test_sample.test_sample))  # pragma: no cover
-        else:
+        if (self.dna_test_sample and
+                self.dna_test_sample.test_sample.ngs_libraries):
             return NGSLibraryShortcut(self.dna_test_sample, next(iter(
                 self.dna_test_sample.test_sample.ngs_libraries.values())))
+        else:
+            return None
 
     def _get_primary_rna_ngs_library(self):
         """Get primary RNA NGS library from self.rna_test_sample, if any
