@@ -171,7 +171,7 @@ class BioSampleShortcut(ShortcutMixin):
                     return TestSampleShortcut(self, test_sample, self.selector)
         raise MissingDataEntity(
             'Could not find data entity for type {} in {}'.format(
-                self.selector, self.test_sample))
+                self.selector, self.bio_sample))
 
     def __repr__(self):
         return 'BioSampleShortcut({})'.format(', '.join(map(str, [

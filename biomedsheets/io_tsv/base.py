@@ -431,7 +431,7 @@ class BaseTSVReader:
                 tsv_header.metadata.description or
                 self.__class__.default_description)),
             ('extraInfoDefs', extra_info_defs),
-            ('bioEntities', OrderedDict()),
+            ('bioEntity', OrderedDict()),
         ])
         records_by_bio_entity = OrderedDict()  # records by bio entity
         for record in records:
@@ -440,7 +440,7 @@ class BaseTSVReader:
             records_by_bio_entity[record[
                 self.__class__.bio_entity_name_column]].append(record)
         for bio_entity_name, records in records_by_bio_entity.items():
-            json_data['bioEntities'][
+            json_data['bioEntity'][
                 bio_entity_name] = self._build_bio_entity_json(
                     records, extra_info_defs)
         return self.postprocess_json_data(json_data)
@@ -486,7 +486,7 @@ class BaseTSVReader:
                 sample_records.setdefault(sample_name, [])
                 sample_records[sample_name].append(record)
             for sample_name, entry in sample_records.items():
-                result['bioSamples'][
+                result['bioSample'][
                     sample_name] = self._build_bio_sample_json(
                         entry, extra_info_defs)
         else:
@@ -494,7 +494,7 @@ class BaseTSVReader:
                 'Must be given if bio_sample_name_column is not'
             # skip if no record with libraryType
             if any(r['libraryType'] for r in sub_records):
-                result['bioSamples'][self.__class__.bio_sample_name] = (
+                result['bioSample'][self.__class__.bio_sample_name] = (
                     self._build_bio_sample_json(sub_records, extra_info_defs))
         return result
 
@@ -508,7 +508,7 @@ class BaseTSVReader:
             ('pk', self.next_pk - 1),
             ('extraInfo', OrderedDict([
             ])),
-            ('bioSamples', OrderedDict()),
+            ('bioSample', OrderedDict()),
         ])
         return self._augment_bio_entity_json(
             bio_entity_json, records[0], extra_info_defs)
@@ -553,14 +553,14 @@ class BaseTSVReader:
                 ('extraInfo', OrderedDict([
                     ('extractionType', extraction_type),
                 ])),
-                ('ngsLibraries', OrderedDict([
+                ('ngsLibrary', OrderedDict([
                     (lib_name, self._build_ngs_library_json(
                         record, extra_info_defs)),
                 ]))
             ])
             test_sample_json = self._augment_test_sample_json(
                 test_sample_json, record, extra_info_defs)
-            result['testSamples'][test_sample_name] = test_sample_json
+            result['testSample'][test_sample_name] = test_sample_json
         return result
 
     @classmethod
@@ -584,7 +584,7 @@ class BaseTSVReader:
         bio_sample_json = OrderedDict([
             ('pk', self.next_pk - 1),
             ('extraInfo', OrderedDict()),
-            ('testSamples', OrderedDict()),
+            ('testSample', OrderedDict()),
         ])
         return self._augment_bio_sample_json(
             bio_sample_json, records[0], extra_info_defs)
