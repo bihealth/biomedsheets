@@ -81,7 +81,7 @@ class SheetBuilder:
                 extra_infos_defs=self.json_data.get(
                     'extraInfoDefs', dict_type()),
                 bio_entities_json=self.json_data.get(
-                    'bioEntity', dict_type()),
+                    'bioEntities', dict_type()),
                 dict_type=dict_type,
                 name_generator=name_generator),
             json_data=self.json_data,
@@ -107,7 +107,7 @@ class SheetBuilder:
                     name_generator=name_generator)),
                 bio_samples=dict_type(self._build_bio_samples(
                     extra_infos_defs=extra_infos_defs,
-                    bio_samples_json=value.get('bioSample', dict_type()),
+                    bio_samples_json=value.get('bioSamples', dict_type()),
                     dict_type=dict_type,
                     name_generator=name_generator)),
                 dict_type=dict_type,
@@ -140,7 +140,7 @@ class SheetBuilder:
                     dict_type=dict_type,
                     name_generator=name_generator)),
                 test_samples=dict_type(self._build_test_samples(
-                    extra_infos_defs, value.get('testSample', dict_type()),
+                    extra_infos_defs, value.get('testSamples', dict_type()),
                     dict_type, name_generator)),
                 dict_type=dict_type,
                 name_generator=name_generator)
@@ -166,7 +166,7 @@ class SheetBuilder:
                 ngs_libraries=dict_type(self._build_ngs_libraries(
                     extra_infos_defs=extra_infos_defs,
                     ngs_libraries_json=value.get(
-                        'ngsLibrary', dict_type()),
+                        'ngsLibraries', dict_type()),
                     dict_type=dict_type,
                     name_generator=name_generator)),
                 dict_type=dict_type,

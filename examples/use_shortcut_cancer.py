@@ -27,12 +27,16 @@ def main():
     print('\nLibraries of all tumor/normal pairs\n')
     for pair in cancer_cases.all_sample_pairs:
         print('  {}'.format(pair.donor.name))
-        print('    normal DNA: {}'.format(pair.normal_sample.dna_ngs_library.name))
+        print('    normal DNA: {}'.format(
+            pair.normal_sample.dna_ngs_library.name))
         if pair.normal_sample.rna_ngs_library:
-            print('    normal RNA: {}'.format(pair.normal_sample.rna_ngs_library.name))
-        print('    tumor DNA:  {}'.format(pair.tumor_sample.dna_ngs_library.name))
+            print('    normal RNA: {}'.format(
+                pair.normal_sample.rna_ngs_library.name))
+        print('    tumor DNA:  {}'.format(
+            pair.tumor_sample.dna_ngs_library.name))
         if pair.tumor_sample.rna_ngs_library:
-            print('    tumor RNA:  {}'.format(pair.tumor_sample.rna_ngs_library.name))
+            print('    tumor RNA:  {}'.format(
+                pair.tumor_sample.rna_ngs_library.name))
 
 
 if __name__ == '__main__':

@@ -103,18 +103,27 @@ def _append_pedigree_to_ped(pedigree, f):
         if donor.father_pk:
             if hasattr(pedigree.pk_to_donor[donor.father_pk],
                        'dna_ngs_library'):
-                father = pedigree.pk_to_donor[
-                    donor.father_pk].dna_ngs_library.name
+                donor_father = pedigree.pk_to_donor[donor.father_pk]
+                if donor_father.dna_ngs_library is None:
+                    father = donor_father.name
+                else:
+                    father = donor_father.dna_ngs_library.name
         mother = '0'
         if donor.mother_pk:
             if hasattr(pedigree.pk_to_donor[donor.mother_pk],
                        'dna_ngs_library'):
-                mother = pedigree.pk_to_donor[
-                    donor.mother_pk].dna_ngs_library.name
+                donor_mother = pedigree.pk_to_donor[donor.mother_pk]
+                if donor_mother.dna_ngs_library is None:
+                    mother = donor_mother.name
+                else:
+                    mother = donor_mother.dna_ngs_library.name
         if hasattr(donor, 'dna_ngs_library'):
+            if donor.dna_ngs_library is None:
+                name = donor.name
+            else:
+                name = donor.dna_ngs_library.name
             print('\t'.join(
-                (family, donor.dna_ngs_library.name, father, mother,
-                 sex, affected)), file=f)
+                (family, name, father, mother, sex, affected)), file=f)
 
 
 def write_pedigree_to_ped(pedigree, path):
