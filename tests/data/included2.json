@@ -1,0 +1,11 @@
+{
+    "key1": "value.included2",
+    "key2": "value.included2",
+    "key3": "value.included2",
+
+    "nested": {
+        "key1": 3,
+        "key2": 3,
+        "key3": 3
+    }
+}

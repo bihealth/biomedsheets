@@ -53,34 +53,49 @@ class RefResolver:
         raises RefResolutionError on problems with the resolution
         """
         self.cache = {doc_uri: obj}
-        return self._resolve(doc_uri, obj, obj)
+        return self._resolve(type(obj)(), obj)
 
-    def _resolve(self, doc_uri, main_doc, obj):
-        if isinstance(obj, (int, bool, float, str)):  # JSON atomic
-            return obj
-        elif isinstance(obj, dict):  # JSON object
-            return self._resolve_dict_entry(doc_uri, main_doc, obj)
-        elif isinstance(obj, list):  # JSON list
-            return [self._resolve(doc_uri, main_doc, elem) for elem in obj]
+    def _resolve(self, base_obj, obj):
+        if isinstance(base_obj, (int, bool, float, str)):  # JSON atomic
+            return base_obj
+        elif isinstance(base_obj, dict):  # JSON object
+            return self._resolve_dict_entry(base_obj, obj)
+        elif isinstance(base_obj, list):  # JSON list
+            return [self._resolve(elem, type(elem)()) for elem in base_obj]
         else:
             raise RefResolutionException(
                 'Can only resolve in dict and list container objects and '
                 'the atomic types int, bool, float, and str.')
 
-    def _resolve_dict_entry(self, doc_uri, main_doc, obj):
+    def _resolve_dict_entry(self, base_obj, obj):
         """Implementation of a dict objects"""
-        # Interpret '$ref' key if present in obj
-        if '$ref' in obj:
-            result = self._load_ref(doc_uri, main_doc, obj['$ref'])
+        # Interpret '$ref' key if present in obj, continue to resolve
+        # recursively if necessary.
+        if base_obj:
+            objs = [self._resolve_dict_entry(self.dict_class(), base_obj), obj]
         else:
-            result = self.dict_class()
-        # Merge values from obj with result
-        for k, v in obj.items():
-            if k != '$ref':
-                result[k] = self._resolve(doc_uri, main_doc, v)
+            objs = [obj]
+        imported = set()
+        while '$ref' in objs[-1]:
+            last = objs[-1]
+            if last['$ref'] in imported:
+                raise RefResolutionException(
+                    'Detected recursion when including {}'.format(
+                        last['$ref']))
+            imported.add(last['$ref'])
+            objs.append(self._load_ref(last['$ref']))
+        # Merge objs, values on the left have higher precedence.
+        result = self.dict_class()
+        for obj in reversed(objs):
+            for k, v in obj.items():
+                if k != '$ref':
+                    if k in result:
+                        result[k] = self._resolve(v, result[k])
+                    else:
+                        result[k] = self._resolve(v, type(v)())
         return result
 
-    def _load_ref(self, doc_uri, doc, ref_uri):
+    def _load_ref(self, ref_uri):
         """Resolve "$ref" URI ``uri``"""
         if self.verbose:
             print('Resolving $ref URI {}'.format(ref_uri), file=sys.stderr)
@@ -89,8 +104,7 @@ class RefResolver:
         if not ref_file:  # must be relative to current doc
             pass  # is already in cache
         elif ref_file not in self.cache:
-            self.cache[ref_uri] = self._load_for_cache(
-                doc_uri, doc, parsed_ref_uri)
+            self.cache[ref_uri] = self._load_for_cache(parsed_ref_uri)
         ref_json = self.cache[ref_uri]
         expr = jsonpath_rw.parse(
             '$' + '.'.join(parsed_ref_uri.fragment.split('/')))
@@ -119,7 +133,7 @@ class RefResolver:
         else:
             return parsed_ref_uri
 
-    def _load_for_cache(self, doc_uri, doc, parsed_uri):
+    def _load_for_cache(self, parsed_uri):
         """Load fragment from file URI without cache"""
         remote_uri = '{}://{}/{}'.format(
             parsed_uri.scheme, parsed_uri.netloc, parsed_uri.path)

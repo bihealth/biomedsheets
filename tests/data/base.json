@@ -1,0 +1,13 @@
+{
+    "key1": "value.base",
+
+    "nested": {
+        "key1": 1
+    },
+
+    "$ref": "file://included1.json",
+
+    "more": {
+        "$ref": "file://included3.json"
+    }
+}

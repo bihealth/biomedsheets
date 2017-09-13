@@ -6,6 +6,8 @@ BioMed Sheets Changelog
 HEAD (not released)
 -------------------
 
+- Fixing bug in reference resolving (+tests)
+
 ----
 v0.3
 ----
