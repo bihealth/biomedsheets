@@ -2,10 +2,15 @@
 BioMed Sheets Changelog
 =======================
 
--------------------
-HEAD (not released)
--------------------
+----
+v0.4
+----
 
+- Fixin TSV I/O.
+- Bumping ruamel.yaml version.
+- Fixing cancer sheet iteration.
+- Allowing cancer-only samples in cance case sheets.
+- Fixing ``float``-related bug.
 - Fixing bug in reference resolving (+tests)
 
 ----
