@@ -3,11 +3,12 @@
 """
 
 from collections import OrderedDict
+from warnings import warn
 
 from .base import (
     EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity,
     ShortcutSampleSheet, BioSampleShortcut, TestSampleShortcut,
-    NGSLibraryShortcut)
+    NGSLibraryShortcut, MissingDataWarning)
 from .generic import GenericBioEntity
 from ..union_find import UnionFind
 
@@ -346,23 +347,19 @@ class GermlineDonor(GenericBioEntity):
     def _get_primary_dna_bio_sample(self):
         """Spider through ``self.bio_entity`` and return primary bio sample
         """
-        sample = next(
-            self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True), None)
-        if sample:
-            return BioSampleShortcut(self, sample, 'ngs_library')
-        else:
-            return None
+        for sample in self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True):
+            if not sample.extra_infos.get('isTumor', False):
+                return BioSampleShortcut(self, sample, 'ngs_library')
+        return None
 
     def _get_primary_rna_bio_sample(self):
         """Spider through ``self.bio_entity`` and return primary bio sample
         with RNA data, if any; ``None`` otherwise
         """
-        sample = next(
-            self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True), None)
-        if sample:
-            return BioSampleShortcut(self, sample, 'ngs_library')
-        else:
-            return None
+        for sample in self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True):
+            if not sample.extra_infos.get('isTumor', False):
+                return BioSampleShortcut(self, sample, 'ngs_library')
+        return None
 
     def _get_primary_dna_test_sample(self):
         """Spider through ``self.bio_entity`` and return primary DNA test sample
@@ -477,9 +474,11 @@ class GermlineCaseSheet(ShortcutSampleSheet):
                 raise ValueError(  # pragma: no cover
                     'Found pedigree without index! {}'.format(pedigree))
             if not pedigree.index.dna_ngs_library:
-                raise ValueError(  # pragma: no cover
-                    'Pedigree index has no DNA library! {}/{}'.format(
-                        pedigree.index, pedigree))
+                # Warn if pedigree does not have a NGS library
+                tpl = 'Pedigree index has no DNA library! {}/{}'
+                msg = tpl.format(pedigree.index, pedigree)
+                warn(msg, MissingDataWarning)
+                continue
             yield pedigree.index.dna_ngs_library.name, pedigree
 
     def _library_name_to_library(self):
