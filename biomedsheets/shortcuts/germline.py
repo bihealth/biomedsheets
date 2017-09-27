@@ -97,7 +97,7 @@ def _append_pedigree_to_ped(pedigree, f):
     for donor in pedigree.donors:
         affected = {
             'affected': '2', 'unaffected': '1', 'unknown': '0'
-        }[donor.extra_infos['isAffected']]
+        }[donor.extra_infos.get(KEY_IS_AFFECTED, 'unknown')]
         sex = {'male': '1', 'female': '2', 'unknown': '0'}[
             donor.extra_infos['sex']]
         father = '0'
