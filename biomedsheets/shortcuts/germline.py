@@ -28,6 +28,9 @@ KEY_FATHER_PK = 'fatherPk'
 #: Key value for the "mother PK" value
 KEY_MOTHER_PK = 'motherPk'
 
+#: Key value for "sex".
+KEY_SEX = 'sex'
+
 
 class Pedigree:
     """Class for accessing information in a pedigree
@@ -99,7 +102,7 @@ def _append_pedigree_to_ped(pedigree, f):
             'affected': '2', 'unaffected': '1', 'unknown': '0'
         }[donor.extra_infos.get(KEY_IS_AFFECTED, 'unknown')]
         sex = {'male': '1', 'female': '2', 'unknown': '0'}[
-            donor.extra_infos['sex']]
+            donor.extra_infos.get(KEY_SEX, 'unknown')]
         father = '0'
         if donor.father_pk:
             if hasattr(pedigree.pk_to_donor[donor.father_pk],
