@@ -2,9 +2,9 @@
 BioMed Sheets Changelog
 =======================
 
------------------------
-HEAD (work in progress)
------------------------
+------
+v0.5.2
+------
 
 - Removing some hard (transitive) dependencies.
 
