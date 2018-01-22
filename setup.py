@@ -37,9 +37,6 @@ setup(
     package_dir={
         'biomedsheets': 'biomedsheets',
     },
-    package_data={
-        'biomedsheets': ['data/*.json'],
-    },
     entry_points={
         'console_scripts': [
             'biomedsheets = biomedsheets.__main__:main',

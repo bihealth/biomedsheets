@@ -12,5 +12,6 @@ recursive-exclude * *.py[co]
 recursive-include docs *.rst conf.py Makefile make.bat *.jpg *.png *.gif
 include versioneer.py
 include biomedsheets/_version.py
+include biomedsheets/data/*.json
 
 include requirements.txt requirements/*.txt

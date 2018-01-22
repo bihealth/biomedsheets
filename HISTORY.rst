@@ -2,9 +2,11 @@
 BioMed Sheets Changelog
 =======================
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.5.1
+------
+
+- Fixing manifest so the package contains the JSON file.
 
 ----
 v0.5
