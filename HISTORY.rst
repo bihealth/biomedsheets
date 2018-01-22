@@ -6,6 +6,8 @@ BioMed Sheets Changelog
 HEAD (work in progress)
 -----------------------
 
+- Removing some hard (transitive) dependencies.
+
 ------
 v0.5.1
 ------
