@@ -3,6 +3,13 @@ BioMed Sheets Changelog
 =======================
 
 ----
+v0.5
+----
+
+- Allow cancer sheets for use in germline calling.
+- Only warn if index has no NGS library, no error.
+
+----
 v0.4
 ----
 
