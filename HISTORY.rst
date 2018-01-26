@@ -7,6 +7,12 @@ HEAD (work in progress)
 -----------------------
 
 ------
+v0.5.3
+------
+
+- Fixing packaging to use base and not test dependencies.
+
+------
 v0.5.2
 ------
 
