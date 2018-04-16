@@ -6,6 +6,12 @@ BioMed Sheets Changelog
 HEAD (not released)
 -------------------
 
+------
+v0.3.1
+------
+
+- Fixing ``setup.py`` to work with pip v10.
+
 ----
 v0.3
 ----
