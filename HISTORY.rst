@@ -7,6 +7,12 @@ HEAD (work in progress)
 -----------------------
 
 ------
+v0.5.4
+------
+
+- Fixing ``setup.py`` to work with pip v10.t
+
+------
 v0.5.3
 ------
 
@@ -41,6 +47,12 @@ v0.4
 - Allowing cancer-only samples in cance case sheets.
 - Fixing ``float``-related bug.
 - Fixing bug in reference resolving (+tests)
+
+------
+v0.3.1
+------
+
+- Fixing ``setup.py`` to work with pip v10.
 
 ----
 v0.3
