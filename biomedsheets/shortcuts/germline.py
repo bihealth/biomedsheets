@@ -277,11 +277,7 @@ class CohortBuilder:
         # Construct the pedigrees
         for ped_donors in partition.values():
             affecteds = [d for d in ped_donors if d.is_affected]
-            if affecteds:
-                index = affecteds[-1]
-            else:
-                index = None
-            yield Pedigree(ped_donors, index)
+            yield Pedigree(ped_donors)
 
 
 class GermlineDonor(GenericBioEntity):

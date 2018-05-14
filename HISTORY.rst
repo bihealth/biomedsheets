@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.5.6
+------
+
+- Fixing bug in computing index (for real).
+
+------
 v0.5.5
 ------
 
