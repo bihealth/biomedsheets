@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.6.0
+------
+
+- Allowing to comment out lines in TSV files by prefixing them with ``#``.
+
+------
 v0.5.6
 ------
 

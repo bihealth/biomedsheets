@@ -232,7 +232,9 @@ class TSVHeaderParser:
         custom_fields_infos = []
         state = None
         for line in self.lines:
-            if line.startswith('[Metadata]'):
+            if line.startswith('#'):
+                continue  # comment: ignore
+            elif line.startswith('[Metadata]'):
                 state = 'metadata'
                 continue
             elif line.startswith('[Custom Fields]'):
