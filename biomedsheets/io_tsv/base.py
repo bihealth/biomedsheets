@@ -364,7 +364,9 @@ class BaseTSVReader:
         header, body = [], []
         in_data = False
         for line in lines:
-            if in_data:
+            if line.startswith('#'):
+                continue  # comment, skip
+            elif in_data:
                 body.append(line)
             else:
                 header.append(line)

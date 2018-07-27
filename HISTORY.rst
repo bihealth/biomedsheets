@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.6.1
+------
+
+- Interpreting ``#`` in TSV files in more locations.
+
+------
 v0.6.0
 ------
 
