@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Code for resolving references in JSON code"""
 
+from collections.abc import MutableSequence, MutableMapping
 import os
 from urllib.parse import urlparse
 import sys
@@ -58,9 +59,9 @@ class RefResolver:
     def _resolve(self, base_obj, obj):
         if isinstance(base_obj, (int, bool, float, str)):  # JSON atomic
             return base_obj
-        elif isinstance(base_obj, dict):  # JSON object
+        elif isinstance(base_obj, (dict, MutableMapping)):  # JSON object
             return self._resolve_dict_entry(base_obj, obj)
-        elif isinstance(base_obj, list):  # JSON list
+        elif isinstance(base_obj, (list, MutableSequence)):  # JSON list
             return [self._resolve(elem, type(elem)()) for elem in base_obj]
         else:
             raise RefResolutionException(
