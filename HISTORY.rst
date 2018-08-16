@@ -2,9 +2,9 @@
 BioMed Sheets Changelog
 =======================
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.6.2
+------
 
 - Proper merging with recent ``ruamel.yaml`` updates.
 
