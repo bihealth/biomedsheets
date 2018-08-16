@@ -52,3 +52,11 @@ Running Tests
 ::
 
     $ py.test
+
+------------------
+Publishing to PyPi
+------------------
+
+::
+
+    $ python setup.py sdist upload
