@@ -27,7 +27,7 @@ def tsv_sheet_generic_header():
     E001\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB1
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1
-    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB2
+    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2
     """.lstrip()))
     return f
 
@@ -40,7 +40,7 @@ def tsv_sheet_generic_no_header():
     E001\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB1
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1
-    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB2
+    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2
     """.lstrip()))
     return f
 
@@ -157,16 +157,24 @@ EXPECTED_GENERIC_SHEET_JSON_HEADER = r"""
                     "extraInfo": {},
                     "testSamples": {
                         "TS1": {
-                            "pk": 12,
+                            "pk": 10,
                             "extraInfo": {
                                 "extractionType": "RNA"
                             },
                             "ngsLibraries": {
+                                "LIB1": {
+                                    "pk": 11,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "E002-BS1-TS1-LIB1",
+                                        "libraryType": "total_RNA_seq"
+                                    }
+                                },
                                 "LIB2": {
                                     "pk": 13,
                                     "extraInfo": {
                                         "seqPlatform": "Illumina",
-                                        "folderName": "E001-BS1-TS1-LIB2",
+                                        "folderName": "E002-BS1-TS1-LIB2",
                                         "libraryType": "total_RNA_seq"
                                     }
                                 }
@@ -291,16 +299,24 @@ EXPECTED_GENERIC_SHEET_JSON_NO_HEADER = r"""
                     "extraInfo": {},
                     "testSamples": {
                         "TS1": {
-                            "pk": 12,
+                            "pk": 10,
                             "extraInfo": {
                                 "extractionType": "RNA"
                             },
                             "ngsLibraries": {
+                                "LIB1": {
+                                    "pk": 11,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "E002-BS1-TS1-LIB1",
+                                        "libraryType": "total_RNA_seq"
+                                    }
+                                },
                                 "LIB2": {
                                     "pk": 13,
                                     "extraInfo": {
                                         "seqPlatform": "Illumina",
-                                        "folderName": "E001-BS1-TS1-LIB2",
+                                        "folderName": "E002-BS1-TS1-LIB2",
                                         "libraryType": "total_RNA_seq"
                                     }
                                 }

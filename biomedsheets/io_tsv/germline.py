@@ -98,7 +98,10 @@ class GermlineTSVReader(BaseTSVReader):
     default_title = GERMLINE_DEFAULT_TITLE
     default_description = GERMLINE_DEFAULT_DESCRIPTION
     bio_entity_name_column = 'patientName'
+    bio_sample_name_column = 'bioSample'
+    test_sample_name_column = 'testSample'
     bio_sample_name = 'N1'
+    optional_body_header_columns = ('seqPlatform', 'bioSample', 'testSample')
 
     def check_tsv_line(self, mapping, lineno):
         """Cancer sample sheet--specific valiation"""

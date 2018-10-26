@@ -276,7 +276,6 @@ class CohortBuilder:
             partition.setdefault(union_find[str(donor.pk)], []).append(donor)
         # Construct the pedigrees
         for ped_donors in partition.values():
-            affecteds = [d for d in ped_donors if d.is_affected]
             yield Pedigree(ped_donors)
 
 

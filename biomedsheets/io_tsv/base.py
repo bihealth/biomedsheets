@@ -483,7 +483,8 @@ class BaseTSVReader:
         # If the sub class defines a sample name column then use it to further
         # split up the sample names.  Otherwise, there can only be one sample
         # name and its name must be defined in the class.
-        if self.__class__.bio_sample_name_column:
+        if (self.__class__.bio_sample_name_column and
+                any(self.__class__.bio_sample_name_column in record for record in sub_records)):
             sample_records = OrderedDict()  # records by bio sample
             for record in sub_records:
                 sample_name = record[self.__class__.bio_sample_name_column]
@@ -534,37 +535,45 @@ class BaseTSVReader:
         self.check_bio_sample_records(records, extra_info_defs)
         result = self.construct_bio_sample_dict(records, extra_info_defs)
         counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
-        counters_lib = dict((x, 1) for x in LIBRARY_TYPES)
+        counters_lib = {}
+        print('reading...', records)
         for record in records:
+            if not record['libraryType'] in LIBRARY_TO_EXTRACTION:
+                continue
             extraction_type = LIBRARY_TO_EXTRACTION[record['libraryType']]
-            if self.__class__.test_sample_name_column:
+            if (self.__class__.test_sample_name_column and
+                    self.__class__.test_sample_name_column in record):
                 test_sample_name = record[
                     self.__class__.test_sample_name_column]
             else:
                 test_sample_name = '{}{}'.format(
                     extraction_type, counters_ext[extraction_type])
-                counters_ext[extraction_type] += 1
             if self.__class__.ngs_library_name_column:
                 lib_name = record[self.__class__.ngs_library_name_column]
             else:
+                counters_lib.setdefault(test_sample_name, dict((x, 1) for x in LIBRARY_TYPES))
                 lib_name = '{}{}'.format(record['libraryType'],
-                                         counters_lib[record['libraryType']])
-                counters_lib[record['libraryType']] += 1
+                                         counters_lib[test_sample_name][record['libraryType']])
+                counters_lib[test_sample_name][record['libraryType']] += 1
             pk = self.next_pk
             self.next_pk += 1
-            test_sample_json = OrderedDict([
-                ('pk', pk),
-                ('extraInfo', OrderedDict([
-                    ('extractionType', extraction_type),
-                ])),
-                ('ngsLibraries', OrderedDict([
-                    (lib_name, self._build_ngs_library_json(
-                        record, extra_info_defs)),
-                ]))
-            ])
-            test_sample_json = self._augment_test_sample_json(
-                test_sample_json, record, extra_info_defs)
-            result['testSamples'][test_sample_name] = test_sample_json
+            if test_sample_name not in result['testSamples']:
+                test_sample_json = OrderedDict([
+                    ('pk', pk),
+                    ('extraInfo', OrderedDict([
+                        ('extractionType', extraction_type),
+                    ])),
+                    ('ngsLibraries', OrderedDict([
+                        (lib_name, self._build_ngs_library_json(
+                            record, extra_info_defs)),
+                    ]))
+                ])
+                test_sample_json = self._augment_test_sample_json(
+                    test_sample_json, record, extra_info_defs)
+                result['testSamples'][test_sample_name] = test_sample_json
+            else:
+                libraries = result['testSamples'][test_sample_name]['ngsLibraries']
+                libraries[lib_name] = self._build_ngs_library_json(record, extra_info_defs)
         return result
 
     @classmethod

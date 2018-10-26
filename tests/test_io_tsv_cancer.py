@@ -240,15 +240,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
-                                }
-                            }
-                        },
-                        "DNA2": {
-                            "pk": 17,
-                            "extraInfo": {
-                                "extractionType": "DNA"
-                            },
-                            "ngsLibraries": {
+                                },
                                 "WES2": {
                                     "pk": 18,
                                     "extraInfo": {
@@ -493,15 +485,7 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
                                         "folderName": "P001-T1-DNA1-WES1",
                                         "libraryType": "WES"
                                     }
-                                }
-                            }
-                        },
-                        "DNA2": {
-                            "pk": 17,
-                            "extraInfo": {
-                                "extractionType": "DNA"
-                            },
-                            "ngsLibraries": {
+                                },
                                 "WES2": {
                                     "pk": 18,
                                     "extraInfo": {

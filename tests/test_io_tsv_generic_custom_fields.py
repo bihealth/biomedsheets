@@ -34,7 +34,7 @@ def tsv_sheet_generic_header():
     E001\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.03\t0.001
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.05\t0.002
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.004
-    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.08\t0.005
+    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.005
     """.lstrip()))
     return f
 
@@ -47,7 +47,7 @@ def tsv_sheet_generic_no_header():
     E001\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.03\t0.001
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.05\t0.002
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.004
-    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.08\t0.005
+    E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.005
     """.lstrip()))
     return f
 
@@ -204,17 +204,26 @@ EXPECTED_GENERIC_SHEET_JSON_HEADER = r"""
                     },
                     "testSamples": {
                         "TS1": {
-                            "pk": 12,
+                            "pk": 10,
                             "extraInfo": {
                                 "extractionType": "RNA",
-                                "testSampleConcentration": 0.08
+                                "testSampleConcentration": 0.06
                             },
                             "ngsLibraries": {
+                                "LIB1": {
+                                    "pk": 11,
+                                    "extraInfo": {
+                                        "seqPlatform": "Illumina",
+                                        "folderName": "E002-BS1-TS1-LIB1",
+                                        "libraryType": "total_RNA_seq",
+                                        "ngsLibraryConcentration": 0.004
+                                    }
+                                },
                                 "LIB2": {
                                     "pk": 13,
                                     "extraInfo": {
                                         "seqPlatform": "Illumina",
-                                        "folderName": "E001-BS1-TS1-LIB2",
+                                        "folderName": "E002-BS1-TS1-LIB2",
                                         "libraryType": "total_RNA_seq",
                                         "ngsLibraryConcentration": 0.005
                                     }

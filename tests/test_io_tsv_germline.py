@@ -643,15 +643,7 @@ EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME = r"""
                                         "folderName": "12_347",
                                         "libraryType": "WGS"
                                     }
-                                }
-                            }
-                        },
-                        "DNA2": {
-                            "pk": 5,
-                            "extraInfo": {
-                                "extractionType": "DNA"
-                            },
-                            "ngsLibraries": {
+                                },
                                 "WGS2": {
                                     "pk": 6,
                                     "extraInfo": {

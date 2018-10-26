@@ -5,7 +5,7 @@ import io
 import pytest
 import textwrap
 
-from biomedsheets import io_tsv, shortcuts
+from biomedsheets import naming, io_tsv, shortcuts
 
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -39,6 +39,81 @@ def sheet_germline(tsv_sheet_germline):
     return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(tsv_sheet_germline))
 
 
+@pytest.fixture
+def tsv_sheet_germline_two_libs():
+    """Example TSV germline sheet"""
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tsingle individual, sequenced twice
+
+    [Data]
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    donor\t0\t0\tM\tN\tWES\tdonor-a\t.
+    donor\t0\t0\tM\tN\tWES\tdonor-b\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_two_libs(tsv_sheet_germline_two_libs):
+    """Return ``Sheet`` instance for the germline example with two libraries"""
+    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(
+        tsv_sheet_germline_two_libs, naming_scheme=naming.NAMING_ONLY_SECONDARY_ID))
+
+
+@pytest.fixture
+def tsv_sheet_germline_two_bio_samples():
+    """Example TSV germline sheet"""
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tsingle individual, sequenced twice
+
+    [Data]
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tbioSample\tlibraryType\tfolderName\thpoTerms
+    donor\t0\t0\tM\tN\tN1\tWES\tdonor-a\t.
+    donor\t0\t0\tM\tN\tN2\tWES\tdonor-b\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_two_bio_samples(tsv_sheet_germline_two_bio_samples):
+    """Return ``Sheet`` instance for the germline example with two bio_samples"""
+    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(
+        tsv_sheet_germline_two_bio_samples, naming_scheme=naming.NAMING_ONLY_SECONDARY_ID))
+
+
+@pytest.fixture
+def tsv_sheet_germline_two_test_samples():
+    """Example TSV germline sheet"""
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tsingle individual, sequenced twice
+
+    [Data]
+    patientName\tfatherName\tmotherName\tsex\tisAffected\ttestSample\tlibraryType\tfolderName\thpoTerms
+    donor\t0\t0\tM\tN\tDNA1\tWES\tdonor-a\t.
+    donor\t0\t0\tM\tN\tDNA2\tWES\tdonor-b\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_two_test_samples(tsv_sheet_germline_two_test_samples):
+    """Return ``Sheet`` instance for the germline example with two test_samples"""
+    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(
+        tsv_sheet_germline_two_test_samples, naming_scheme=naming.NAMING_ONLY_SECONDARY_ID))
+
+
 def test_germline_case_sheet(sheet_germline):
     """Tests for the germline case sheet"""
     sheet = sheet_germline
@@ -55,6 +130,45 @@ def test_germline_case_sheet(sheet_germline):
         'index2-N1-DNA1-WES1-000016',
         'father2-N1-DNA1-WES1-000020',
         'mother2-N1-DNA1-WES1-000024',
+    ]
+
+
+def test_germline_case_sheet_two_libs(sheet_germline_two_libs):
+    """Tests for the germline case sheet with two libraries"""
+    sheet = sheet_germline_two_libs
+    assert len(sheet.donors) == 1
+    assert len(sheet.index_ngs_library_to_pedigree) == 1
+    assert list(sheet.index_ngs_library_to_pedigree) == ['donor-N1-DNA1-WES1']
+    assert len(sheet.index_ngs_library_to_donor) == 1
+    assert list(sheet.library_name_to_library) == [
+        'donor-N1-DNA1-WES1',
+        'donor-N1-DNA1-WES2'
+    ]
+
+
+def test_germline_case_sheet_two_bio_samples(sheet_germline_two_bio_samples):
+    """Tests for the germline case sheet with two bio samples"""
+    sheet = sheet_germline_two_bio_samples
+    assert len(sheet.donors) == 1
+    assert len(sheet.index_ngs_library_to_pedigree) == 1
+    assert list(sheet.index_ngs_library_to_pedigree) == ['donor-N1-DNA1-WES1']
+    assert len(sheet.index_ngs_library_to_donor) == 1
+    assert list(sheet.library_name_to_library) == [
+        'donor-N1-DNA1-WES1',
+        'donor-N2-DNA1-WES1'
+    ]
+
+
+def test_germline_case_sheet_two_test_samples(sheet_germline_two_test_samples):
+    """Tests for the germline case sheet with two test samples"""
+    sheet = sheet_germline_two_test_samples
+    assert len(sheet.donors) == 1
+    assert len(sheet.index_ngs_library_to_pedigree) == 1
+    assert list(sheet.index_ngs_library_to_pedigree) == ['donor-N1-DNA1-WES1']
+    assert len(sheet.index_ngs_library_to_donor) == 1
+    assert list(sheet.library_name_to_library) == [
+        'donor-N1-DNA1-WES1',
+        'donor-N1-DNA2-WES1'
     ]
 
 

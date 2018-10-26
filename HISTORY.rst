@@ -3,6 +3,13 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.7.0
+------
+
+- Allowing to specify ``bioSample`` and ``testSample`` in germline TSV files.
+- Fixing some tests.
+
+------
 v0.6.2
 ------
 

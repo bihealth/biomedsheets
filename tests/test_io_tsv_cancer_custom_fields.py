@@ -345,15 +345,7 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
                                         "libraryType": "WES",
                                         "ngsLibraryNice": true
                                     }
-                                }
-                            }
-                        },
-                        "DNA2": {
-                            "pk": 17,
-                            "extraInfo": {
-                                "extractionType": "DNA"
-                            },
-                            "ngsLibraries": {
+                                },
                                 "WES2": {
                                     "pk": 18,
                                     "extraInfo": {
