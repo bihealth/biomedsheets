@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.7.1
+------
+
+- Removing superflous print.
+
+------
 v0.7.0
 ------
 

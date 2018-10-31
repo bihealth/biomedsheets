@@ -536,7 +536,6 @@ class BaseTSVReader:
         result = self.construct_bio_sample_dict(records, extra_info_defs)
         counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
         counters_lib = {}
-        print('reading...', records)
         for record in records:
             if not record['libraryType'] in LIBRARY_TO_EXTRACTION:
                 continue
