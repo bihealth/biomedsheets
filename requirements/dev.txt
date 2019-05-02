@@ -7,7 +7,7 @@
 -e git+ssh://git@github.com/holtgrewe/sphinx.git@autodata/human-readable#egg=sphinx
 
 # Prettier CLI for py.test
-pytest-sugar==0.8.0
+pytest-sugar>=0.8.0
 
 # Sphinx theme
 sphinx_rtd_theme==0.1.9

@@ -145,7 +145,7 @@ class RefResolver:
             response.raise_for_status()
         except HTTPError as e:
             raise RefResolutionException(
-                'Could not load file {}'.format(parsed_uri.geturl()))
+                'Could not load file {}'.format(parsed_uri.geturl())) from e
         remote_json = self._load_json(response)
         return remote_json
 

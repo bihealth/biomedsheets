@@ -76,11 +76,21 @@ class Pedigree:
             self.affecteds = []
             self.index = self.donors[0]
         else:
+            donors_with_libs = [
+                d for d in self.donors
+                if d.dna_ngs_library or d.rna_ngs_library]
+            affecteds_with_libs = [
+                d for d in donors_with_libs if d.is_affected]
             self.affecteds = [d for d in self.donors if d.is_affected]
-            if self.index is None and self.affecteds:
-                self.index = self.affecteds[0]
-            elif self.index is None:  # fallback to first in list
-                self.index = self.donors[0]
+            if self.index is None:
+                if affecteds_with_libs:
+                    self.index = affecteds_with_libs[0]
+                elif donors_with_libs:
+                    self.index = donors_with_libs[0]
+                elif self.affecteds:
+                    self.index = self.affecteds[0]
+                else:
+                    self.index = self.donors[0]
         self.founders = [d for d in self.donors if d.is_founder]
         self.name_to_donor = OrderedDict([(d.name, d) for d in self.donors])
         self.pk_to_donor = OrderedDict([(str(d.pk), d) for d in self.donors])

@@ -2,6 +2,14 @@
 BioMed Sheets Changelog
 =======================
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Changed behaviour in case of no affected donor has library.
+  In this case, the first donor becomes the index.
+  Consequently, the index must have an NGS library.
+
 ------
 v0.7.1
 ------

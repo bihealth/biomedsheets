@@ -484,7 +484,8 @@ class BaseTSVReader:
         # split up the sample names.  Otherwise, there can only be one sample
         # name and its name must be defined in the class.
         if (self.__class__.bio_sample_name_column and
-                any(self.__class__.bio_sample_name_column in record for record in sub_records)):
+                any(self.__class__.bio_sample_name_column in record
+                    for record in sub_records)):
             sample_records = OrderedDict()  # records by bio sample
             for record in sub_records:
                 sample_name = record[self.__class__.bio_sample_name_column]
@@ -550,9 +551,11 @@ class BaseTSVReader:
             if self.__class__.ngs_library_name_column:
                 lib_name = record[self.__class__.ngs_library_name_column]
             else:
-                counters_lib.setdefault(test_sample_name, dict((x, 1) for x in LIBRARY_TYPES))
-                lib_name = '{}{}'.format(record['libraryType'],
-                                         counters_lib[test_sample_name][record['libraryType']])
+                counters_lib.setdefault(
+                    test_sample_name, dict((x, 1) for x in LIBRARY_TYPES))
+                lib_name = '{}{}'.format(
+                    record['libraryType'],
+                    counters_lib[test_sample_name][record['libraryType']])
                 counters_lib[test_sample_name][record['libraryType']] += 1
             pk = self.next_pk
             self.next_pk += 1
@@ -571,8 +574,10 @@ class BaseTSVReader:
                     test_sample_json, record, extra_info_defs)
                 result['testSamples'][test_sample_name] = test_sample_json
             else:
-                libraries = result['testSamples'][test_sample_name]['ngsLibraries']
-                libraries[lib_name] = self._build_ngs_library_json(record, extra_info_defs)
+                libraries = result['testSamples'][test_sample_name][
+                    'ngsLibraries']
+                libraries[lib_name] = self._build_ngs_library_json(
+                    record, extra_info_defs)
         return result
 
     @classmethod

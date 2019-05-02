@@ -5,6 +5,7 @@
 
 *.pyc
 *.egg-info
+src/
 
 __pycache__
 

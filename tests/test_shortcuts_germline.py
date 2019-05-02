@@ -114,6 +114,32 @@ def sheet_germline_two_test_samples(tsv_sheet_germline_two_test_samples):
         tsv_sheet_germline_two_test_samples, naming_scheme=naming.NAMING_ONLY_SECONDARY_ID))
 
 
+@pytest.fixture
+def tsv_sheet_germline_only_parent_samples():
+    """Example TSV germline sheet"""
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tonly parents have samples
+
+    [Data]
+    patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    father\t0\t0\tM\tN\tWES\tfather\t.
+    mother\t0\t0\tF\tN\tWES\tmother\t.
+    child\tfather\tmother\tM\tY\t.\tchild\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_only_parent_samples(tsv_sheet_germline_only_parent_samples):
+    """Return ``Sheet`` instance for the germline example where only parents have samples"""
+    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(
+        tsv_sheet_germline_only_parent_samples, naming_scheme=naming.NAMING_ONLY_SECONDARY_ID))
+
+
 def test_germline_case_sheet(sheet_germline):
     """Tests for the germline case sheet"""
     sheet = sheet_germline
@@ -169,6 +195,25 @@ def test_germline_case_sheet_two_test_samples(sheet_germline_two_test_samples):
     assert list(sheet.library_name_to_library) == [
         'donor-N1-DNA1-WES1',
         'donor-N1-DNA2-WES1'
+    ]
+
+
+def test_germline_case_sheet_only_parent_samples(sheet_germline_only_parent_samples):
+    """Tests for the germline case sheet where only parents have samples.
+
+    The first donor with sample (the father) should become the index.
+    """
+    sheet = sheet_germline_only_parent_samples
+    assert len(sheet.donors) == 3
+    assert len(sheet.index_ngs_library_to_pedigree) == 1
+    assert list(sheet.index_ngs_library_to_pedigree) == ['father-N1-DNA1-WES1']
+    assert list(sheet.index_ngs_library_to_donor) == [
+        'father-N1-DNA1-WES1',
+        'mother-N1-DNA1-WES1'
+    ]
+    assert list(sheet.library_name_to_library) == [
+        'father-N1-DNA1-WES1',
+        'mother-N1-DNA1-WES1'
     ]
 
 
