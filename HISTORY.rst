@@ -2,9 +2,9 @@
 BioMed Sheets Changelog
 =======================
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.8.0
+------
 
 - Changed behaviour in case of no affected donor has library.
   In this case, the first donor becomes the index.
