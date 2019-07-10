@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.8.1
+------
+
+- Fixing mapping of `Unknown` values.
+
+------
 v0.8.0
 ------
 

@@ -65,7 +65,7 @@ SEX_VALUES = {
     '0': 'unknown',
     '1': 'male',
     '2': 'female',
-    None: 'unknown,'
+    None: 'unknown'
 }
 
 #: Constants for interpreting "sex" field
@@ -79,7 +79,7 @@ AFFECTED_VALUES = {
     '0': 'unknown',
     '1': 'unaffected',
     '2': 'affected',
-    None: 'unknown,'
+    None: 'unknown'
 }
 
 
