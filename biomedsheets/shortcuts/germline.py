@@ -82,6 +82,7 @@ class Pedigree:
             affecteds_with_libs = [
                 d for d in donors_with_libs if d.is_affected]
             self.affecteds = [d for d in self.donors if d.is_affected]
+            self.affecteds = list(sorted(self.affecteds, key=lambda d: d.name))
             if self.index is None:
                 if affecteds_with_libs:
                     self.index = affecteds_with_libs[0]

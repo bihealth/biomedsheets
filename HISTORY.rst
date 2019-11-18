@@ -3,10 +3,16 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.9.0
+------
+
+- Sorting donors for picking the index in germline sample sheets.
+
+------
 v0.8.1
 ------
 
-- Fixing mapping of `Unknown` values.
+- Fixing mapping of ``Unknown`` values.
 
 ------
 v0.8.0
