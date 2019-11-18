@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 ------
+v0.9.1
+------
+
+- Fixing sorting bug.
+
+------
 v0.9.0
 ------
 

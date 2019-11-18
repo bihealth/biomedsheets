@@ -3,6 +3,8 @@
 
 .cache/
 
+.tox
+
 *.pyc
 *.egg-info
 src/
