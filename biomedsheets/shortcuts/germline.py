@@ -2,6 +2,7 @@
 """Shortcuts for rare germline sample sheets
 """
 
+from copy import deepcopy
 from collections import OrderedDict
 from warnings import warn
 
@@ -30,6 +31,11 @@ KEY_MOTHER_PK = 'motherPk'
 
 #: Key value for "sex".
 KEY_SEX = 'sex'
+
+
+def donor_has_dna_ngs_library(donor):
+    """Predicate that returns whether the donor has a dna library."""
+    return bool(donor.dna_ngs_library)
 
 
 class Pedigree:
@@ -61,6 +67,31 @@ class Pedigree:
         self.secondary_id_to_donor = {}
         # Initialize the shortcuts
         self.update_shortcuts()
+
+    def with_filtered_donors(self, predicate):
+        """Return pedigree, removing donors not passing ``predicate``."""
+        if self.index and predicate(self.index):
+            index = self.index
+        else:
+            index = None
+
+        included = set()
+        for donor in filter(predicate, self.donors):
+            included.add(donor.name)
+
+        donors = []
+        for donor in self.donors:
+            if donor.name in included:
+                donor = deepcopy(donor)
+                if not donor._father or donor._father.name not in included:
+                    donor._father = None
+                    donor.extra_infos.pop(KEY_FATHER_PK, None)
+                if not donor._mother or donor._mother.name not in included:
+                    donor._mother = None
+                    donor.extra_infos.pop(KEY_MOTHER_PK, None)
+                donors.append(donor)
+
+        return Pedigree(donors, index)    
 
     @property
     def member_count(self):

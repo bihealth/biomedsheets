@@ -2,6 +2,12 @@
 BioMed Sheets Changelog
 =======================
 
+-------
+v0.10.0
+-------
+
+- Adding functionality for filtering pedigrees.
+
 ------
 v0.9.1
 ------
