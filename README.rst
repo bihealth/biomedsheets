@@ -2,9 +2,6 @@
 BioMed Sheets
 =============
 
-.. image:: https://travis-ci.org/bihealth/biomedsheets.svg?branch=master
-    :target: https://travis-ci.org/bihealth/biomedsheets
-
 .. image:: https://readthedocs.org/projects/biomedsheets/badge/?version=master
     :target: https://biomedsheets.readthedocs.io/en/master
 
