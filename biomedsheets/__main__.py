@@ -14,15 +14,16 @@ import sys
 
 import pkg_resources
 
-from .io import SheetSchema, json_loads_ordered
+from .io import json_loads_ordered, SheetSchema
 from .io_tsv import (
-    read_cancer_tsv_json_data, read_germline_tsv_json_data,
-    read_generic_tsv_json_data)
+    read_cancer_tsv_json_data, read_generic_tsv_json_data, read_germline_tsv_json_data
+)
 from .ref_resolver import RefResolver
-from .validation import SchemaValidator
 from .shortcuts import (
-    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED,
-    SHEET_TYPE_GENERIC)
+    SHEET_TYPE_CANCER_MATCHED, SHEET_TYPE_GENERIC, SHEET_TYPE_GERMLINE_VARIANTS
+    )
+from .validation import SchemaValidator
+
 
 #: Choices for the TSV sheet type
 CHOICES_SHEET_TYPE = (

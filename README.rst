@@ -27,7 +27,7 @@ It's best to start a new virtualenv
 
     $ virtualenv -p python3 venv
     $ source venv/bin/activate
-    $ pip install -r requirements_dev.txt
+    $ pip install -r requirements/dev.txt
     $ pip install -e .
 
 Use ``python setup.py install`` if you want to copy the files instead of creating a link only.

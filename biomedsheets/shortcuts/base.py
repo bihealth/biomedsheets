@@ -72,6 +72,11 @@ class ShortcutSampleSheet:
     """Shortcut of a generic experiment sample sheet"""
 
     def __init__(self, sheet):
+        """Constructor.
+
+        :param sheet: py:class`Biomedsheet` object.
+        :type sheet: biomedsheets.models.Sheet
+        """
         #: The wrapped ``Sheet``
         self.sheet = sheet
         #: Shortcut to wrapped sheet

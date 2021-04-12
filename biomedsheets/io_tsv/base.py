@@ -5,8 +5,8 @@
 from collections import OrderedDict
 import re
 
-from .. import ref_resolver
 from .. import io
+from .. import ref_resolver
 from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -319,7 +319,7 @@ class BaseTSVReader:
         :raises:TSVSheetException in case of problems
         """
         # Read lines from file and check for file not being empty
-        lines = [l.strip() for l in self.f]
+        lines = [line.strip() for line in self.f]
         if not lines:
             raise TSVSheetException(
                 'Problem loading TSV sheet in file {}'.format(
