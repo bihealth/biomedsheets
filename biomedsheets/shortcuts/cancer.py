@@ -6,9 +6,9 @@ from collections import OrderedDict
 from warnings import warn
 
 from .base import (
-    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA,
-    MissingDataEntity, MissingDataWarning, ShortcutSampleSheet,
-    TestSampleShortcut, NGSLibraryShortcut)
+    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity, MissingDataWarning,
+    NGSLibraryShortcut, ShortcutSampleSheet, TestSampleShortcut
+    )
 from .generic import (GenericBioEntity, GenericBioSample)
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'

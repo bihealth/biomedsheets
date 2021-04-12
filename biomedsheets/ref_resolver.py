@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Code for resolving references in JSON code"""
 
-from collections.abc import MutableSequence, MutableMapping
+from collections.abc import MutableMapping, MutableSequence
 import os
-from urllib.parse import urlparse
 import sys
+from urllib.parse import urlparse
 
 import jsonpath_rw
 import requests

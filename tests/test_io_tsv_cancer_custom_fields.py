@@ -421,11 +421,11 @@ def test_read_cancer_sheet_custom_fields_header(tsv_sheet_cancer_header):
 def test_read_cancer_sheet_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_no_header)
-    EXPECTED = (
+    expected = (
         'Unexpected column seen in header row of body: inssStage, lohChr1p, '
         'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
         'testSampleNice, timeToDeathDays, timeToEventDays')
-    assert EXPECTED == str(e_info.value)
+    assert expected == str(e_info.value)
 
 
 def test_read_cancer_json_custom_fields_header(tsv_sheet_cancer_header):
@@ -437,8 +437,8 @@ def test_read_cancer_json_custom_fields_header(tsv_sheet_cancer_header):
 def test_read_cancer_json_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
-    EXPECTED = (
+    expected = (
         'Unexpected column seen in header row of body: inssStage, lohChr1p, '
         'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
         'testSampleNice, timeToDeathDays, timeToEventDays')
-    assert EXPECTED == str(e_info.value)
+    assert expected == str(e_info.value)

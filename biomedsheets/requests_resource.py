@@ -3,11 +3,11 @@
 
 import io
 import locale
-import pkg_resources
 
+import pkg_resources
+from requests import codes, Response
 from requests.adapters import BaseAdapter
 from requests.compat import urlparse
-from requests import Response, codes
 
 
 class ResourceAdapter(BaseAdapter):

@@ -2,14 +2,14 @@
 """Shortcuts for rare germline sample sheets
 """
 
-from copy import deepcopy
 from collections import OrderedDict
+from copy import deepcopy
 from warnings import warn
 
 from .base import (
-    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity,
-    ShortcutSampleSheet, BioSampleShortcut, TestSampleShortcut,
-    NGSLibraryShortcut, MissingDataWarning)
+    BioSampleShortcut, EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity,
+    MissingDataWarning, NGSLibraryShortcut, ShortcutSampleSheet, TestSampleShortcut
+    )
 from .generic import GenericBioEntity
 from ..union_find import UnionFind
 
@@ -49,10 +49,18 @@ class Pedigree:
     """
 
     def __init__(self, donors=None, index=None):
+        """Constructor.
+
+        :param donors: List of :py:class:`GermlineDornor` objects.
+        :type donors: list
+
+        :param index: :py:class:`GermlineDornor` of index sample.
+        :type index: GermlineDonor
+        """
         #: Members of the pedigree
         self.donors = list(donors or [])
         #: Index patient in the pedigree, there can only be one, even if
-        #: there are multiple affected individuals.  Usually, the first
+        #: there are multiple affected individuals. Usually, the first
         #: affected patient in a study is used
         self.index = index
         #: All affected individuals
@@ -69,7 +77,13 @@ class Pedigree:
         self.update_shortcuts()
 
     def with_filtered_donors(self, predicate):
-        """Return pedigree, removing donors not passing ``predicate``."""
+        """
+        :param predicate: Function to evaluate predicate. For instance, test whether the donor has
+        a dna library or not: ``donor_has_dna_ngs_library``.
+        :type predicate: function
+
+        :return: Returns Pedigree, removing donors not passing ``predicate``.
+        """
         if self.index and predicate(self.index):
             index = self.index
         else:
@@ -91,7 +105,7 @@ class Pedigree:
                     donor.extra_infos.pop(KEY_MOTHER_PK, None)
                 donors.append(donor)
 
-        return Pedigree(donors, index)    
+        return Pedigree(donors, index)
 
     @property
     def member_count(self):
@@ -309,8 +323,7 @@ class CohortBuilder:
         # Use Union-Find data structure for gathering pedigree donors
         union_find = UnionFind()
         for donor in self.donors:
-            for parent_pk in (
-                    pk for pk in (donor.father_pk, donor.mother_pk) if pk):
+            for parent_pk in (pk for pk in (donor.father_pk, donor.mother_pk) if pk):
                 # String conversion is necessary because "fatherPk" and
                 # "motherPk" are given with type "str" in std_fields.json
                 union_find.union(str(donor.pk), parent_pk)

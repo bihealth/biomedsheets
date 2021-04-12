@@ -2,10 +2,11 @@
 """Tests for the shortcuts module with germline sample sheet"""
 
 import io
-import pytest
 import textwrap
 
-from biomedsheets import naming, io_tsv, shortcuts
+import pytest
+
+from biomedsheets import io_tsv, naming, shortcuts
 
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
@@ -37,6 +38,39 @@ def tsv_sheet_germline():
 def sheet_germline(tsv_sheet_germline):
     """Return ``Sheet`` instance for the germline example"""
     return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(tsv_sheet_germline))
+
+
+@pytest.fixture
+def tsv_sheet_germline_trio_plus():
+    """Example TSV germline sheet with trio plus.
+
+    :return: Returns StringIO with sample sheet for trio plus: index, mother, father, and aunt.
+    """
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with one trio plus
+
+    [Custom Fields]
+    key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+    familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+
+    [Data]
+    familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    family1\tindex1\tfather1\tmother1\tM\tY\tWES\tindex1\t.
+    family1\tfather1\t0\t0\tM\tN\tWES\tfather1\t.
+    family1\tmother1\t0\t0\tM\tN\tWES\tmother1\t.
+    family1\taunt1\t0\t0\tM\tN\tWES\taunt1\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_trio_plus(tsv_sheet_germline_trio_plus):
+    """Return ``Sheet`` instance for the germline trio plus example"""
+    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus))
 
 
 @pytest.fixture

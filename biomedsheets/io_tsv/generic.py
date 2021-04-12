@@ -5,8 +5,8 @@
 from collections import OrderedDict
 
 from .base import (
-    LIBRARY_TYPES, EXTRACTION_TYPES, std_field, TSVSheetException,
-    BaseTSVReader)
+    BaseTSVReader, EXTRACTION_TYPES, LIBRARY_TYPES, std_field, TSVSheetException
+    )
 from ..naming import name_generator_for_scheme, NAMING_DEFAULT
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
