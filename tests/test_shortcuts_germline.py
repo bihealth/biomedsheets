@@ -7,7 +7,7 @@ import textwrap
 import pytest
 
 from biomedsheets import io_tsv, naming, shortcuts
-
+from biomedsheets.shortcuts.germline import UndefinedFieldException
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -70,7 +70,51 @@ def tsv_sheet_germline_trio_plus():
 @pytest.fixture
 def sheet_germline_trio_plus(tsv_sheet_germline_trio_plus):
     """Return ``Sheet`` instance for the germline trio plus example"""
-    return shortcuts.GermlineCaseSheet(io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus))
+    return shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
+        join_by_field='familyId'
+    )
+
+
+@pytest.fixture
+def tsv_sheet_germline_multiple_trio_plus():
+    """Example TSV germline sheet with trio plus.
+
+    :return: Returns StringIO with sample sheet for multiple trio plus.
+    Basic unit: index, mother, father, and another family member.
+    """
+    f = io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with one trio plus
+
+    [Custom Fields]
+    key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+    familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+
+    [Data]
+    familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    family1\tindex1\tfather1\tmother1\tM\tY\tWES\tindex1\t.
+    family1\tfather1\t0\t0\tM\tN\tWES\tfather1\t.
+    family1\tmother1\t0\t0\tM\tN\tWES\tmother1\t.
+    family1\taunt1\t0\t0\tM\tN\tWES\taunt1\t.
+    family2\tindex2\tfather2\tmother2\tM\tY\tWES\tindex2\t.
+    family2\tfather2\t0\t0\tM\tN\tWES\tfather2\t.
+    family2\tmother2\t0\t0\tM\tN\tWES\tmother2\t.
+    family2\tuncle2\t0\t0\tM\tN\tWES\tuncle2\t.
+    """.lstrip()))
+    return f
+
+
+@pytest.fixture
+def sheet_germline_multiple_trio_plus(tsv_sheet_germline_multiple_trio_plus):
+    """Return ``Sheet`` instance for the germline multiple trio plus example"""
+    return shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_multiple_trio_plus),
+        join_by_field='familyId'
+    )
 
 
 @pytest.fixture
@@ -191,6 +235,49 @@ def test_germline_case_sheet(sheet_germline):
         'father2-N1-DNA1-WES1-000020',
         'mother2-N1-DNA1-WES1-000024',
     ]
+
+
+def test_undefined_field_exception():
+    """Tests UndefinedFieldException raise."""
+    error_msg = "Raised UndefinedFieldException"
+    with pytest.raises(Exception) as exec_info:
+        raise UndefinedFieldException(error_msg)
+    assert exec_info.value.args[0] == error_msg
+
+
+def test_sheet_germline_trio_plus_exception(tsv_sheet_germline_trio_plus):
+    """Tests UndefinedFieldException raise while creating GermlineCaseSheet"""
+    with pytest.raises(Exception):
+        shortcuts.GermlineCaseSheet(
+            sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
+            join_by_field='undefined_field'
+        )
+
+
+def test_germline_case_sheet_trio_plus(sheet_germline_trio_plus):
+    """Tests for the germline case sheet for trio plus"""
+    # Initialise variables
+    index_name_list = ['index1-N1-DNA1-WES1-000004']
+    sheet = sheet_germline_trio_plus
+    # Test members count: index1, father1, mother1, aunt1
+    assert len(sheet.donors) == 4
+    # Only one index
+    assert len(sheet.index_ngs_library_to_pedigree) == 1
+    # Index name as expected
+    assert all([nk in index_name_list for nk in sheet.index_ngs_library_to_pedigree.keys()])
+
+
+def test_germline_case_sheet_multiple_trio_plus(sheet_germline_multiple_trio_plus):
+    """Tests for the germline case sheet for multiple trio plus"""
+    # Initialise variables
+    sheet = sheet_germline_multiple_trio_plus
+    index_name_list = ['index1-N1-DNA1-WES1-000004', 'index2-N1-DNA1-WES1-000020']
+    # Test members count: 2 x (index, father, mother, 'other')
+    assert len(sheet.donors) == 8
+    # Two indexes in sheet
+    assert len(sheet.index_ngs_library_to_pedigree) == 2
+    # Index name as expected
+    assert all([nk in index_name_list for nk in sheet.index_ngs_library_to_pedigree.keys()])
 
 
 def test_germline_case_sheet_two_libs(sheet_germline_two_libs):

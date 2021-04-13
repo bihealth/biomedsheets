@@ -2,7 +2,7 @@
 """Shortcuts for rare germline sample sheets
 """
 
-from collections import OrderedDict
+from collections import defaultdict, OrderedDict
 from copy import deepcopy
 from warnings import warn
 
@@ -36,6 +36,11 @@ KEY_SEX = 'sex'
 def donor_has_dna_ngs_library(donor):
     """Predicate that returns whether the donor has a dna library."""
     return bool(donor.dna_ngs_library)
+
+
+class UndefinedFieldException(Exception):
+    """Raised if user tries to join samples based on a custom field that is not
+    defined in extra_infos."""
 
 
 class Pedigree:
@@ -301,9 +306,20 @@ class CohortBuilder:
     :py:class:`GermlineDonor`
     """
 
-    def __init__(self, donors):
+    def __init__(self, donors, join_by_field=None):
+        """Constructor.
+
+        :param donors: List of :py:class:`GermlineDonor` objects.
+        :type donors: list
+
+        :param : Field or identifier used to join samples into pedigree,
+        e.g.: 'familyID'. If None, it will join based on row information of sample sheet.
+        Default: None.
+        :type join_by_field: str
+        """
         #: Iterable of :py:class:`GermlineDonor` objects
         self.donors = list(donors)
+        self.join_by_field = join_by_field
 
     def run(self):
         """Return :py:class:`Cohort` object with :py:class:`Pedigree` sub
@@ -320,6 +336,49 @@ class CohortBuilder:
 
     def _yield_pedigrees(self):
         """Yield Pedigree objects built from self.donors"""
+        # Define dict based on pedigree definition
+        if self.join_by_field:
+            partition = self._custom_field_pedigree_definition()
+        else:
+            partition = self._standard_pedigree_definition()
+        # Construct the pedigrees
+        for ped_donors in partition.values():
+            yield Pedigree(ped_donors)
+
+    def _custom_field_pedigree_definition(self):
+        """
+        :return: Returns DefaultDictionary with partition of donors based on custom field, for
+        example, it can join samples based on family identifier.
+
+        :raises: UndefinedFieldException: if custom field is not defined in
+        GermlineDonor extra_info dictionary.
+        """
+        # Initialise variables
+        custom_field = self.join_by_field
+        partition = defaultdict(list)
+        err_msg = "Field '{f}' is not defined for 'pk {pk}'. Available fields: {af}."
+
+        # Partition the donors: iterate over GermlineDonor objects
+        for donor in self.donors:
+            # Check if field is defined
+            if custom_field not in donor.extra_infos:
+                fields_str = ', '.join(donor.extra_infos.keys())
+                err_msg = err_msg.format(f=custom_field, pk=str(donor.pk), af=fields_str)
+                raise UndefinedFieldException(err_msg)
+            # Extra info
+            _id = donor.extra_infos.get(custom_field)
+            partition[_id].append(donor)
+
+        # Return
+        return partition
+
+    def _standard_pedigree_definition(self):
+        """
+        :return: Returns OrderedDict with partition of donors. Uses only the row information
+        to define pedigree.
+        """
+        # Initialise variable
+        partition = OrderedDict()
         # Use Union-Find data structure for gathering pedigree donors
         union_find = UnionFind()
         for donor in self.donors:
@@ -328,12 +387,10 @@ class CohortBuilder:
                 # "motherPk" are given with type "str" in std_fields.json
                 union_find.union(str(donor.pk), parent_pk)
         # Partition the donors
-        partition = OrderedDict()
         for donor in self.donors:
             partition.setdefault(union_find[str(donor.pk)], []).append(donor)
-        # Construct the pedigrees
-        for ped_donors in partition.values():
-            yield Pedigree(ped_donors)
+        # Return
+        return partition
 
 
 class GermlineDonor(GenericBioEntity):
@@ -494,13 +551,23 @@ class GermlineCaseSheet(ShortcutSampleSheet):
 
     bio_entity_class = GermlineDonor
 
-    def __init__(self, sheet):
+    def __init__(self, sheet, join_by_field=None):
+        """Constructor.
+
+        :param sheet: Biomedsheet object.
+        :type sheet: biomedsheets.models.Sheet
+
+        :param : Field or identifier used to join samples into pedigree,
+        e.g.: 'familyID'. If None, it will join based on row information of sample sheet.
+        Default: None.
+        :type join_by_field: str
+        """
         super().__init__(sheet)
         #: List of donors in the sample sheet
         self.donors = list(self._iter_donors())
         #: :py:class:`Cohort` object with the pedigrees and donors built from
         #: the sample sheet
-        self.cohort = CohortBuilder(self.donors).run()
+        self.cohort = CohortBuilder(self.donors, join_by_field).run()
         #: Mapping from index DNA NGS library name to pedigree
         self.index_ngs_library_to_pedigree = OrderedDict(
             self._index_ngs_library_to_pedigree())
