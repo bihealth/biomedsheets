@@ -44,10 +44,6 @@ EXTRACTION_TYPE_DNA = 'DNA'
 EXTRACTION_TYPE_RNA = 'RNA'
 
 
-class MissingDataWarning(UserWarning):
-    """Used for warning for missing data in non-fatal cases"""
-
-
 def is_background(sheet):
     """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
     """
@@ -58,6 +54,10 @@ def is_not_background(sheet):
     """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
     """
     return not is_background(sheet)
+
+
+class MissingDataWarning(UserWarning):
+    """Used for warning for missing data in non-fatal cases"""
 
 
 class InvalidSelector(Exception):
