@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 -------
+v0.11.0
+-------
+
+- Adding custom option to join pedigrees by fields such as ``familyId``.
+
+-------
 v0.10.0
 -------
 
