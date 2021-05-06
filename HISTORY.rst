@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 -------
+v0.11.1
+-------
+
+- Adding property to shortcut sheets that indicates available kwargs.
+
+-------
 v0.11.0
 -------
 

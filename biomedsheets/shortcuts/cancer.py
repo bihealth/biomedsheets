@@ -51,6 +51,9 @@ class CancerCaseSheet(ShortcutSampleSheet):
     given.  This can be changed by setting the ``options`` on creation.
     """
 
+    #: Supported extra kwargs.
+    supported_kwargs = ("options",)
+
     def __init__(self, sheet, options=None):
         super().__init__(sheet)
         #: Configuration

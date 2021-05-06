@@ -551,6 +551,9 @@ class GermlineCaseSheet(ShortcutSampleSheet):
 
     bio_entity_class = GermlineDonor
 
+    #: Supported extra kwargs.
+    supported_kwargs = ("join_by_field",)
+
     def __init__(self, sheet, join_by_field=None):
         """Constructor.
 
