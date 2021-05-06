@@ -13,6 +13,9 @@ __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 class GenericSampleSheet(ShortcutSampleSheet):
     """Shortcut for "rare disease" view on bio-medical sample sheets"""
 
+    #: Supported extra kwargs.
+    supported_kwargs = ()
+
     def __init__(self, sheet):
         super().__init__(sheet)
         #: Generic wrapper BioEntity objects
