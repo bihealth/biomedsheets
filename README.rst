@@ -5,11 +5,6 @@ BioMed Sheets
 .. image:: https://readthedocs.org/projects/biomedsheets/badge/?version=master
     :target: https://biomedsheets.readthedocs.io/en/master
 
-.. image:: https://api.codacy.com/project/badge/Grade/842a296b23d5450eb7bc525621d7f5a2
-    :target: https://www.codacy.com/app/manuel-holtgrewe/biomedsheets?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bihealth/biomedsheets&amp;utm_campaign=Badge_Grade
-
-.. image:: https://api.codacy.com/project/badge/Coverage/842a296b23d5450eb7bc525621d7f5a2
-    :target: https://www.codacy.com/app/manuel-holtgrewe/biomedsheets?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bihealth/biomedsheets&amp;utm_campaign=Badge_Coverage
 
 This project contains the documentation for the BioMedical sample sheets project.
 Further, it contains the implementation of a Python API for I/O and comfortable access to the sample sheets and some CLI tools.
