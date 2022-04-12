@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 -------
+v0.11.2
+-------
+
+- Updating/modernizing dependencies.
+
+-------
 v0.11.1
 -------
 
