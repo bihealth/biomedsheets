@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 -------
+v0.11.3
+-------
+
+- Fixing warnings in the tests (#19).
+
+-------
 v0.11.2
 -------
 

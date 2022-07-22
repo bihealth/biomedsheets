@@ -12,7 +12,7 @@ from requests.exceptions import HTTPError
 import requests_file
 
 try:
-    import ruamel.yaml as yaml
+    import ruamel.yaml as ruamel_yaml
     YAML_AVAILABLE = True
 except ImportError:
     YAML_AVAILABLE = False
@@ -151,6 +151,7 @@ class RefResolver:
 
     def _load_json(self, response):
         if YAML_AVAILABLE:
-            return yaml.round_trip_load(response.text)
+            yaml = ruamel_yaml.YAML()
+            return yaml.load(response.text)
         else:
             return response.json(object_pairs_hook=self.dict_class)
