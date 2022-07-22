@@ -37,9 +37,11 @@ class ResourceAdapter(BaseAdapter):
         # responses. Use urllib's unquote to translate percent escapes into
         # whatever they actually need to be
         try:
-            resp.raw = pkg_resources.resource_stream(
-                pkg_name, url_parts.path)
-            resp.raw.release_conn = resp.raw.close
+            url_path = url_parts.path
+            while url_path.startswith("/"):
+                url_path = url_path[1:]
+            with pkg_resources.resource_stream(pkg_name, url_path) as inputf:
+                resp.raw = io.BytesIO(inputf.read())
         except FileNotFoundError as e:
             resp.status_code = codes.not_found
 
