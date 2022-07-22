@@ -3,6 +3,12 @@ BioMed Sheets Changelog
 =======================
 
 -------
+v0.11.4
+-------
+
+- Fixing issues with ResourceAdapter (#21).
+
+-------
 v0.11.3
 -------
 

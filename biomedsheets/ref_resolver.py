@@ -37,9 +37,6 @@ class RefResolver:
         self.cache = {}
         self.dict_class = dict_class
         self.lookup_paths = list(lookup_paths or [])
-        self.session = requests.Session()
-        self.session.mount('file://', requests_file.FileAdapter())
-        self.session.mount('resource://', requests_resource.ResourceAdapter())
         #: whether or not to resolve relative paths using cwd
         self.rel_cwd_paths = True
         self.verbose = verbose  # TODO: use logging instead
@@ -54,26 +51,30 @@ class RefResolver:
         raises RefResolutionError on problems with the resolution
         """
         self.cache = {doc_uri: obj}
-        return self._resolve(type(obj)(), obj)
+        session = requests.Session()
+        session.mount('file://', requests_file.FileAdapter())
+        session.mount('resource://', requests_resource.ResourceAdapter())
+        with session:
+            return self._resolve(type(obj)(), obj, session)
 
-    def _resolve(self, base_obj, obj):
+    def _resolve(self, base_obj, obj, session):
         if isinstance(base_obj, (int, bool, float, str)):  # JSON atomic
             return base_obj
         elif isinstance(base_obj, (dict, MutableMapping)):  # JSON object
-            return self._resolve_dict_entry(base_obj, obj)
+            return self._resolve_dict_entry(base_obj, obj, session)
         elif isinstance(base_obj, (list, MutableSequence)):  # JSON list
-            return [self._resolve(elem, type(elem)()) for elem in base_obj]
+            return [self._resolve(elem, type(elem)(), session) for elem in base_obj]
         else:
             raise RefResolutionException(
                 'Can only resolve in dict and list container objects and '
                 'the atomic types int, bool, float, and str.')
 
-    def _resolve_dict_entry(self, base_obj, obj):
+    def _resolve_dict_entry(self, base_obj, obj, session):
         """Implementation of a dict objects"""
         # Interpret '$ref' key if present in obj, continue to resolve
         # recursively if necessary.
         if base_obj:
-            objs = [self._resolve_dict_entry(self.dict_class(), base_obj), obj]
+            objs = [self._resolve_dict_entry(self.dict_class(), base_obj, session), obj]
         else:
             objs = [obj]
         imported = set()
@@ -84,19 +85,19 @@ class RefResolver:
                     'Detected recursion when including {}'.format(
                         last['$ref']))
             imported.add(last['$ref'])
-            objs.append(self._load_ref(last['$ref']))
+            objs.append(self._load_ref(last['$ref'], session))
         # Merge objs, values on the left have higher precedence.
         result = self.dict_class()
         for obj in reversed(objs):
             for k, v in obj.items():
                 if k != '$ref':
                     if k in result:
-                        result[k] = self._resolve(v, result[k])
+                        result[k] = self._resolve(v, result[k], session)
                     else:
-                        result[k] = self._resolve(v, type(v)())
+                        result[k] = self._resolve(v, type(v)(), session)
         return result
 
-    def _load_ref(self, ref_uri):
+    def _load_ref(self, ref_uri, session):
         """Resolve "$ref" URI ``uri``"""
         if self.verbose:
             print('Resolving $ref URI {}'.format(ref_uri), file=sys.stderr)
@@ -105,7 +106,7 @@ class RefResolver:
         if not ref_file:  # must be relative to current doc
             pass  # is already in cache
         elif ref_file not in self.cache:
-            self.cache[ref_uri] = self._load_for_cache(parsed_ref_uri)
+            self.cache[ref_uri] = self._load_for_cache(parsed_ref_uri, session)
         ref_json = self.cache[ref_uri]
         expr = jsonpath_rw.parse(
             '$' + '.'.join(parsed_ref_uri.fragment.split('/')))
@@ -134,13 +135,13 @@ class RefResolver:
         else:
             return parsed_ref_uri
 
-    def _load_for_cache(self, parsed_uri):
+    def _load_for_cache(self, parsed_uri, session):
         """Load fragment from file URI without cache"""
         remote_uri = '{}://{}/{}'.format(
             parsed_uri.scheme, parsed_uri.netloc, parsed_uri.path)
         if self.verbose:
             print('Loading URI {}'.format(remote_uri), file=sys.stderr)
-        response = self.session.get(remote_uri)
+        response = session.get(remote_uri)
         try:
             response.raise_for_status()
         except HTTPError as e:
