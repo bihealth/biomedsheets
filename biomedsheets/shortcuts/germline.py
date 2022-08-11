@@ -43,6 +43,18 @@ class UndefinedFieldException(Exception):
     defined in extra_infos."""
 
 
+class InconsistentPedigreeException(Exception):
+    """Raised if pedigree information from custom field is inconsistent with row definition.
+
+    Example for field 'familyId':
+        [Data]
+        familyId | patientName | fatherName | motherName | ...
+        family1  |   index1    |   father1  |   mother1  | ...
+        family2  |   father1   |     0      |     0      | ...
+        family3  |   mother1   |     0      |     0      | ...
+    """
+
+
 class Pedigree:
     """Class for accessing information in a pedigree
 
@@ -325,13 +337,27 @@ class CohortBuilder:
         """Return :py:class:`Cohort` object with :py:class:`Pedigree` sub
         structure
         """
+        error_msg = (
+            "Found inconsistent in input sample sheet. For index '{id_}' pedigree description from "
+            "row is not the same as the one found using custom join field '{join_by_field}'."
+        )
         cohort = Cohort(self._yield_pedigrees())
         for pedigree in cohort.pedigrees:
             for donor in pedigree.donors:
                 if donor.father_pk:
                     donor._father = cohort.pk_to_donor[int(donor.father_pk)]
+                    # Consistent check - it shouldn't be 'None' if pedigree correctly joint.
+                    if not pedigree.pk_to_donor.get(donor.father_pk, None):
+                        raise InconsistentPedigreeException(error_msg.format(
+                            id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field)
+                        )
                 if donor.mother_pk:
                     donor._mother = cohort.pk_to_donor[int(donor.mother_pk)]
+                    # Consistent check - it shouldn't be 'None' if pedigree correctly joint
+                    if not pedigree.pk_to_donor.get(donor.father_pk, None):
+                        raise InconsistentPedigreeException(error_msg.format(
+                            id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field)
+                        )
         return cohort
 
     def _yield_pedigrees(self):

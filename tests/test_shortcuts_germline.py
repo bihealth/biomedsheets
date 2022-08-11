@@ -7,7 +7,7 @@ import textwrap
 import pytest
 
 from biomedsheets import io_tsv, naming, shortcuts
-from biomedsheets.shortcuts.germline import UndefinedFieldException
+from biomedsheets.shortcuts.germline import InconsistentPedigreeException, UndefinedFieldException
 
 __author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
 
@@ -65,6 +65,31 @@ def tsv_sheet_germline_trio_plus():
     family1\taunt1\t0\t0\tM\tN\tWES\taunt1\t.
     """.lstrip()))
     return f
+
+@pytest.fixture
+def tsv_sheet_germline_inconsistent_pedigree():
+    """Example TSV germline sheet with inconsistent pedigree definition.
+
+    :return: Returns StringIO with sample sheet for with inconsistent pedigree definition:
+    family identifier and row information don't agree.
+    """
+    return io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with one trio plus
+
+    [Custom Fields]
+    key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+    familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+
+    [Data]
+    familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    family1\tindex1\tfather1\tmother1\tM\tY\tWES\tindex1\t.
+    family2\tfather1\t0\t0\tM\tN\tWES\tfather1\t.
+    family3\tmother1\t0\t0\tM\tN\tWES\tmother1\t.
+    """.lstrip()))
 
 
 @pytest.fixture
@@ -388,3 +413,21 @@ def test_cohorts(sheet_germline):
     assert set(cohort.secondary_id_to_donor) == {'index1', 'father1', 'mother2', 'index2', 'mother1', 'father2'}
     assert cohort.member_count == 6
     assert cohort.pedigree_count == 2
+
+
+def test_sheet_germline_inconsistent_pedigree(
+    tsv_sheet_germline_inconsistent_pedigree,
+    tsv_sheet_germline_trio_plus,
+):
+    """Tests Germline sheet for sheet with conflict information for joint field and row."""
+    # Sanity check
+    shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
+        join_by_field='familyId'
+    )
+    # Expect error as each member of the pedigree has its own `familyId` instead of a common one
+    with pytest.raises(InconsistentPedigreeException):
+        shortcuts.GermlineCaseSheet(
+            sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_inconsistent_pedigree),
+            join_by_field='familyId'
+        )
