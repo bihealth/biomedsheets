@@ -272,7 +272,7 @@ def test_undefined_field_exception():
 
 def test_sheet_germline_trio_plus_exception(tsv_sheet_germline_trio_plus):
     """Tests UndefinedFieldException raise while creating GermlineCaseSheet"""
-    with pytest.raises(Exception):
+    with pytest.raises(UndefinedFieldException):
         shortcuts.GermlineCaseSheet(
             sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
             join_by_field='undefined_field'
