@@ -104,17 +104,7 @@ class GermlineTSVReader(BaseTSVReader):
     optional_body_header_columns = ('seqPlatform', 'bioSample', 'testSample')
 
     def check_tsv_line(self, mapping, lineno):
-        """Cancer sample sheet--specific valiation"""
-        # Check for hyphen in patient or sample name
-        if '-' in mapping['patientName']:
-            raise GermlineTSVSheetException(
-                'Hyphen not allowed in patientName column')  # pragma: no cover
-        if mapping['fatherName'] and '-' in mapping['fatherName']:
-            raise GermlineTSVSheetException(
-                'Hyphen not allowed in fatherName column')  # pragma: no cover
-        if mapping['motherName'] and '-' in mapping['motherName']:
-            raise GermlineTSVSheetException(
-                'Hyphen not allowed in motherName column')  # pragma: no cover
+        """Germline sample sheet--specific validation"""
         # Check "libraryType" field
         if mapping['libraryType'] and (
                 mapping['libraryType'] not in LIBRARY_TYPES):
