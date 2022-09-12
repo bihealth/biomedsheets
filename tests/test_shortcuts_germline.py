@@ -67,6 +67,52 @@ def tsv_sheet_germline_trio_plus():
     return f
 
 @pytest.fixture
+def tsv_sheet_germline_duo_w_mother():
+    """Example TSV germline sheet with duo - mother present.
+
+    :return: Returns StringIO with sample sheet for duo: index, mother.
+    """
+    return io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with one trio plus
+
+    [Custom Fields]
+    key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+    familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+
+    [Data]
+    familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    family1\tmother1\t0\t0\tM\tN\tWES\tmother1\t.
+    family1\tindex1\t0\tmother1\tM\tY\tWES\tindex1\t.
+    """.lstrip()))
+
+@pytest.fixture
+def tsv_sheet_germline_duo_w_father():
+    """Example TSV germline sheet with duo - father present.
+
+    :return: Returns StringIO with sample sheet for duo: index, father.
+    """
+    return io.StringIO(textwrap.dedent("""
+    [Metadata]
+    schema\tgermline_variants
+    schema_version\tv1
+    title\tExample germline study
+    description\tSimple study with one trio plus
+
+    [Custom Fields]
+    key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+    familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+
+    [Data]
+    familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
+    family1\tfather1\t0\t0\tM\tN\tWES\tfather1\t.
+    family1\tindex1\tfather1\t0\tM\tY\tWES\tindex1\t.
+    """.lstrip()))
+
+@pytest.fixture
 def tsv_sheet_germline_inconsistent_pedigree():
     """Example TSV germline sheet with inconsistent pedigree definition.
 
@@ -418,13 +464,25 @@ def test_cohorts(sheet_germline):
 def test_sheet_germline_inconsistent_pedigree(
     tsv_sheet_germline_inconsistent_pedigree,
     tsv_sheet_germline_trio_plus,
+    tsv_sheet_germline_duo_w_mother,
+    tsv_sheet_germline_duo_w_father,
+
 ):
     """Tests Germline sheet for sheet with conflict information for joint field and row."""
-    # Sanity check
+    # Sanity checks
     shortcuts.GermlineCaseSheet(
         sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
         join_by_field='familyId'
     )
+    shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_duo_w_mother),
+        join_by_field='familyId'
+    )
+    shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_duo_w_father),
+        join_by_field='familyId'
+    )
+
     # Expect error as each member of the pedigree has its own `familyId` instead of a common one
     with pytest.raises(InconsistentPedigreeException):
         shortcuts.GermlineCaseSheet(
