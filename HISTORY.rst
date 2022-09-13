@@ -2,6 +2,13 @@
 BioMed Sheets Changelog
 =======================
 
+
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Hotfix: fixed consistency check for Duo Cases (#26)
+
 -------
 v0.11.4
 -------

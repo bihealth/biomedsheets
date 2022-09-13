@@ -354,7 +354,7 @@ class CohortBuilder:
                 if donor.mother_pk:
                     donor._mother = cohort.pk_to_donor[int(donor.mother_pk)]
                     # Consistent check - it shouldn't be 'None' if pedigree correctly joint
-                    if not pedigree.pk_to_donor.get(donor.father_pk, None):
+                    if not pedigree.pk_to_donor.get(donor.mother_pk, None):
                         raise InconsistentPedigreeException(error_msg.format(
                             id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field)
                         )
