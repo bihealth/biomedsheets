@@ -68,9 +68,10 @@ def tsv_sheet_germline_trio_plus():
 
 @pytest.fixture
 def tsv_sheet_germline_trio_all_unaffected():
-    """Example TSV germline sheet with trio all unnafected.
+    """Example TSV germline sheet with trio, all unaffected.
 
-    :return: Returns StringIO with sample sheet for trio plus: index, mother, father, and aunt.
+    :return: Returns StringIO with sample sheet for unaffected trio: index (AB22-4321),
+    mother (AB19-4319) and father (AB19-4320).
     """
     return io.StringIO(textwrap.dedent("""
         [Metadata]
@@ -519,7 +520,7 @@ def test_sheet_germline_correct_index_defined(
     tsv_sheet_germline_trio_all_unaffected,
     tsv_sheet_germline_trio_plus
 ):
-    """Tests that the correct index will be assigned."""
+    """Tests that the correct index is assigned."""
 
     # Test all family members unaffected
     sheet = shortcuts.GermlineCaseSheet(
