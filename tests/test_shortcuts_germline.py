@@ -67,6 +67,31 @@ def tsv_sheet_germline_trio_plus():
     return f
 
 @pytest.fixture
+def tsv_sheet_germline_trio_all_unaffected():
+    """Example TSV germline sheet with trio all unnafected.
+
+    :return: Returns StringIO with sample sheet for trio plus: index, mother, father, and aunt.
+    """
+    return io.StringIO(textwrap.dedent("""
+        [Metadata]
+        schema\tgermline_variants
+        schema_version\tv1
+        title\tExample germline study
+        description\tSimple study with one trio
+
+        [Custom Fields]
+        key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern
+        familyId\tbioEntity\tFamily\tstring\t.\t.\t.\t.\t.
+        libraryKit\tngsLibrary\tEnrichment kit\tstring\t.\t.\t.\t.\t.
+
+        [Data]
+        familyId\tpatientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms\tlibraryKit
+        family1\tAB22-4321\tAB19-4320\tAB19-4319\tM\tN\tWES\tAB22-4321\t.\t.
+        family1\tAB19-4320\t0\t0\tM\tN\tWES\tAB19-4320\t.\t.
+        family1\tAB19-4319\t0\t0\tF\tN\tWES\tAB19-4319\t.\t.
+    """.lstrip()))
+
+@pytest.fixture
 def tsv_sheet_germline_duo_w_mother():
     """Example TSV germline sheet with duo - mother present.
 
@@ -489,3 +514,27 @@ def test_sheet_germline_inconsistent_pedigree(
             sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_inconsistent_pedigree),
             join_by_field='familyId'
         )
+
+def test_sheet_germline_correct_index_defined(
+    tsv_sheet_germline_trio_all_unaffected,
+    tsv_sheet_germline_trio_plus
+):
+    """Tests that the correct index will be assigned."""
+
+    # Test all family members unaffected
+    sheet = shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_all_unaffected),
+        join_by_field='familyId'
+    )
+    expected = "AB22-4321-N1-DNA1-WES1-000004"
+    for pedigree in sheet.cohort.pedigrees:
+        assert pedigree.index.dna_ngs_library.name == expected
+
+    # Tests trio, index is affected
+    sheet = shortcuts.GermlineCaseSheet(
+        sheet=io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_trio_plus),
+        join_by_field='familyId'
+    )
+    expected = "index1-N1-DNA1-WES1-000004"
+    for pedigree in sheet.cohort.pedigrees:
+        assert pedigree.index.dna_ngs_library.name == expected

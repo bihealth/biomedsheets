@@ -146,7 +146,14 @@ class Pedigree:
             self.affecteds = [d for d in self.donors if d.is_affected]
             self.affecteds = list(sorted(self.affecteds, key=lambda d: d.name))
             affecteds_with_libs = list(sorted(affecteds_with_libs, key=lambda d: d.name))
-            donors_with_libs = list(sorted(donors_with_libs, key=lambda d: d.name))
+            # Sort donors by name (alphabetically) and presence of parents (boolean, reverse)
+            donors_with_libs = list(
+                sorted(
+                    sorted(donors_with_libs, key=lambda d: d.name),
+                    key=lambda d: any((d.mother_pk, d.father_pk)),
+                    reverse=True,
+                )
+            )
             if self.index is None:
                 if affecteds_with_libs:
                     self.index = affecteds_with_libs[0]
