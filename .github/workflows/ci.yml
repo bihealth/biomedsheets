@@ -80,40 +80,28 @@ jobs:
           - "3.11"
     needs: linting
     steps:
-      - name: Install Python via conda
-        uses: s-weigand/setup-conda@v1
+      - name: Install Python
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-          conda-channels: defaults,bioconda,conda-forge
+
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
           lfs: true
-          fetch-depth: 2
-      - name: Install mamba
-        run: conda install -y mamba>=1.0.0
-      - name: Prepare environment.yml file
-        run: >
-          cp environment.yml /tmp/environment.yml && sed -i -e
-          's/- python/- python=${{ matrix.python-version }}/'
-          /tmp/environment.yml
-      - name: Update environment using mamba
-        run: mamba env update --name root --file /tmp/environment.yml
-      - name: Fail early on htslib etc. problems
-        run: |
-          set -euo pipefail
-          bgzip -c /dev/null >/dev/null
-          samtools version
-          bcftools version
-      - name: Install some more dependencies via pip
-        # Workaround - see https://github.com/pytest-dev/pytest/issues/10420#issuecomment-1290697849
+          fetch-depth: 0
+
+      - name: Install dependencies
         run: pip install -r requirements/test.txt; pip install --ignore-installed py
+
       - name: Run tests
         run: pytest
         env:
           DIFF_MAIN: ${{ github.event_name == 'pull_request' }}
           DIFF_LAST_COMMIT: ${{ github.ref == 'refs/heads/main' }}
+
       - name: Create text report
         run: coverage report
+
       - name: Coveralls
         uses: AndreMiras/coveralls-python-action@develop
