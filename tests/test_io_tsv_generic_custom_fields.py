@@ -10,12 +10,14 @@ import pytest
 
 from biomedsheets import io_tsv
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 @pytest.fixture
 def tsv_sheet_generic_header():
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     [Metadata]
     schema\tgeneric
     schema_version\tv1
@@ -35,20 +37,26 @@ def tsv_sheet_generic_header():
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.05\t0.002
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.004
     E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.005
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
 @pytest.fixture
 def tsv_sheet_generic_no_header():
     """Generic TSV sheet without header"""
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     bioEntity\tbioSample\ttestSample\tngsLibrary\textractionType\tlibraryType\tfolderName\tncbiTaxon\tuberonCellSource\ttestSampleConcentration\tngsLibraryConcentration
     E001\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.03\t0.001
     E001\tBS2\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE001-BS2-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.05\t0.002
     E002\tBS1\tTS1\tLIB1\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB1\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.004
     E002\tBS1\tTS1\tLIB2\tRNA\ttotal_RNA_seq\tE002-BS1-TS1-LIB2\tNCBITaxon_9606\tUBERON:0002107\t0.06\t0.005
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
@@ -240,29 +248,29 @@ EXPECTED_GENERIC_SHEET_JSON_HEADER = r"""
 
 def test_read_generic_custom_fields_sheet_header(tsv_sheet_generic_header):
     sheet = io_tsv.read_generic_tsv_sheet(tsv_sheet_generic_header)
-    assert EXPECTED_GENERIC_SHEET_JSON_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_GENERIC_SHEET_JSON_HEADER == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_generic_custom_fields_sheet_no_header(tsv_sheet_generic_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_generic_tsv_json_data(tsv_sheet_generic_no_header)
     expected = (
-        'Unexpected column seen in header row of body: ncbiTaxon, '
-        'ngsLibraryConcentration, testSampleConcentration, uberonCellSource')
+        "Unexpected column seen in header row of body: ncbiTaxon, "
+        "ngsLibraryConcentration, testSampleConcentration, uberonCellSource"
+    )
     assert expected == str(e_info.value)
 
 
 def test_read_generic_sheet_custom_fields_json_header(tsv_sheet_generic_header):
     sheet_struc = io_tsv.read_generic_tsv_json_data(tsv_sheet_generic_header)
-    assert EXPECTED_GENERIC_SHEET_JSON_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_GENERIC_SHEET_JSON_HEADER == json.dumps(sheet_struc, indent="    ")
 
 
 def test_read_generic_sheet_custom_fields_json_no_header(tsv_sheet_generic_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_generic_tsv_json_data(tsv_sheet_generic_no_header)
     expected = (
-        'Unexpected column seen in header row of body: ncbiTaxon, '
-        'ngsLibraryConcentration, testSampleConcentration, uberonCellSource')
+        "Unexpected column seen in header row of body: ncbiTaxon, "
+        "ngsLibraryConcentration, testSampleConcentration, uberonCellSource"
+    )
     assert expected == str(e_info.value)

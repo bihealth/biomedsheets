@@ -29,30 +29,28 @@ underlying schema data structure.
 
 from .. import models
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 #: Token for identifying a germline variants sequencing experiment
-SHEET_TYPE_GERMLINE_VARIANTS = 'germline_variants'
+SHEET_TYPE_GERMLINE_VARIANTS = "germline_variants"
 #: Token for identifying a cancer matched tumor/normal study
-SHEET_TYPE_CANCER_MATCHED = 'cancer_matched'
+SHEET_TYPE_CANCER_MATCHED = "cancer_matched"
 #: Token for identifying a generic sample sheet
-SHEET_TYPE_GENERIC = 'generic'
+SHEET_TYPE_GENERIC = "generic"
 
 #: Extraction type "DNA"
-EXTRACTION_TYPE_DNA = 'DNA'
+EXTRACTION_TYPE_DNA = "DNA"
 #: Extraction type "RNA"
-EXTRACTION_TYPE_RNA = 'RNA'
+EXTRACTION_TYPE_RNA = "RNA"
 
 
 def is_background(sheet):
-    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
-    """
-    return sheet.extra_infos.get('is_background', False)
+    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background"""
+    return sheet.extra_infos.get("is_background", False)
 
 
 def is_not_background(sheet):
-    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background
-    """
+    """Return ``True`` if the ``Sheet`` shortcut is not flagged as background"""
     return not is_background(sheet)
 
 
@@ -155,8 +153,7 @@ class BioSampleShortcut(ShortcutMixin):
         self.wrapped = bio_sample
         # Check selector for being valid
         if selector not in models.TEST_SAMPLE_CHILDREN:
-            raise InvalidSelector(
-                'Invalid test sample selector {}'.format(selector))
+            raise InvalidSelector("Invalid test sample selector {}".format(selector))
         #: Selector for ``TestSample`` children
         self.selector = selector
         #: The selected ``TestSample`` with the selected ``TestSample`` child
@@ -175,13 +172,15 @@ class BioSampleShortcut(ShortcutMixin):
                 if not entity.disabled:
                     return TestSampleShortcut(self, test_sample, self.selector)
         raise MissingDataEntity(
-            'Could not find data entity for type {} in {}'.format(
-                self.selector, self.bio_sample))
+            "Could not find data entity for type {} in {}".format(self.selector, self.bio_sample)
+        )
 
     def __repr__(self):
-        return 'BioSampleShortcut({})'.format(', '.join(map(str, [
-            self.bio_sample, self.selector, self.test_sample,
-            self.assay_sample])))
+        return "BioSampleShortcut({})".format(
+            ", ".join(
+                map(str, [self.bio_sample, self.selector, self.test_sample, self.assay_sample])
+            )
+        )
 
     def __str__(self):
         return repr(self)
@@ -203,8 +202,7 @@ class TestSampleShortcut:
         self.test_sample = test_sample
         # Check selector for being valid
         if selector not in models.TEST_SAMPLE_CHILDREN:
-            raise InvalidSelector(
-                'Invalid test sample selector {}'.format(selector))
+            raise InvalidSelector("Invalid test sample selector {}".format(selector))
         #: Selector for ``TestSample`` children
         self.selector = selector
         #: The selected ``TestSample`` child
@@ -254,20 +252,20 @@ class TestSampleShortcut:
             if not entity.disabled:
                 return constructors[self.selector](self, entity)
         raise MissingDataEntity(
-            'Could not find data entity for type {} in {}'.format(
-                self.selector, self.test_sample))
+            "Could not find data entity for type {} in {}".format(self.selector, self.test_sample)
+        )
 
     def __repr__(self):
-        return 'TestSampleShortcut({})'.format(', '.join(map(str, [
-            self.test_sample, self.selector, self.assay_sample])))
+        return "TestSampleShortcut({})".format(
+            ", ".join(map(str, [self.test_sample, self.selector, self.assay_sample]))
+        )
 
     def __str__(self):
         return repr(self)
 
 
 class TestSampleChildShortcut:
-    """Helper base class for children of ``TestSampleShortcut``
-    """
+    """Helper base class for children of ``TestSampleShortcut``"""
 
     def __init__(self, test_sample, wrapped):
         #: Containing ``TestSampleChildShortcut``
@@ -313,8 +311,7 @@ class TestSampleChildShortcut:
 
 
 class NGSLibraryShortcut(TestSampleChildShortcut):
-    """Shortcut to NGSLibrary
-    """
+    """Shortcut to NGSLibrary"""
 
     def __init__(self, test_sample, ngs_library):
         super().__init__(test_sample, ngs_library)

@@ -6,19 +6,24 @@ from collections import OrderedDict
 from warnings import warn
 
 from .base import (
-    EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity, MissingDataWarning,
-    NGSLibraryShortcut, ShortcutSampleSheet, TestSampleShortcut
-    )
-from .generic import (GenericBioEntity, GenericBioSample)
+    EXTRACTION_TYPE_DNA,
+    EXTRACTION_TYPE_RNA,
+    MissingDataEntity,
+    MissingDataWarning,
+    NGSLibraryShortcut,
+    ShortcutSampleSheet,
+    TestSampleShortcut,
+)
+from .generic import GenericBioEntity, GenericBioSample
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 #: Key value for "is tumor" flag
-KEY_IS_TUMOR = 'isTumor'
+KEY_IS_TUMOR = "isTumor"
 
 #: Key value for "extraction type" value
-KEY_EXTRACTION_TYPE = 'extractionType'
+KEY_EXTRACTION_TYPE = "extractionType"
 
 
 class CancerCaseSheetOptions:
@@ -26,9 +31,7 @@ class CancerCaseSheetOptions:
 
     @classmethod
     def create_defaults(klass):
-        return CancerCaseSheetOptions(
-            allow_missing_normal=False,
-            allow_missing_tumor=False)
+        return CancerCaseSheetOptions(allow_missing_normal=False, allow_missing_tumor=False)
 
     def __init__(self, *, allow_missing_normal, allow_missing_tumor):
         #: Allow missing normal sample, leads to empty pair list
@@ -38,7 +41,7 @@ class CancerCaseSheetOptions:
 
     def __str__(self):
         args = (self.allow_missing_normal, self.allow_missing_tumor)
-        return 'CancerCaseSheetOptions({})'.format(', '.join(map(str, args)))
+        return "CancerCaseSheetOptions({})".format(", ".join(map(str, args)))
 
     def __repr__(self):
         return str(self)
@@ -68,17 +71,20 @@ class CancerCaseSheet(ShortcutSampleSheet):
         self.all_sample_pairs_by_tumor_dna_test_sample = OrderedDict(
             (pair.tumor_sample.dna_test_sample.name, pair)
             for pair in self.all_sample_pairs
-            if pair.tumor_sample and pair.tumor_sample.dna_test_sample)
+            if pair.tumor_sample and pair.tumor_sample.dna_test_sample
+        )
         #: Mapping of all sample pairs by name of primary DNA library name
         self.all_sample_pairs_by_tumor_dna_ngs_library = OrderedDict(
             (pair.tumor_sample.dna_ngs_library.name, pair)
             for pair in self.all_sample_pairs
-            if pair.tumor_sample.dna_ngs_library)
+            if pair.tumor_sample.dna_ngs_library
+        )
         #: Mapping of all sample pairs by name of primary RNA library name
         self.all_sample_pairs_by_tumor_rna_ngs_library = OrderedDict(
             (pair.tumor_sample.rna_ngs_library.name, pair)
             for pair in self.all_sample_pairs
-            if pair.tumor_sample.rna_ngs_library)
+            if pair.tumor_sample.rna_ngs_library
+        )
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
@@ -114,8 +120,9 @@ class CancerMatchedSamplePair:
         self.normal_sample = normal_sample
 
     def __repr__(self):
-        return 'CancerMatchedSamplePair({})'.format(', '.join(
-            map(str, [self.donor, self.tumor_sample, self.normal_sample])))
+        return "CancerMatchedSamplePair({})".format(
+            ", ".join(map(str, [self.donor, self.tumor_sample, self.normal_sample]))
+        )
 
     def __str__(self):
         return repr(self)
@@ -151,10 +158,9 @@ class CancerBioSample(GenericBioSample):
         """Spider through ``self.bio_sample`` and return primary DNA test
         sample
         """
-        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_DNA, True),
-                      None)
+        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_DNA, True), None)
         if sample:
-            return TestSampleShortcut(self, sample, 'ngs_library')
+            return TestSampleShortcut(self, sample, "ngs_library")
         else:
             return None
 
@@ -162,30 +168,29 @@ class CancerBioSample(GenericBioSample):
         """Spider through ``self.bio_sample`` and return primary RNA test
         sample, if any; ``None`` otherwise
         """
-        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_RNA, True),
-                      None)
+        sample = next(self._iter_all_test_samples(EXTRACTION_TYPE_RNA, True), None)
         if sample:
-            return TestSampleShortcut(self, sample, 'ngs_library')
+            return TestSampleShortcut(self, sample, "ngs_library")
         else:
             return None
 
     def _get_primary_dna_ngs_library(self):
-        """Get primary DNA NGS library from self.dna_test_sample
-        """
-        if (self.dna_test_sample and
-                self.dna_test_sample.test_sample.ngs_libraries):
-            return NGSLibraryShortcut(self.dna_test_sample, next(iter(
-                self.dna_test_sample.test_sample.ngs_libraries.values())))
+        """Get primary DNA NGS library from self.dna_test_sample"""
+        if self.dna_test_sample and self.dna_test_sample.test_sample.ngs_libraries:
+            return NGSLibraryShortcut(
+                self.dna_test_sample,
+                next(iter(self.dna_test_sample.test_sample.ngs_libraries.values())),
+            )
         else:
             return None
 
     def _get_primary_rna_ngs_library(self):
-        """Get primary RNA NGS library from self.rna_test_sample, if any
-        """
-        if (self.rna_test_sample and
-                self.rna_test_sample.test_sample.ngs_libraries):
-            return NGSLibraryShortcut(self.rna_test_sample, next(iter(
-                self.rna_test_sample.test_sample.ngs_libraries.values())))
+        """Get primary RNA NGS library from self.rna_test_sample, if any"""
+        if self.rna_test_sample and self.rna_test_sample.test_sample.ngs_libraries:
+            return NGSLibraryShortcut(
+                self.rna_test_sample,
+                next(iter(self.rna_test_sample.test_sample.ngs_libraries.values())),
+            )
         else:
             return None
 
@@ -199,19 +204,22 @@ class CancerBioSample(GenericBioSample):
             if KEY_EXTRACTION_TYPE not in test_sample.extra_infos:
                 raise MissingDataEntity(  # pragma: no cover
                     'Could not find "{}" flag in TestSample {}'.format(
-                        KEY_EXTRACTION_TYPE, test_sample))
+                        KEY_EXTRACTION_TYPE, test_sample
+                    )
+                )
             elif test_sample.extra_infos[KEY_EXTRACTION_TYPE] == ext_type:
                 yielded_any = True
                 yield test_sample
         if not yielded_any and not allow_none:
             raise MissingDataEntity(  # pragma: no cover
-                ('Could not find a TestSample with {} == {} for '
-                 'BioSample {}'.format(
-                     KEY_EXTRACTION_TYPE, ext_type, self.bio_sample)))
+                (
+                    "Could not find a TestSample with {} == {} for "
+                    "BioSample {}".format(KEY_EXTRACTION_TYPE, ext_type, self.bio_sample)
+                )
+            )
 
     def __repr__(self):
-        return 'CancerBioSample({})'.format(', '.join(
-            map(str, [self.bio_entity, self.bio_sample])))
+        return "CancerBioSample({})".format(", ".join(map(str, [self.bio_entity, self.bio_sample])))
 
     def __str__(self):
         return repr(self)
@@ -242,8 +250,7 @@ class CancerDonor(GenericBioEntity):
         normal_bio_sample = self._get_primary_normal_bio_sample()
         if normal_bio_sample:
             for tumor_bio_sample in self._iter_tumor_bio_samples():
-                yield CancerMatchedSamplePair(
-                    self, tumor_bio_sample, normal_bio_sample)
+                yield CancerMatchedSamplePair(self, tumor_bio_sample, normal_bio_sample)
 
     def _get_primary_normal_bio_sample(self):
         """Return primary normal ``BioSample``
@@ -253,13 +260,13 @@ class CancerDonor(GenericBioEntity):
         for bio_sample in self.bio_samples.values():
             if KEY_IS_TUMOR not in bio_sample.extra_infos:
                 raise MissingDataEntity(  # pragma: no cover
-                    'Could not find "{}" flag in BioSample {}'.format(
-                        KEY_IS_TUMOR, bio_sample))
+                    'Could not find "{}" flag in BioSample {}'.format(KEY_IS_TUMOR, bio_sample)
+                )
             elif not bio_sample.extra_infos[KEY_IS_TUMOR]:
                 return bio_sample
         # Having no normal sample is an error by default but this behaviour
         # can be switched off.
-        tpl = 'Could not find primary normal sample for BioEntity {}'
+        tpl = "Could not find primary normal sample for BioEntity {}"
         msg = tpl.format(self.bio_entity)
         if not self.sheet.options.allow_missing_normal:  # pragma: no cover
             raise MissingDataEntity(msg)
@@ -279,15 +286,15 @@ class CancerDonor(GenericBioEntity):
         for bio_sample in self.bio_samples.values():
             if KEY_IS_TUMOR not in bio_sample.extra_infos:
                 raise MissingDataEntity(  # pragma: no cover
-                    'Could not find "{}" flag in BioSample {}'.format(
-                        KEY_IS_TUMOR, bio_sample))
+                    'Could not find "{}" flag in BioSample {}'.format(KEY_IS_TUMOR, bio_sample)
+                )
             elif bio_sample.extra_infos[KEY_IS_TUMOR]:
                 yielded_any = True
                 yield bio_sample
         if not yielded_any:
             # Having no tumor sample is an error by default but this behaviour
             # can be switched off.
-            tpl = 'Could not find a BioSample with {} = true for BioEntity {}'
+            tpl = "Could not find a BioSample with {} = true for BioEntity {}"
             msg = tpl.format(KEY_IS_TUMOR, self.bio_entity)
             if not self.sheet.options.allow_missing_tumor:
                 raise MissingDataEntity(msg)  # pragma: no cover
@@ -295,8 +302,7 @@ class CancerDonor(GenericBioEntity):
                 warn(msg, MissingDataWarning)
 
     def __repr__(self):
-        return 'CancerDonor({})'.format(', '.join(map(
-            str, [self.sheet, self.bio_entity])))
+        return "CancerDonor({})".format(", ".join(map(str, [self.sheet, self.bio_entity])))
 
     def __str__(self):
         return repr(self)

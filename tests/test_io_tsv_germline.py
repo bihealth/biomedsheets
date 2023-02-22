@@ -10,12 +10,14 @@ import pytest
 
 from biomedsheets import io_tsv
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 @pytest.fixture
 def tsv_sheet_germline_header():
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     [Metadata]
     schema\tgermline_variants
     schema_version\tv1
@@ -28,43 +30,57 @@ def tsv_sheet_germline_header():
     12_348\t12_346\t12_347\tM\tN\tWGS\t12_348\t.
     12_346\t.\t.\tM\tN\t.\t.\t.
     12_347\t.\t.\tF\tN\tWGS\t12_347\t.
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
 @pytest.fixture
 def tsv_sheet_germline_no_header():
     """Germline TSV sheet without header"""
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
     12_345\t12_346\t12_347\tM\tY\tWGS\t12_345\tHP:0009946,HP:0009899
     12_348\t12_346\t12_347\tM\tN\tWGS\t12_348\t.
     12_346\t.\t.\tM\tN\t.\t.\t.
     12_347\t.\t.\tF\tN\tWGS\t12_347\t.
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
 @pytest.fixture
 def tsv_sheet_germline_no_header_hyphened_identifier():
     """Germline TSV sheet without header"""
-    return io.StringIO(textwrap.dedent("""
+    return io.StringIO(
+        textwrap.dedent(
+            """
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms
     12-345\t12-346\t12-347\tM\tY\tWGS\t12-345\tHP:0009946,HP:0009899
     12-348\t12-346\t12-347\tM\tN\tWGS\t12-348\t.
     12-346\t.\t.\tM\tN\t.\t.\t.
     12-347\t.\t.\tF\tN\tWGS\t12-347\t.
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
 
 
 @pytest.fixture
 def tsv_sheet_germline_platform_name():
     """Germline TSV sheet with seqPlatform name"""
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     patientName\tfatherName\tmotherName\tsex\tisAffected\tlibraryType\tfolderName\thpoTerms\tseqPlatform
     12_347\t.\t.\tF\tN\tWGS\t12_347\t.\tIllumina
     12_347\t.\t.\tF\tN\tWGS\t12_347\t.\tPacBio
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
@@ -902,42 +918,38 @@ EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME = r"""
 
 def test_read_germline_sheet_header(tsv_sheet_germline_header):
     sheet = io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_header)
-    assert EXPECTED_GERMLINE_SHEET_JSON_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_HEADER == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_germline_sheet_no_header(tsv_sheet_germline_no_header):
     sheet = io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_no_header)
-    assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER == json.dumps(sheet.json_data, indent="    ")
+
 
 def test_read_germline_sheet_no_header_hyphened_identifiers(
-    tsv_sheet_germline_no_header_hyphened_identifier
+    tsv_sheet_germline_no_header_hyphened_identifier,
 ):
     sheet = io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_no_header_hyphened_identifier)
     assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER_HYPHEN == json.dumps(
-        sheet.json_data, indent='    ')
+        sheet.json_data, indent="    "
+    )
 
 
 def test_read_germline_sheet_platform_name(tsv_sheet_germline_platform_name):
     sheet = io_tsv.read_germline_tsv_sheet(tsv_sheet_germline_platform_name)
-    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_tumor_json_header(tsv_sheet_germline_header):
     sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_header)
-    assert EXPECTED_GERMLINE_SHEET_JSON_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_HEADER == json.dumps(sheet_struc, indent="    ")
 
 
 def test_read_tumor_json_no_header(tsv_sheet_germline_no_header):
     sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_no_header)
-    assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_NO_HEADER == json.dumps(sheet_struc, indent="    ")
 
 
 def test_read_tumor_json_platform_name(tsv_sheet_germline_platform_name):
     sheet_struc = io_tsv.read_germline_tsv_json_data(tsv_sheet_germline_platform_name)
-    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_GERMLINE_SHEET_JSON_PLATFORM_NAME == json.dumps(sheet_struc, indent="    ")

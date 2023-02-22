@@ -4,9 +4,16 @@
 -r base.txt
 
 # Wonderful py.test library, style checker etc.
-pytest>=4.4.1
-flake8>=3.5.0
-pytest-flake8>=1.0.4
-coverage>=4.3.4
-pytest-cov>=2.4.0
-codacy-coverage>=1.3.6
+pytest
+coverage
+pytest-cov
+pytest-mock
+
+flake8
+flake8-import-order
+pytest-flake8
+
+# "Black" code formatter and checker.
+black ==22.8.0
+# isort code formatter - import order
+isort ==5.10.1

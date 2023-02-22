@@ -10,12 +10,14 @@ import pytest
 
 from biomedsheets import io_tsv
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 @pytest.fixture
 def tsv_sheet_cancer_header():
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     [Metadata]
     schema\ttumor_matched
     schema_version\tv1
@@ -32,14 +34,18 @@ def tsv_sheet_cancer_header():
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1
     P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
 @pytest.fixture
 def tsv_sheet_cancer_no_header():
     """Tumor TSV sheet without header"""
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     patientName\tsampleName\tisTumor\tlibraryType\tfolderName
     P001\tN1\tN\tWES\tP001-N1-DNA1-WES1
     P001\tT1\tY\tWES\tP001-T1-DNA1-WES1
@@ -49,7 +55,9 @@ def tsv_sheet_cancer_no_header():
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1
     P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
@@ -546,23 +554,19 @@ EXPECTED_CANCER_SHEET_JSON_NO_HEADER = r"""
 
 def test_read_cancer_sheet_header(tsv_sheet_cancer_header):
     sheet = io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_header)
-    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_cancer_sheet_no_header(tsv_sheet_cancer_no_header):
     sheet = io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_no_header)
-    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_tumor_json_header(tsv_sheet_cancer_header):
     sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_header)
-    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(sheet_struc, indent="    ")
 
 
 def test_read_tumor_json_no_header(tsv_sheet_cancer_no_header):
     sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
-    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_NO_HEADER == json.dumps(sheet_struc, indent="    ")

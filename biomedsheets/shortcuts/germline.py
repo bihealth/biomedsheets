@@ -2,35 +2,41 @@
 """Shortcuts for rare germline sample sheets
 """
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from copy import deepcopy
 from warnings import warn
 
-from .base import (
-    BioSampleShortcut, EXTRACTION_TYPE_DNA, EXTRACTION_TYPE_RNA, MissingDataEntity,
-    MissingDataWarning, NGSLibraryShortcut, ShortcutSampleSheet, TestSampleShortcut
-    )
-from .generic import GenericBioEntity
 from ..union_find import UnionFind
+from .base import (
+    EXTRACTION_TYPE_DNA,
+    EXTRACTION_TYPE_RNA,
+    BioSampleShortcut,
+    MissingDataEntity,
+    MissingDataWarning,
+    NGSLibraryShortcut,
+    ShortcutSampleSheet,
+    TestSampleShortcut,
+)
+from .generic import GenericBioEntity
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 # TODO: need selector or WGS/WES data somehow in case both are present.
 
 #: Key value for "extraction type" value
-KEY_EXTRACTION_TYPE = 'extractionType'
+KEY_EXTRACTION_TYPE = "extractionType"
 
 #: Key value for the "is affected" flag
-KEY_IS_AFFECTED = 'isAffected'
+KEY_IS_AFFECTED = "isAffected"
 
 #: Key value for the "father PK" value
-KEY_FATHER_PK = 'fatherPk'
+KEY_FATHER_PK = "fatherPk"
 
 #: Key value for the "mother PK" value
-KEY_MOTHER_PK = 'motherPk'
+KEY_MOTHER_PK = "motherPk"
 
 #: Key value for "sex".
-KEY_SEX = 'sex'
+KEY_SEX = "sex"
 
 
 def donor_has_dna_ngs_library(donor):
@@ -138,11 +144,8 @@ class Pedigree:
             self.affecteds = []
             self.index = self.donors[0]
         else:
-            donors_with_libs = [
-                d for d in self.donors
-                if d.dna_ngs_library or d.rna_ngs_library]
-            affecteds_with_libs = [
-                d for d in donors_with_libs if d.is_affected]
+            donors_with_libs = [d for d in self.donors if d.dna_ngs_library or d.rna_ngs_library]
+            affecteds_with_libs = [d for d in donors_with_libs if d.is_affected]
             self.affecteds = [d for d in self.donors if d.is_affected]
             self.affecteds = list(sorted(self.affecteds, key=lambda d: d.name))
             affecteds_with_libs = list(sorted(affecteds_with_libs, key=lambda d: d.name))
@@ -159,59 +162,55 @@ class Pedigree:
         self.founders = [d for d in self.donors if d.is_founder]
         self.name_to_donor = OrderedDict([(d.name, d) for d in self.donors])
         self.pk_to_donor = OrderedDict([(str(d.pk), d) for d in self.donors])
-        self.secondary_id_to_donor = OrderedDict([
-            (d.secondary_id, d) for d in self.donors])
+        self.secondary_id_to_donor = OrderedDict([(d.secondary_id, d) for d in self.donors])
 
     def __repr__(self):
-        return 'Pedigree({})'.format(', '.join(map(str, [
-            self.donors, self.index])))
+        return "Pedigree({})".format(", ".join(map(str, [self.donors, self.index])))
 
     def __str__(self):
         return repr(self)
 
 
 def _append_pedigree_to_ped(pedigree, f):
-    family = 'FAM_' + pedigree.index.name
+    family = "FAM_" + pedigree.index.name
     for donor in pedigree.donors:
-        affected = {
-            'affected': '2', 'unaffected': '1', 'unknown': '0'
-        }[donor.extra_infos.get(KEY_IS_AFFECTED, 'unknown')]
-        sex = {'male': '1', 'female': '2', 'unknown': '0'}[
-            donor.extra_infos.get(KEY_SEX, 'unknown')]
-        father = '0'
+        affected = {"affected": "2", "unaffected": "1", "unknown": "0"}[
+            donor.extra_infos.get(KEY_IS_AFFECTED, "unknown")
+        ]
+        sex = {"male": "1", "female": "2", "unknown": "0"}[
+            donor.extra_infos.get(KEY_SEX, "unknown")
+        ]
+        father = "0"
         if donor.father_pk:
-            if hasattr(pedigree.pk_to_donor[donor.father_pk],
-                       'dna_ngs_library'):
+            if hasattr(pedigree.pk_to_donor[donor.father_pk], "dna_ngs_library"):
                 donor_father = pedigree.pk_to_donor[donor.father_pk]
                 if donor_father.dna_ngs_library is None:
                     father = donor_father.name
                 else:
                     father = donor_father.dna_ngs_library.name
-        mother = '0'
+        mother = "0"
         if donor.mother_pk:
-            if hasattr(pedigree.pk_to_donor[donor.mother_pk],
-                       'dna_ngs_library'):
+            if hasattr(pedigree.pk_to_donor[donor.mother_pk], "dna_ngs_library"):
                 donor_mother = pedigree.pk_to_donor[donor.mother_pk]
                 if donor_mother.dna_ngs_library is None:
                     mother = donor_mother.name
                 else:
                     mother = donor_mother.dna_ngs_library.name
-        if hasattr(donor, 'dna_ngs_library'):
+        if hasattr(donor, "dna_ngs_library"):
             if donor.dna_ngs_library is None:
                 name = donor.name
             else:
                 name = donor.dna_ngs_library.name
-            print('\t'.join(
-                (family, name, father, mother, sex, affected)), file=f)
+            print("\t".join((family, name, father, mother, sex, affected)), file=f)
 
 
 def write_pedigree_to_ped(pedigree, path):
-    with open(path, 'wt') as f:
+    with open(path, "wt") as f:
         _append_pedigree_to_ped(pedigree, f)
 
 
 def write_pedigrees_to_ped(pedigrees, path):
-    with open(path, 'wt') as f:
+    with open(path, "wt") as f:
         for pedigree in pedigrees:
             _append_pedigree_to_ped(pedigree, f)
 
@@ -274,25 +273,24 @@ class Cohort:
         for pedigree in self.pedigrees:
             # Update {name,pk,secondary_id} to pedigree mapping
             self._checked_update(
-                self.name_to_pedigree,
-                {d.name: pedigree for d in pedigree.donors}, 'name')
+                self.name_to_pedigree, {d.name: pedigree for d in pedigree.donors}, "name"
+            )
             self._checked_update(
-                self.pk_to_pedigree,
-                {d.pk: pedigree for d in pedigree.donors}, 'pk')
+                self.pk_to_pedigree, {d.pk: pedigree for d in pedigree.donors}, "pk"
+            )
             self._checked_update(
                 self.secondary_id_to_pedigree,
                 {d.secondary_id: pedigree for d in pedigree.donors},
-                'secondary id')
+                "secondary id",
+            )
             # Update {name,pk,secondary_id} to donor mapping
+            self._checked_update(self.name_to_donor, {d.name: d for d in pedigree.donors}, "name")
+            self._checked_update(self.pk_to_donor, {d.pk: d for d in pedigree.donors}, "pk")
             self._checked_update(
-                self.name_to_donor,
-                {d.name: d for d in pedigree.donors}, 'name')
-            self._checked_update(
-                self.pk_to_donor, {d.pk: d for d in pedigree.donors}, 'pk')
-            self._checked_update(
-                self.secondary_id_to_donor, {
-                    d.secondary_id: d for d in pedigree.donors},
-                'secondary id')
+                self.secondary_id_to_donor,
+                {d.secondary_id: d for d in pedigree.donors},
+                "secondary id",
+            )
 
     def _checked_update(self, dest, other, msg_token):
         """Check overlap of keys between ``dest`` and ``other``, update and
@@ -302,10 +300,8 @@ class Cohort:
         """
         overlap = set(dest.keys()) & set(other.keys())
         if overlap:
-            tpl = ('Duplicate {}s when building '
-                   'cohort shortcuts: {}')  # pramga: no cover
-            raise ValueError(  # pramga: no cover
-                tpl.format(msg_token, list(sorted(overlap))))
+            tpl = "Duplicate {}s when building " "cohort shortcuts: {}"  # pramga: no cover
+            raise ValueError(tpl.format(msg_token, list(sorted(overlap))))  # pramga: no cover
         dest.update(other)
         return dest
 
@@ -348,15 +344,19 @@ class CohortBuilder:
                     donor._father = cohort.pk_to_donor[int(donor.father_pk)]
                     # Consistent check - it shouldn't be 'None' if pedigree correctly joint.
                     if not pedigree.pk_to_donor.get(donor.father_pk, None):
-                        raise InconsistentPedigreeException(error_msg.format(
-                            id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field)
+                        raise InconsistentPedigreeException(
+                            error_msg.format(
+                                id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field
+                            )
                         )
                 if donor.mother_pk:
                     donor._mother = cohort.pk_to_donor[int(donor.mother_pk)]
                     # Consistent check - it shouldn't be 'None' if pedigree correctly joint
                     if not pedigree.pk_to_donor.get(donor.mother_pk, None):
-                        raise InconsistentPedigreeException(error_msg.format(
-                            id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field)
+                        raise InconsistentPedigreeException(
+                            error_msg.format(
+                                id_=donor.bio_entity.secondary_id, join_by_field=self.join_by_field
+                            )
                         )
         return cohort
 
@@ -388,7 +388,7 @@ class CohortBuilder:
         for donor in self.donors:
             # Check if field is defined
             if custom_field not in donor.extra_infos:
-                fields_str = ', '.join(donor.extra_infos.keys())
+                fields_str = ", ".join(donor.extra_infos.keys())
                 err_msg = err_msg.format(f=custom_field, pk=str(donor.pk), af=fields_str)
                 raise UndefinedFieldException(err_msg)
             # Extra info
@@ -446,8 +446,7 @@ class GermlineDonor(GenericBioEntity):
     @property
     def is_affected(self):
         """Return whether or not the donor is affected"""
-        return self.extra_infos.get(
-            KEY_IS_AFFECTED, 'unaffected') == 'affected'
+        return self.extra_infos.get(KEY_IS_AFFECTED, "unaffected") == "affected"
 
     @property
     def father_pk(self):
@@ -464,8 +463,9 @@ class GermlineDonor(GenericBioEntity):
         """Return mother ``GermlineDonor`` object or ``None``"""
         if not self._father and self.father_pk:
             raise AttributeError(
-                'Father object not yet set, although PK available.  '
-                'Not processed through CohortBuilder?')
+                "Father object not yet set, although PK available.  "
+                "Not processed through CohortBuilder?"
+            )
         return self._father
 
     @property
@@ -473,8 +473,9 @@ class GermlineDonor(GenericBioEntity):
         """Return mother ``GermlineDonor`` object or ``None``"""
         if not self._mother and self.mother_pk:
             raise AttributeError(
-                'Mother object not yet set, although PK available.  '
-                'Not processed through CohortBuilder?')
+                "Mother object not yet set, although PK available.  "
+                "Not processed through CohortBuilder?"
+            )
         return self._mother
 
     @property
@@ -483,11 +484,10 @@ class GermlineDonor(GenericBioEntity):
         return (not self.father_pk) and (not self.mother_pk)
 
     def _get_primary_dna_bio_sample(self):
-        """Spider through ``self.bio_entity`` and return primary bio sample
-        """
+        """Spider through ``self.bio_entity`` and return primary bio sample"""
         for sample in self._iter_all_bio_samples(EXTRACTION_TYPE_DNA, True):
-            if not sample.extra_infos.get('isTumor', False):
-                return BioSampleShortcut(self, sample, 'ngs_library')
+            if not sample.extra_infos.get("isTumor", False):
+                return BioSampleShortcut(self, sample, "ngs_library")
         return None
 
     def _get_primary_rna_bio_sample(self):
@@ -495,18 +495,18 @@ class GermlineDonor(GenericBioEntity):
         with RNA data, if any; ``None`` otherwise
         """
         for sample in self._iter_all_bio_samples(EXTRACTION_TYPE_RNA, True):
-            if not sample.extra_infos.get('isTumor', False):
-                return BioSampleShortcut(self, sample, 'ngs_library')
+            if not sample.extra_infos.get("isTumor", False):
+                return BioSampleShortcut(self, sample, "ngs_library")
         return None
 
     def _get_primary_dna_test_sample(self):
-        """Spider through ``self.bio_entity`` and return primary DNA test sample
-        """
-        if (self.dna_bio_sample and
-                self.dna_bio_sample.bio_sample.test_samples):
-            return TestSampleShortcut(self.dna_bio_sample, next(iter(
-                self.dna_bio_sample.bio_sample.test_samples.values())),
-                'ngs_library')
+        """Spider through ``self.bio_entity`` and return primary DNA test sample"""
+        if self.dna_bio_sample and self.dna_bio_sample.bio_sample.test_samples:
+            return TestSampleShortcut(
+                self.dna_bio_sample,
+                next(iter(self.dna_bio_sample.bio_sample.test_samples.values())),
+                "ngs_library",
+            )
         else:
             return None
 
@@ -514,31 +514,32 @@ class GermlineDonor(GenericBioEntity):
         """Spider through ``self.bio_entity`` and return primary RNA
         testsample, if any; ``None`` otherwise
         """
-        if (self.rna_bio_sample and
-                self.rna_bio_sample.bio_sample.test_samples):
-            return TestSampleShortcut(self.rna_bio_sample, next(iter(
-                self.rna_bio_sample.bio_sample.test_samples.values())),
-                'ngs_library')
+        if self.rna_bio_sample and self.rna_bio_sample.bio_sample.test_samples:
+            return TestSampleShortcut(
+                self.rna_bio_sample,
+                next(iter(self.rna_bio_sample.bio_sample.test_samples.values())),
+                "ngs_library",
+            )
         else:
             return None
 
     def _get_primary_dna_ngs_library(self):
-        """Get primary DNA NGS library from self.dna_test_sample
-        """
-        if (self.dna_test_sample and
-                self.dna_test_sample.test_sample.ngs_libraries):
-            return NGSLibraryShortcut(self.dna_test_sample, next(iter(
-                self.dna_test_sample.test_sample.ngs_libraries.values())))
+        """Get primary DNA NGS library from self.dna_test_sample"""
+        if self.dna_test_sample and self.dna_test_sample.test_sample.ngs_libraries:
+            return NGSLibraryShortcut(
+                self.dna_test_sample,
+                next(iter(self.dna_test_sample.test_sample.ngs_libraries.values())),
+            )
         else:
             return None
 
     def _get_primary_rna_ngs_library(self):
-        """Get primary RNA NGS library from self.rna_test_sample, if any
-        """
-        if (self.rna_test_sample and
-                self.rna_test_sample.test_sample.ngs_libraries):
-            return NGSLibraryShortcut(self.rna_test_sample, next(iter(
-                self.rna_test_sample.test_sample.ngs_libraries.values())))
+        """Get primary RNA NGS library from self.rna_test_sample, if any"""
+        if self.rna_test_sample and self.rna_test_sample.test_sample.ngs_libraries:
+            return NGSLibraryShortcut(
+                self.rna_test_sample,
+                next(iter(self.rna_test_sample.test_sample.ngs_libraries.values())),
+            )
         else:
             return None
 
@@ -554,19 +555,19 @@ class GermlineDonor(GenericBioEntity):
                 if KEY_EXTRACTION_TYPE not in test_sample.extra_infos:
                     raise MissingDataEntity(
                         'Could not find "{}" flag in TestSample {}'.format(
-                            KEY_EXTRACTION_TYPE, test_sample))
+                            KEY_EXTRACTION_TYPE, test_sample
+                        )
+                    )
                 elif test_sample.extra_infos[KEY_EXTRACTION_TYPE] == ext_type:
                     yielded_any = True
                     yield bio_sample
                     break  # each bio_sample only once
         if not yielded_any and not allow_none:
-            msg = 'Could not find a TestSample with {} == {} for BioEntity {}'
-            raise MissingDataEntity(msg.format(
-                KEY_EXTRACTION_TYPE, ext_type, self.bio_entity))
+            msg = "Could not find a TestSample with {} == {} for BioEntity {}"
+            raise MissingDataEntity(msg.format(KEY_EXTRACTION_TYPE, ext_type, self.bio_entity))
 
     def __repr__(self):
-        return 'GermlineDonor({})'.format(', '.join(map(
-            str, [self.sheet, self.bio_entity])))
+        return "GermlineDonor({})".format(", ".join(map(str, [self.sheet, self.bio_entity])))
 
     def __str__(self):
         return repr(self)
@@ -598,20 +599,22 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         #: the sample sheet
         self.cohort = CohortBuilder(self.donors, join_by_field).run()
         #: Mapping from index DNA NGS library name to pedigree
-        self.index_ngs_library_to_pedigree = OrderedDict(
-            self._index_ngs_library_to_pedigree())
+        self.index_ngs_library_to_pedigree = OrderedDict(self._index_ngs_library_to_pedigree())
         #: Mapping from any DNA NGS library name in pedigree to pedigree
-        self.donor_ngs_library_to_pedigree = OrderedDict([
-            (donor.dna_ngs_library.name, pedigree)
-            for pedigree in self.cohort.pedigrees
-            for donor in pedigree.donors if donor.dna_ngs_library])
+        self.donor_ngs_library_to_pedigree = OrderedDict(
+            [
+                (donor.dna_ngs_library.name, pedigree)
+                for pedigree in self.cohort.pedigrees
+                for donor in pedigree.donors
+                if donor.dna_ngs_library
+            ]
+        )
         #: Mapping from DNA NGS library name to donor
-        self.index_ngs_library_to_donor = OrderedDict([
-            (donor.dna_ngs_library.name, donor)
-            for donor in self.donors if donor.dna_ngs_library])
+        self.index_ngs_library_to_donor = OrderedDict(
+            [(donor.dna_ngs_library.name, donor) for donor in self.donors if donor.dna_ngs_library]
+        )
         #: Mapping from library name to object
-        self.library_name_to_library = OrderedDict(
-            self._library_name_to_library())
+        self.library_name_to_library = OrderedDict(self._library_name_to_library())
 
     def _iter_donors(self):
         """Return iterator over the donors in the study"""
@@ -623,10 +626,11 @@ class GermlineCaseSheet(ShortcutSampleSheet):
         for pedigree in self.cohort.pedigrees:
             if not pedigree.index:
                 raise ValueError(  # pragma: no cover
-                    'Found pedigree without index! {}'.format(pedigree))
+                    "Found pedigree without index! {}".format(pedigree)
+                )
             if not pedigree.index.dna_ngs_library:
                 # Warn if pedigree does not have a NGS library
-                tpl = 'Pedigree index has no DNA library! {}/{}'
+                tpl = "Pedigree index has no DNA library! {}/{}"
                 msg = tpl.format(pedigree.index, pedigree)
                 warn(msg, MissingDataWarning)
                 continue

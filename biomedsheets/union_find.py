@@ -50,8 +50,7 @@ class UnionFind:
         return root
 
     def __iter__(self):
-        """Iterate through all items ever found or unioned by this structure
-        """
+        """Iterate through all items ever found or unioned by this structure"""
         return iter(self.parents)
 
     def union(self, *keys):

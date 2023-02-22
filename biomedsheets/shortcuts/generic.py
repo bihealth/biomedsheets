@@ -4,10 +4,9 @@
 
 from collections import OrderedDict
 
-from .base import (ShortcutMixin)
-from .base import (ShortcutSampleSheet)
+from .base import ShortcutMixin, ShortcutSampleSheet
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 class GenericSampleSheet(ShortcutSampleSheet):
@@ -38,8 +37,7 @@ class GenericSampleSheet(ShortcutSampleSheet):
             for bio_sample in bio_entity.bio_samples.values():
                 primary = True
                 for test_sample in bio_sample.test_samples.values():
-                    for ngs_library in (
-                            test_sample.ngs_libraries.values()):
+                    for ngs_library in test_sample.ngs_libraries.values():
                         if ngs_library.disabled:
                             continue
                         self.all_ngs_libraries.append(ngs_library)
@@ -106,8 +104,7 @@ class GenericBioSample(ShortcutMixin):
         self.test_samples = OrderedDict(self._build_test_samples())
 
     def _build_test_samples(self):
-        """Build GenericTestSample objects for ``self.bio_sample.test_samples``
-        """
+        """Build GenericTestSample objects for ``self.bio_sample.test_samples``"""
         for name, test_sample in self.bio_sample.test_samples.items():
             yield name, self.__class__.test_sample_class(self, test_sample)
 
@@ -131,7 +128,6 @@ class GenericBioEntity(ShortcutMixin):
         self.bio_samples = OrderedDict(self._build_bio_samples())
 
     def _build_bio_samples(self):
-        """Build GenericBioSample objects for ``self.bio_entity.bio_samples``
-        """
+        """Build GenericBioSample objects for ``self.bio_entity.bio_samples``"""
         for name, bio_sample in self.bio_entity.bio_samples.items():
             yield name, self.__class__.bio_sample_class(self, bio_sample)
