@@ -9,6 +9,10 @@ coverage
 pytest-cov
 pytest-mock
 
+flake8
+flake8-import-order
+pytest-flake8
+
 # "Black" code formatter and checker.
 black ==22.8.0
 # isort code formatter - import order
