@@ -4,10 +4,7 @@
 
 import pytest
 
-from biomedsheets.shortcuts.base import (
-    InvalidSelector,
-    MissingDataEntity
-)
+from biomedsheets.shortcuts.base import InvalidSelector, MissingDataEntity
 
 
 def test_invalid_selection_exception():

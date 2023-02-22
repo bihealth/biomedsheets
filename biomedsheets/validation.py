@@ -2,7 +2,7 @@
 """Python code for the validation of BioMed Schemas
 """
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 class SchemaValidator:

@@ -5,7 +5,7 @@ import io
 import locale
 
 import pkg_resources
-from requests import codes, Response
+from requests import Response, codes
 from requests.adapters import BaseAdapter
 from requests.compat import urlparse
 
@@ -19,16 +19,14 @@ class ResourceAdapter(BaseAdapter):
         The host name is interpreted as the package name
         """
         # Check that the method makes sense. Only support GET
-        if request.method not in ('GET', 'HEAD'):
-            raise ValueError('Invalid request method {}'.format(
-                request.method))
+        if request.method not in ("GET", "HEAD"):
+            raise ValueError("Invalid request method {}".format(request.method))
         # Parse the URL
         url_parts = urlparse(request.url)
 
         # Interpret host name as package name
         if not url_parts.netloc:
-            raise ValueError(
-                'pkg_resource: hostname interpreted as package name')
+            raise ValueError("pkg_resource: hostname interpreted as package name")
         pkg_name = url_parts.netloc
 
         resp = Response()
@@ -50,7 +48,7 @@ class ResourceAdapter(BaseAdapter):
             # representation of the exception into a byte stream
             resp_str = str(e).encode(locale.getpreferredencoding(False))
             resp.raw = io.BytesIO(resp_str)
-            resp.headers['Content-Length'] = len(resp_str)
+            resp.headers["Content-Length"] = len(resp_str)
 
             # Add release_conn to the BytesIO object
             resp.raw.release_conn = resp.raw.close

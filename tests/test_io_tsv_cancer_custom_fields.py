@@ -10,12 +10,14 @@ import pytest
 
 from biomedsheets import io_tsv
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 @pytest.fixture
 def tsv_sheet_cancer_header():
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     [Metadata]
     schema\tcancer_matched
     schema_version\tv1
@@ -45,14 +47,18 @@ def tsv_sheet_cancer_header():
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1\tNCBITaxon_9606\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.\tfalse\tfalse
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
     P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
 @pytest.fixture
 def tsv_sheet_cancer_no_header():
     """Tumor TSV sheet without header"""
-    f = io.StringIO(textwrap.dedent("""
+    f = io.StringIO(
+        textwrap.dedent(
+            """
     patientName\tsampleName\tisTumor\tlibraryType\tfolderName\tncbiTaxon\tmycnCn\tinssStage\tshimada4Class\tlohChr1p\tpatientStatus\ttimeToEventDays\ttimeToDeathDays\ttestSampleNice\tngsLibraryNice
     P001\tN1\tN\tWES\tP001-N1-DNA1-WES1\tNCBITaxon_9606\t.\t1\tfavorable\ttrue\tNo_disease_event\t.\t.\ttrue\ttrue
     P001\tT1\tY\tWES\tP001-T1-DNA1-WES1\tNCBITaxon_9606\t2\t1\tfavorable\ttrue\tNo_disease_event\t.\t.\ttrue\tfalse
@@ -62,7 +68,9 @@ def tsv_sheet_cancer_no_header():
     P002\tT1\tY\tWES\tP001-T1-RNA1-RNAseq1\tNCBITaxon_9606\t.\t2\tunfavorable\ttrue\tRelapse_progression\t.\t.\tfalse\tfalse
     P002\tT2\tY\tWES\tP001-T2-DNA1-WES1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
     P002\tT2\tY\tmRNA_seq\tP001-T2-RNA1-mRNAseq1\tNCBITaxon_9606\t.\t3\tunfavorable\ttrue\tRelapse_progression\t.\t.\ttrue\ttrue
-    """.lstrip()))
+    """.lstrip()
+        )
+    )
     return f
 
 
@@ -414,31 +422,31 @@ EXPECTED_CANCER_SHEET_JSON_HEADER = r"""
 
 def test_read_cancer_sheet_custom_fields_header(tsv_sheet_cancer_header):
     sheet = io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_header)
-    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
-        sheet.json_data, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(sheet.json_data, indent="    ")
 
 
 def test_read_cancer_sheet_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_sheet(tsv_sheet_cancer_no_header)
     expected = (
-        'Unexpected column seen in header row of body: inssStage, lohChr1p, '
-        'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
-        'testSampleNice, timeToDeathDays, timeToEventDays')
+        "Unexpected column seen in header row of body: inssStage, lohChr1p, "
+        "mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, "
+        "testSampleNice, timeToDeathDays, timeToEventDays"
+    )
     assert expected == str(e_info.value)
 
 
 def test_read_cancer_json_custom_fields_header(tsv_sheet_cancer_header):
     sheet_struc = io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_header)
-    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(
-        sheet_struc, indent='    ')
+    assert EXPECTED_CANCER_SHEET_JSON_HEADER == json.dumps(sheet_struc, indent="    ")
 
 
 def test_read_cancer_json_custom_fields_no_header(tsv_sheet_cancer_no_header):
     with pytest.raises(io_tsv.TSVSheetException) as e_info:
         io_tsv.read_cancer_tsv_json_data(tsv_sheet_cancer_no_header)
     expected = (
-        'Unexpected column seen in header row of body: inssStage, lohChr1p, '
-        'mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, '
-        'testSampleNice, timeToDeathDays, timeToEventDays')
+        "Unexpected column seen in header row of body: inssStage, lohChr1p, "
+        "mycnCn, ncbiTaxon, ngsLibraryNice, patientStatus, shimada4Class, "
+        "testSampleNice, timeToDeathDays, timeToEventDays"
+    )
     assert expected == str(e_info.value)

@@ -1,21 +1,86 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches_ignore: []
 
 jobs:
-  build:
+  cancel-previous:
+    runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/main'
+    steps:
+      - uses: khan/pull-request-workflow-cancel@1.0.0
+        with:
+          workflows: "main.yml"
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
 
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+            pip install -r requirements/test.txt
+            pip freeze
+
+      - name: Run linting tools
+        run: |
+          make lint
+
+      - name: Comment PR
+        if: github.event_name == 'pull_request' && failure()
+        uses: marocchino/sticky-pull-request-comment@v1.1.0
+        with:
+          message: |
+            - Please format your Python code with [black](https://black.readthedocs.io): `make black`
+            - Please organize your imports [isorts](https://isort.readthedocs.io): `make isort`
+            - Please ensure that your code passes [flake8](https://flake8.pycqa.org/en/latest/): `make flake8`
+
+            You can trigger all lints locally by running `make lint`
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  sphinx-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.8"
+
+      - name: Install dependencies
+        run: |
+            pip install -r requirements/test.txt
+            pip freeze
+
+      - name: Build documentation
+        run: |
+          cd docs
+          make html
+
+  testing:
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version:
-          - "3.7"
           - "3.8"
           - "3.9"
           - "3.10"
-
+          - "3.11"
+    needs: linting
     steps:
-      - name: Install Python via conda.
+      - name: Install Python via conda
         uses: s-weigand/setup-conda@v1
         with:
           python-version: ${{ matrix.python-version }}
@@ -24,19 +89,31 @@ jobs:
         uses: actions/checkout@v2
         with:
           lfs: true
-      - name: Install test dependencies via pip
-        run: pip install -r requirements/test.txt
+          fetch-depth: 2
+      - name: Install mamba
+        run: conda install -y mamba>=1.0.0
+      - name: Prepare environment.yml file
+        run: >
+          cp environment.yml /tmp/environment.yml && sed -i -e
+          's/- python/- python=${{ matrix.python-version }}/'
+          /tmp/environment.yml
+      - name: Update environment using mamba
+        run: mamba env update --name root --file /tmp/environment.yml
+      - name: Fail early on htslib etc. problems
+        run: |
+          set -euo pipefail
+          bgzip -c /dev/null >/dev/null
+          samtools version
+          bcftools version
+      - name: Install some more dependencies via pip
+        # Workaround - see https://github.com/pytest-dev/pytest/issues/10420#issuecomment-1290697849
+        run: pip install -r requirements/test.txt; pip install --ignore-installed py
       - name: Run tests
         run: pytest
+        env:
+          DIFF_MAIN: ${{ github.event_name == 'pull_request' }}
+          DIFF_LAST_COMMIT: ${{ github.ref == 'refs/heads/main' }}
       - name: Create text report
         run: coverage report
-      - name: Create XML report for codacy
-        run: coverage xml
-#      - name: Run codacy-coverage-reporter
-#        uses: codacy/codacy-coverage-reporter-action@master
-#        with:
-#          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-#          coverage-reports: coverage.xml
-#        if: ${{ matrix.python-version == '3.7' }}
-#      - name: Check style with flake8
-#        run: flake8 .
+      - name: Coveralls
+        uses: AndreMiras/coveralls-python-action@develop

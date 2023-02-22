@@ -2,76 +2,76 @@
 # -*- coding: utf-8 -*-
 
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 
 import versioneer
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 def parse_requirements(path):
     """Parse ``requirements.txt`` at ``path``."""
     requirements = []
-    with open(path, 'rt') as reqs_f:
+    with open(path, "rt") as reqs_f:
         for line in reqs_f:
             line = line.strip()
-            if line.startswith('-r'):
+            if line.startswith("-r"):
                 fname = line.split()[1]
-                inner_path = os.path.join(
-                    os.path.dirname(path), fname)
+                inner_path = os.path.join(os.path.dirname(path), fname)
                 requirements += parse_requirements(inner_path)
-            elif line != '' and not line.startswith('#'):
+            elif line != "" and not line.startswith("#"):
                 requirements.append(line)
     return requirements
 
 
-with open('README.rst') as readme_file:
+with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
+with open("CHANGELOG.md") as changelog_file:
+    changelog = changelog_file.read()
 
-requirements = parse_requirements('requirements.txt')
+requirements = parse_requirements("requirements.txt")
 
 test_requirements = [
     # TODO: put package test requirements here
 ]
 
 setup(
-    name='biomedsheets',
+    name="biomedsheets",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
-    description=(
-        'Python 3 library for accessing and managing BioMedical sheets'),
-    long_description=readme + '\n\n' + history,
-    author='Manuel Holtgrewe',
-    author_email='manuel.holtgrewe@bihealth.de',
-    url='https://github.com/bihealth/biomedsheets',
+    description=("Python 3 library for accessing and managing BioMedical sheets"),
+    long_description=readme + "\n\n" + changelog,
+    long_description_content_type="text/markdown",
+    author="Manuel Holtgrewe",
+    author_email="manuel.holtgrewe@bihealth.de",
+    url="https://github.com/bihealth/biomedsheets",
     packages=find_packages(),
     package_dir={
-        'biomedsheets': 'biomedsheets',
+        "biomedsheets": "biomedsheets",
     },
     entry_points={
-        'console_scripts': [
-            'biomedsheets = biomedsheets.__main__:main',
+        "console_scripts": [
+            "biomedsheets = biomedsheets.__main__:main",
         ]
     },
     include_package_data=True,
     install_requires=requirements,
-    license='MIT license',
+    license="MIT license",
     zip_safe=False,
-    keywords='biomedsheets',
+    keywords="biomedsheets",
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
-        'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
-        'Natural Language :: English',
-        'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
-        'Programming Language :: Python :: 3.9',
-        'Programming Language :: Python :: 3.10',
+        "Development Status :: 2 - Pre-Alpha",
+        "Intended Audience :: Developers",
+        "License :: OSI Approved :: MIT License",
+        "Natural Language :: English",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
     ],
-    test_suite='tests',
-    tests_require=test_requirements
+    test_suite="tests",
+    tests_require=test_requirements,
 )

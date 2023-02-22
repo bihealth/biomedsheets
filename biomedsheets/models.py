@@ -6,15 +6,15 @@ from collections import OrderedDict
 
 from .naming import DEFAULT_NAME_GENERATOR
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 #: Key for storing disabled flag for entities
-KEY_DISABLED = 'disabled'
+KEY_DISABLED = "disabled"
 # TODO: add this as a main property
 
 #: Key for selecting an ``NGSLibrary`` object
-KEY_NGS_LIBRARY = 'ngs_library'
+KEY_NGS_LIBRARY = "ngs_library"
 
 #: Frozen set of valid ``TestSample`` child types
 TEST_SAMPLE_CHILDREN = frozenset((KEY_NGS_LIBRARY,))
@@ -46,17 +46,16 @@ class CrawlMixin:
     Also provides helpers for merging "sub_entries" dicts
     """
 
-    def crawl(self, name, sep='-'):
-        """Crawl through sheet based on the path by secondary id
-        """
+    def crawl(self, name, sep="-"):
+        """Crawl through sheet based on the path by secondary id"""
         if sep in name:
             next, rest = name.split(sep, 1)
         else:
             next, rest = name, None
         if next not in self.sub_entries:
             raise SecondaryIDNotFoundException(
-                'Could not find sub entry with secondary ID {}'.format(
-                    next))
+                "Could not find sub entry with secondary ID {}".format(next)
+            )
         if rest:
             return self.sub_entries[next].crawl(rest)
         else:
@@ -71,8 +70,7 @@ class CrawlMixin:
                     dupes = set(d1.keys()) & set(d2.keys())
                     duplicates = duplicates | dupes
         if len(duplicates) > 0:
-            raise AmbiguousSecondaryIdException(
-                'Ambiguous secondary IDs: {}'.format(duplicates))
+            raise AmbiguousSecondaryIdException("Ambiguous secondary IDs: {}".format(duplicates))
         # Build result
         result = {}
         for d in dicts:
@@ -81,12 +79,19 @@ class CrawlMixin:
 
 
 class Sheet(CrawlMixin):
-    """Container for multiple :class:`BioEntity` objects
-    """
+    """Container for multiple :class:`BioEntity` objects"""
 
-    def __init__(self, identifier, title, json_data, description=None,
-                 bio_entities=None, extra_infos=None, dict_type=OrderedDict,
-                 name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        identifier,
+        title,
+        json_data,
+        description=None,
+        bio_entities=None,
+        extra_infos=None,
+        dict_type=OrderedDict,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         #: Identifier URI of the sheet, cannot be changed after construction
         self.identifier = identifier
         #: Title of the sheet, can be changed after construction
@@ -105,9 +110,22 @@ class Sheet(CrawlMixin):
         self.name_generator = name_generator
 
     def __repr__(self):
-        return 'Sheet({})'.format(', '.join(map(str, [
-            self.identifier, self.title, self.json_data, self.description,
-            self.bio_entities, self.extra_infos, self.sub_entries])))
+        return "Sheet({})".format(
+            ", ".join(
+                map(
+                    str,
+                    [
+                        self.identifier,
+                        self.title,
+                        self.json_data,
+                        self.description,
+                        self.bio_entities,
+                        self.extra_infos,
+                        self.sub_entries,
+                    ],
+                )
+            )
+        )
 
     def __str__(self):
         return repr(self)
@@ -120,9 +138,16 @@ class SheetEntry:
     properties dict
     """
 
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, dict_type=OrderedDict,
-                 name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        pk,
+        disabled,
+        secondary_id,
+        extra_ids=None,
+        extra_infos=None,
+        dict_type=OrderedDict,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         #: Primary key of the bio entity, globally unique
         self.pk = pk
         #: Flag for explicit disabling of objects
@@ -140,7 +165,7 @@ class SheetEntry:
     @property
     def full_secondary_id(self):
         """Return full path from BioEntity to this entry"""
-        raise NotImplementedError('Override me!')
+        raise NotImplementedError("Override me!")
 
     @property
     def name(self):
@@ -154,15 +179,22 @@ class SheetEntry:
 
 
 class BioEntity(SheetEntry, CrawlMixin):
-    """Represent one biological specimen
-    """
+    """Represent one biological specimen"""
 
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, bio_samples=None, dict_type=OrderedDict,
-                 name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        pk,
+        disabled,
+        secondary_id,
+        extra_ids=None,
+        extra_infos=None,
+        bio_samples=None,
+        dict_type=OrderedDict,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-            name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator
+        )
         #: List of ``BioSample`` objects described for the ``BioEntity``
         self.bio_samples = dict_type(bio_samples or [])
         # Assign owner pointer in bio samples to self
@@ -176,24 +208,44 @@ class BioEntity(SheetEntry, CrawlMixin):
         return self.secondary_id
 
     def __repr__(self):
-        return 'BioEntity({})'.format(', '.join(map(str, [
-            self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos, self.bio_samples])))
+        return "BioEntity({})".format(
+            ", ".join(
+                map(
+                    str,
+                    [
+                        self.pk,
+                        self.disabled,
+                        self.secondary_id,
+                        self.extra_ids,
+                        self.extra_infos,
+                        self.bio_samples,
+                    ],
+                )
+            )
+        )
 
     def __str__(self):
         return repr(self)
 
 
 class BioSample(SheetEntry, CrawlMixin):
-    """Represent one sample taken from a biological entity/specimen
-    """
+    """Represent one sample taken from a biological entity/specimen"""
 
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, test_samples=None, dict_type=OrderedDict,
-                 bio_entity=None, name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        pk,
+        disabled,
+        secondary_id,
+        extra_ids=None,
+        extra_infos=None,
+        test_samples=None,
+        dict_type=OrderedDict,
+        bio_entity=None,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-            name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator
+        )
         #: Containing BioEntity
         self.bio_entity = bio_entity
         #: List of ``TestSample`` objects described for the ``BioSample``
@@ -206,28 +258,47 @@ class BioSample(SheetEntry, CrawlMixin):
 
     @property
     def full_secondary_id(self):
-        return '-'.join((self.bio_entity.full_secondary_id, self.secondary_id))
+        return "-".join((self.bio_entity.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
-        return 'BioSample({})'.format(', '.join(map(str, [
-            self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos, self.test_samples])))
+        return "BioSample({})".format(
+            ", ".join(
+                map(
+                    str,
+                    [
+                        self.pk,
+                        self.disabled,
+                        self.secondary_id,
+                        self.extra_ids,
+                        self.extra_infos,
+                        self.test_samples,
+                    ],
+                )
+            )
+        )
 
     def __str__(self):
         return repr(self)
 
 
 class TestSample(SheetEntry, CrawlMixin):
-    """Represent a technical sample from biological sample, e.g., DNA or RNA
-    """
+    """Represent a technical sample from biological sample, e.g., DNA or RNA"""
 
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, ngs_libraries=None, dict_type=OrderedDict,
-                 bio_sample=None,
-                 name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        pk,
+        disabled,
+        secondary_id,
+        extra_ids=None,
+        extra_infos=None,
+        ngs_libraries=None,
+        dict_type=OrderedDict,
+        bio_sample=None,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-            name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator
+        )
         #: Containing BioSample
         self.bio_sample = bio_sample
         #: List of ``NGSLibrary`` objects described for the ``TestSample``
@@ -240,39 +311,62 @@ class TestSample(SheetEntry, CrawlMixin):
 
     @property
     def full_secondary_id(self):
-        return '-'.join((self.bio_sample.full_secondary_id, self.secondary_id))
+        return "-".join((self.bio_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
-        return 'TestSample({})'.format(', '.join(map(str, [
-            self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos, self.ngs_libraries])))
+        return "TestSample({})".format(
+            ", ".join(
+                map(
+                    str,
+                    [
+                        self.pk,
+                        self.disabled,
+                        self.secondary_id,
+                        self.extra_ids,
+                        self.extra_infos,
+                        self.ngs_libraries,
+                    ],
+                )
+            )
+        )
 
     def __str__(self):
         return repr(self)
 
 
 class NGSLibrary(SheetEntry):
-    """Represent one NGSLibrary generated from a test sample
-    """
+    """Represent one NGSLibrary generated from a test sample"""
 
-    def __init__(self, pk, disabled, secondary_id, extra_ids=None,
-                 extra_infos=None, dict_type=OrderedDict, test_sample=None,
-                 name_generator=DEFAULT_NAME_GENERATOR):
+    def __init__(
+        self,
+        pk,
+        disabled,
+        secondary_id,
+        extra_ids=None,
+        extra_infos=None,
+        dict_type=OrderedDict,
+        test_sample=None,
+        name_generator=DEFAULT_NAME_GENERATOR,
+    ):
         super().__init__(
-            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type,
-            name_generator)
+            pk, disabled, secondary_id, extra_ids, extra_infos, dict_type, name_generator
+        )
         #: Owning TestSample
         self.test_sample = test_sample
 
     @property
     def full_secondary_id(self):
-        return '-'.join((
-            self.test_sample.full_secondary_id, self.secondary_id))
+        return "-".join((self.test_sample.full_secondary_id, self.secondary_id))
 
     def __repr__(self):
-        return 'NGSLibrary({})'.format(', '.join(map(str, [
-            self.pk, self.disabled, self.secondary_id, self.extra_ids,
-            self.extra_infos])))
+        return "NGSLibrary({})".format(
+            ", ".join(
+                map(
+                    str,
+                    [self.pk, self.disabled, self.secondary_id, self.extra_ids, self.extra_infos],
+                )
+            )
+        )
 
     def __str__(self):
         return repr(self)

@@ -14,23 +14,20 @@ import sys
 
 import pkg_resources
 
-from .io import json_loads_ordered, SheetSchema
+from .io import SheetSchema, json_loads_ordered
 from .io_tsv import (
-    read_cancer_tsv_json_data, read_generic_tsv_json_data, read_germline_tsv_json_data
+    read_cancer_tsv_json_data,
+    read_generic_tsv_json_data,
+    read_germline_tsv_json_data,
 )
 from .ref_resolver import RefResolver
-from .shortcuts import (
-    SHEET_TYPE_CANCER_MATCHED, SHEET_TYPE_GENERIC, SHEET_TYPE_GERMLINE_VARIANTS
-    )
+from .shortcuts import SHEET_TYPE_CANCER_MATCHED, SHEET_TYPE_GENERIC, SHEET_TYPE_GERMLINE_VARIANTS
 from .validation import SchemaValidator
 
-
 #: Choices for the TSV sheet type
-CHOICES_SHEET_TYPE = (
-    SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED,
-    SHEET_TYPE_GENERIC)
+CHOICES_SHEET_TYPE = (SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED, SHEET_TYPE_GENERIC)
 
-__author__ = 'Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>'
+__author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
 class AppBase:
@@ -57,20 +54,20 @@ class JsonSheetAppBase(AppBase):
 
     def run(self):
         """Execute the command"""
-        raise NotImplementedError('Abstract method called: override me!')
+        raise NotImplementedError("Abstract method called: override me!")
 
     def load_sheet_schema(self):
         """Load the bundled SheetSchema"""
-        print('Loading bundled BioMed Sheet JSON Schema...', file=sys.stderr)
-        return SheetSchema.load_from_string(pkg_resources.resource_stream(
-            'biomedsheets', 'data/sheet.schema.json').read().decode())
+        print("Loading bundled BioMed Sheet JSON Schema...", file=sys.stderr)
+        return SheetSchema.load_from_string(
+            pkg_resources.resource_stream("biomedsheets", "data/sheet.schema.json").read().decode()
+        )
 
     def load_sheet_json(self):
         """Load the sheet JSON file"""
-        print('Loading sheet JSON from "{}"'.format(self.args.input),
-              file=sys.stderr)
+        print('Loading sheet JSON from "{}"'.format(self.args.input), file=sys.stderr)
         try:
-            with open(self.args.input, 'rt') as f:
+            with open(self.args.input, "rt") as f:
                 return json_loads_ordered(f.read())
         except FileNotFoundError:
             raise  # re-raise
@@ -84,17 +81,15 @@ class JsonSheetAppBase(AppBase):
     def resolve_refs(self, sheet_json):
         """Resolve "$ref" JSON pointers in sheet_json"""
         print('Resolving {{ "$ref": "..." }} in JSON...')
-        resolver = RefResolver(
-            lookup_paths=self.get_lib_dirs(),
-            dict_class=collections.OrderedDict)
-        return resolver.resolve('file://' + self.args.input, sheet_json)
+        resolver = RefResolver(lookup_paths=self.get_lib_dirs(), dict_class=collections.OrderedDict)
+        return resolver.resolve("file://" + self.args.input, sheet_json)
 
     def validate_and_print_errors(self):
         errors = self.validator.validate(self.resolved_json)
         if errors:
-            print('The following validation errors occured', file=sys.stderr)
+            print("The following validation errors occured", file=sys.stderr)
             for error in errors:
-                print(' - {}'.format(error), file=sys.stderr)
+                print(" - {}".format(error), file=sys.stderr)
         return errors
 
 
@@ -105,15 +100,15 @@ class ValidateApp(JsonSheetAppBase):
         if self.validate_and_print_errors():
             return 1
         else:
-            print('Sheet passed validation, congratulation!', file=sys.stderr)
+            print("Sheet passed validation, congratulation!", file=sys.stderr)
 
 
 class ExpandApp(JsonSheetAppBase):
     """App sub class for expanding "$ref" JSON pointers"""
 
     def run(self):
-        json.dump(self.resolved_json, self.args.output, indent='  ')
-        print('', file=self.args.output)
+        json.dump(self.resolved_json, self.args.output, indent="  ")
+        print("", file=self.args.output)
 
 
 class ConvertApp(AppBase):
@@ -128,16 +123,17 @@ class ConvertApp(AppBase):
         json.dump(
             funcs[self.args.type](self.args.input, self.args.input.name),
             self.args.output,
-            indent='    ')
-        print('', file=self.args.output)
+            indent="    ",
+        )
+        print("", file=self.args.output)
 
 
 def run(args):
     """Program entry point after parsing command line arguments"""
     apps = {
-        'validate': ValidateApp,
-        'expand': ExpandApp,
-        'convert': ConvertApp,
+        "validate": ValidateApp,
+        "expand": ExpandApp,
+        "convert": ConvertApp,
     }
     return apps[args.subparser](args).run()
 
@@ -146,44 +142,54 @@ def main(argv=None):
     """Main program entry point, starts parsing command line arguments"""
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        '--lib-dir', type=str, default=['.', os.getcwd()], action='append',
-        help=('Base directorie for JSON file pointers, can be given '
-              'multiple times'))
+        "--lib-dir",
+        type=str,
+        default=[".", os.getcwd()],
+        action="append",
+        help=("Base directorie for JSON file pointers, can be given " "multiple times"),
+    )
 
-    subparsers = parser.add_subparsers(dest='subparser')
+    subparsers = parser.add_subparsers(dest="subparser")
 
-    parser_validate = subparsers.add_parser(
-        'validate', help='Validate sample sheet JSON')
+    parser_validate = subparsers.add_parser("validate", help="Validate sample sheet JSON")
     parser_validate.add_argument(
-        '-i', '--input', type=str, required=True,
-        help='Path to BioMed Sheet (JSON or YAML) file')
+        "-i", "--input", type=str, required=True, help="Path to BioMed Sheet (JSON or YAML) file"
+    )
 
-    parser_expand = subparsers.add_parser(
-        'expand', help='Expand "$ref" JSON pointers')
+    parser_expand = subparsers.add_parser("expand", help='Expand "$ref" JSON pointers')
     parser_expand.add_argument(
-        '-i', '--input', type=str, required=True,
-        help='Path to BioMed Sheet (JSON or YAML) file')
+        "-i", "--input", type=str, required=True, help="Path to BioMed Sheet (JSON or YAML) file"
+    )
     parser_expand.add_argument(
-        '-o', '--output', type=argparse.FileType('wt'), default=sys.stdout,
-        help='Path to output file, defaults to stdout')
+        "-o",
+        "--output",
+        type=argparse.FileType("wt"),
+        default=sys.stdout,
+        help="Path to output file, defaults to stdout",
+    )
 
     parser_convert = subparsers.add_parser(
-        'convert', help='Convert shortcut TSV sheet to JSON sample sheet')
+        "convert", help="Convert shortcut TSV sheet to JSON sample sheet"
+    )
     parser_convert.add_argument(
-        '-t', '--type', choices=CHOICES_SHEET_TYPE, required=True,
-        help='Shortcut TSV sheet type')
+        "-t", "--type", choices=CHOICES_SHEET_TYPE, required=True, help="Shortcut TSV sheet type"
+    )
     parser_convert.add_argument(
-        '-i', '--input', type=argparse.FileType('rt'), required=True,
-        help='Path to input TSV file')
+        "-i", "--input", type=argparse.FileType("rt"), required=True, help="Path to input TSV file"
+    )
     parser_convert.add_argument(
-        '-o', '--output', type=argparse.FileType('wt'), default=sys.stdout,
-        help='Path to output file, defaults to stdout')
+        "-o",
+        "--output",
+        type=argparse.FileType("wt"),
+        default=sys.stdout,
+        help="Path to output file, defaults to stdout",
+    )
 
     console = logging.StreamHandler()
     console.setLevel(logging.INFO)
-    formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+    formatter = logging.Formatter("%(name)-12s: %(levelname)-8s %(message)s")
     console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
+    logging.getLogger("").addHandler(console)
 
     args = parser.parse_args(argv)
     if not args.subparser:
@@ -192,5 +198,5 @@ def main(argv=None):
     return run(args)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
