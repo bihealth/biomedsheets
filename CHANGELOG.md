@@ -1,5 +1,12 @@
 # BioMed Sheets Changelog
 
+### [0.11.6](https://www.github.com/bihealth/biomedsheets/compare/v0.11.5...v0.11.6) (2023-02-22)
+
+
+### Bug Fixes
+
+* implementing release-please ([#30](https://www.github.com/bihealth/biomedsheets/issues/30)) ([2076440](https://www.github.com/bihealth/biomedsheets/commit/20764408458898b1f65cc550f5c1ae0514657b12))
+
 ## v0.11.5
 
 -   Fixing consistency check for Duo Cases (#26).
