@@ -1,5 +1,12 @@
 # BioMed Sheets Changelog
 
+### [0.11.7](https://www.github.com/bihealth/biomedsheets/compare/v0.11.6...v0.11.7) (2023-02-22)
+
+
+### Bug Fixes
+
+* MANIFEST.in file for CHANGELOG.md ([#32](https://www.github.com/bihealth/biomedsheets/issues/32)) ([c093555](https://www.github.com/bihealth/biomedsheets/commit/c093555c937bd65d2c0cd3f06f62fd404e5364fd))
+
 ### [0.11.6](https://www.github.com/bihealth/biomedsheets/compare/v0.11.5...v0.11.6) (2023-02-22)
 
 
