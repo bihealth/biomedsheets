@@ -5,8 +5,6 @@ import os
 
 from setuptools import find_packages, setup
 
-import versioneer
-
 __author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 
 
@@ -37,10 +35,15 @@ test_requirements = [
     # TODO: put package test requirements here
 ]
 
+package_root = os.path.abspath(os.path.dirname(__file__))
+version = {}
+with open(os.path.join(package_root, "biomedsheets/version.py")) as fp:
+    exec(fp.read(), version)
+version = version["__version__"]
+
 setup(
     name="biomedsheets",
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    version=version,
     description=("Python 3 library for accessing and managing BioMedical sheets"),
     long_description=readme + "\n\n" + changelog,
     long_description_content_type="text/markdown",
