@@ -55,20 +55,23 @@ class RefResolver:
         session = requests.Session()
         session.mount("file://", requests_file.FileAdapter())
         session.mount("resource://", requests_resource.ResourceAdapter())
+        key = None
         with session:
-            return self._resolve(type(obj)(), obj, session)
+            return self._resolve(type(obj)(), obj, session, key)
 
-    def _resolve(self, base_obj, obj, session):
+    def _resolve(self, base_obj, obj, session, key):
         if isinstance(base_obj, (int, bool, float, str)):  # JSON atomic
             return base_obj
         elif isinstance(base_obj, (dict, MutableMapping)):  # JSON object
             return self._resolve_dict_entry(base_obj, obj, session)
         elif isinstance(base_obj, (list, MutableSequence)):  # JSON list
-            return [self._resolve(elem, type(elem)(), session) for elem in base_obj]
+            return [self._resolve(elem, type(elem)(), session, key) for elem in base_obj]
         else:
             raise RefResolutionException(
-                "Can only resolve in dict and list container objects and "
-                "the atomic types int, bool, float, and str."
+                f"Can only resolve in dict and list container objects and "
+                f"the atomic types int, bool, float, and str. "
+                f"Encountered object of type {type(obj).__name__} with value: {repr(obj)}"
+                f"Error encountered at key: {str(key)}"
             )
 
     def _resolve_dict_entry(self, base_obj, obj, session):
@@ -94,9 +97,9 @@ class RefResolver:
             for k, v in obj.items():
                 if k != "$ref":
                     if k in result:
-                        result[k] = self._resolve(v, result[k], session)
+                        result[k] = self._resolve(v, result[k], session, k)
                     else:
-                        result[k] = self._resolve(v, type(v)(), session)
+                        result[k] = self._resolve(v, type(v)(), session, k)
         return result
 
     def _load_ref(self, ref_uri, session):
