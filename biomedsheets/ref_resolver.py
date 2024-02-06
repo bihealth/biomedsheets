@@ -55,7 +55,7 @@ class RefResolver:
         session = requests.Session()
         session.mount("file://", requests_file.FileAdapter())
         session.mount("resource://", requests_resource.ResourceAdapter())
-        key=None
+        key = None
         with session:
             return self._resolve(type(obj)(), obj, session, key)
 
