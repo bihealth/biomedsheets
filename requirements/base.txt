@@ -10,4 +10,4 @@ requests>=2.12.4
 requests-file>=1.4.1
 
 # Replacement for obsolete pkg_resources
-importlib_resources>=6.5.2
+importlib_resources>=6.4.5
