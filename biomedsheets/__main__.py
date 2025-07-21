@@ -12,7 +12,7 @@ import logging
 import os
 import sys
 
-import pkg_resources
+import importlib_resources
 
 from .io import SheetSchema, json_loads_ordered
 from .io_tsv import (
@@ -59,9 +59,9 @@ class JsonSheetAppBase(AppBase):
     def load_sheet_schema(self):
         """Load the bundled SheetSchema"""
         print("Loading bundled BioMed Sheet JSON Schema...", file=sys.stderr)
-        return SheetSchema.load_from_string(
-            pkg_resources.resource_stream("biomedsheets", "data/sheet.schema.json").read().decode()
-        )
+        ref = importlib_resources.files("biomedsheets").joinpath("data/sheet.schema.json")
+        inputf = ref.open("rb")
+        return SheetSchema.load_from_string(inputf.read().decode())
 
     def load_sheet_json(self):
         """Load the sheet JSON file"""

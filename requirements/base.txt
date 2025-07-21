@@ -8,3 +8,6 @@ ruamel.yaml>=0.15.18
 # Kenneth Reitz' wonderful requests module
 requests>=2.12.4
 requests-file>=1.4.1
+
+# Replacement for obsolete pkg_resources
+importlib_resources>=6.5.2
