@@ -1,5 +1,17 @@
 # BioMed Sheets Changelog
 
+## [0.12.0](https://www.github.com/bihealth/biomedsheets/compare/v0.11.7...v0.12.0) (2025-07-22)
+
+
+### Features
+
+* Added more verbose error message to the _resolve function, see issue [#36](https://www.github.com/bihealth/biomedsheets/issues/36) ([#37](https://www.github.com/bihealth/biomedsheets/issues/37)) ([4e0a848](https://www.github.com/bihealth/biomedsheets/commit/4e0a8484850c39d1511036c3fe29ec0b4f9271f8))
+
+
+### Bug Fixes
+
+* replaced obsolete pkg_resources package by importlib_resources ([#41](https://www.github.com/bihealth/biomedsheets/issues/41)) ([8a86f4c](https://www.github.com/bihealth/biomedsheets/commit/8a86f4c0b94b2c0bde14a22acf552387958ad688))
+
 ### [0.11.7](https://www.github.com/bihealth/biomedsheets/compare/v0.11.6...v0.11.7) (2023-02-22)
 
 
