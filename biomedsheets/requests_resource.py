@@ -4,14 +4,14 @@
 import io
 import locale
 
-import pkg_resources
+import importlib_resources
 from requests import Response, codes
 from requests.adapters import BaseAdapter
 from requests.compat import urlparse
 
 
 class ResourceAdapter(BaseAdapter):
-    """Adapter to pkg_resources.resource_stream()"""
+    """Adapter to importlib_resources replacement for pkg_resources.resource_stream()"""
 
     def send(self, request, **kwargs):
         """Wraps a pkg_resource.resource_stream
@@ -38,7 +38,8 @@ class ResourceAdapter(BaseAdapter):
             url_path = url_parts.path
             while url_path.startswith("/"):
                 url_path = url_path[1:]
-            with pkg_resources.resource_stream(pkg_name, url_path) as inputf:
+            ref = importlib_resources.files(pkg_name).joinpath(url_path)
+            with ref.open("rb") as inputf:
                 resp.raw = io.BytesIO(inputf.read())
         except FileNotFoundError as e:
             resp.status_code = codes.not_found
