@@ -60,8 +60,8 @@ class JsonSheetAppBase(AppBase):
         """Load the bundled SheetSchema"""
         print("Loading bundled BioMed Sheet JSON Schema...", file=sys.stderr)
         ref = importlib_resources.files("biomedsheets").joinpath("data/sheet.schema.json")
-        inputf = ref.open("rb")
-        return SheetSchema.load_from_string(inputf.read().decode())
+        with ref.open("rb") as inputf:
+            return SheetSchema.load_from_string(inputf.read().decode())
 
     def load_sheet_json(self):
         """Load the sheet JSON file"""
