@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "biomedsheets"
-version = "1.0.0"
+dynamic = ["version"]
 description = "Python 3 library for accessing and managing BioMedical sheets"
 readme = "README.md"
 license = "MIT"
@@ -51,6 +51,10 @@ docs = [
     "sphinx>=8",
     "sphinx-rtd-theme>=3",
 ]
+
+[tool.hatch.version]
+# Single source of the version; release-please updates this file.
+path = "biomedsheets/version.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["biomedsheets"]
