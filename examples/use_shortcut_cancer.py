@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Demonstrate shortcuts for cancer sample sheet
-"""
+"""Demonstrate shortcuts for cancer sample sheet"""
 
 import collections
 import os

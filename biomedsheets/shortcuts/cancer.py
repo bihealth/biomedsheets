@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Shortcuts for cancer sample sheets
-"""
+"""Shortcuts for cancer sample sheets"""
 
 from collections import OrderedDict
 from warnings import warn
@@ -213,8 +212,9 @@ class CancerBioSample(GenericBioSample):
         if not yielded_any and not allow_none:
             raise MissingDataEntity(  # pragma: no cover
                 (
-                    "Could not find a TestSample with {} == {} for "
-                    "BioSample {}".format(KEY_EXTRACTION_TYPE, ext_type, self.bio_sample)
+                    "Could not find a TestSample with {} == {} for BioSample {}".format(
+                        KEY_EXTRACTION_TYPE, ext_type, self.bio_sample
+                    )
                 )
             )
 

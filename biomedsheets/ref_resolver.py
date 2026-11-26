@@ -6,7 +6,7 @@ import os
 import sys
 from urllib.parse import urlparse
 
-import jsonpath_rw
+import jsonpath_ng
 import requests
 from requests.exceptions import HTTPError
 import requests_file
@@ -113,7 +113,7 @@ class RefResolver:
         elif ref_file not in self.cache:
             self.cache[ref_uri] = self._load_for_cache(parsed_ref_uri, session)
         ref_json = self.cache[ref_uri]
-        expr = jsonpath_rw.parse("$" + ".".join(parsed_ref_uri.fragment.split("/")))
+        expr = jsonpath_ng.parse("$" + ".".join(parsed_ref_uri.fragment.split("/")))
         for match in expr.find(ref_json):
             return match.value  # return first match only
         # If we reach here, resolution failed

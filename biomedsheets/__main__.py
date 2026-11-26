@@ -7,12 +7,12 @@ executable for the various
 
 import argparse
 import collections
+import contextlib
+import importlib.resources
 import json
 import logging
 import os
 import sys
-
-import importlib_resources
 
 from .io import SheetSchema, json_loads_ordered
 from .io_tsv import (
@@ -28,6 +28,13 @@ from .validation import SchemaValidator
 CHOICES_SHEET_TYPE = (SHEET_TYPE_GERMLINE_VARIANTS, SHEET_TYPE_CANCER_MATCHED, SHEET_TYPE_GENERIC)
 
 __author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
+
+
+def open_output(path):
+    """Return context manager for writing to ``path``, or to stdout if ``path`` is ``None``"""
+    if path is None:
+        return contextlib.nullcontext(sys.stdout)
+    return open(path, "wt")
 
 
 class AppBase:
@@ -59,7 +66,7 @@ class JsonSheetAppBase(AppBase):
     def load_sheet_schema(self):
         """Load the bundled SheetSchema"""
         print("Loading bundled BioMed Sheet JSON Schema...", file=sys.stderr)
-        ref = importlib_resources.files("biomedsheets").joinpath("data/sheet.schema.json")
+        ref = importlib.resources.files("biomedsheets").joinpath("data/sheet.schema.json")
         with ref.open("rb") as inputf:
             return SheetSchema.load_from_string(inputf.read().decode())
 
@@ -80,7 +87,7 @@ class JsonSheetAppBase(AppBase):
 
     def resolve_refs(self, sheet_json):
         """Resolve "$ref" JSON pointers in sheet_json"""
-        print('Resolving {{ "$ref": "..." }} in JSON...')
+        print('Resolving { "$ref": "..." } in JSON...', file=sys.stderr)
         resolver = RefResolver(lookup_paths=self.get_lib_dirs(), dict_class=collections.OrderedDict)
         return resolver.resolve("file://" + self.args.input, sheet_json)
 
@@ -107,8 +114,9 @@ class ExpandApp(JsonSheetAppBase):
     """App sub class for expanding "$ref" JSON pointers"""
 
     def run(self):
-        json.dump(self.resolved_json, self.args.output, indent="  ")
-        print("", file=self.args.output)
+        with open_output(self.args.output) as outputf:
+            json.dump(self.resolved_json, outputf, indent="  ")
+            print("", file=outputf)
 
 
 class ConvertApp(AppBase):
@@ -120,12 +128,9 @@ class ConvertApp(AppBase):
             SHEET_TYPE_CANCER_MATCHED: read_cancer_tsv_json_data,
             SHEET_TYPE_GENERIC: read_generic_tsv_json_data,
         }
-        json.dump(
-            funcs[self.args.type](self.args.input, self.args.input.name),
-            self.args.output,
-            indent="    ",
-        )
-        print("", file=self.args.output)
+        with open(self.args.input, "rt") as inputf, open_output(self.args.output) as outputf:
+            json.dump(funcs[self.args.type](inputf, self.args.input), outputf, indent="    ")
+            print("", file=outputf)
 
 
 def run(args):
@@ -146,7 +151,7 @@ def main(argv=None):
         type=str,
         default=[".", os.getcwd()],
         action="append",
-        help=("Base directorie for JSON file pointers, can be given " "multiple times"),
+        help=("Base directorie for JSON file pointers, can be given multiple times"),
     )
 
     subparsers = parser.add_subparsers(dest="subparser")
@@ -161,11 +166,7 @@ def main(argv=None):
         "-i", "--input", type=str, required=True, help="Path to BioMed Sheet (JSON or YAML) file"
     )
     parser_expand.add_argument(
-        "-o",
-        "--output",
-        type=argparse.FileType("wt"),
-        default=sys.stdout,
-        help="Path to output file, defaults to stdout",
+        "-o", "--output", type=str, default=None, help="Path to output file, defaults to stdout"
     )
 
     parser_convert = subparsers.add_parser(
@@ -175,14 +176,10 @@ def main(argv=None):
         "-t", "--type", choices=CHOICES_SHEET_TYPE, required=True, help="Shortcut TSV sheet type"
     )
     parser_convert.add_argument(
-        "-i", "--input", type=argparse.FileType("rt"), required=True, help="Path to input TSV file"
+        "-i", "--input", type=str, required=True, help="Path to input TSV file"
     )
     parser_convert.add_argument(
-        "-o",
-        "--output",
-        type=argparse.FileType("wt"),
-        default=sys.stdout,
-        help="Path to output file, defaults to stdout",
+        "-o", "--output", type=str, default=None, help="Path to output file, defaults to stdout"
     )
 
     console = logging.StreamHandler()

@@ -8,30 +8,22 @@ Further, it contains the implementation of a Python API for I/O and comfortable 
 
 ## Installation
 
-It's best to start a new virtualenv
-
 ```
-$ virtualenv -p python3 venv
-$ source venv/bin/activate
-$ pip install -r requirements/dev.txt
-$ pip install -e .
+$ pip install biomedsheets
 ```
 
-Use `python setup.py install` if you want to copy the files instead of creating a link only.
+## Development
 
-## Building Documentation
-
-After installation (`requirements_dev.txt` contains the appropriate Sphinx version).
-
-```
-$ cd docs
-$ make clean html
-```
-
-Now, open `docs/build/html/index.html`.
-
-## Running Tests
+The project uses [uv](https://docs.astral.sh/uv/) for environment management.
+`uv sync` creates `.venv` with the package installed in editable mode plus all
+development dependencies.
 
 ```
-$ py.test
+$ uv sync
+$ make lint      # ruff lint and format check
+$ make test      # pytest
+$ make docs      # Sphinx HTML, see docs/build/html/index.html
 ```
+
+Versioning and the changelog are handled by release-please from conventional
+commit messages, so do not edit `CHANGELOG.md` or the version by hand.

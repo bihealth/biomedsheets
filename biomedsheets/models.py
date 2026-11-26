@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Python classes for representing the generic part of BioMedical sheets
-"""
+"""Python classes for representing the generic part of BioMedical sheets"""
 
 from collections import OrderedDict
 

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Code for reading and writing the compact cancer TSV format
-"""
+"""Code for reading and writing the compact cancer TSV format"""
 
 from collections import OrderedDict
 
@@ -20,9 +19,7 @@ __author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 CANCER_DEFAULT_TITLE = "Cancer Sample Sheet"
 
 #: Default description
-CANCER_DEFAULT_DESCRIPTION = (
-    "Sample Sheet constructed from cancer matched samples " "compact TSV file"
-)
+CANCER_DEFAULT_DESCRIPTION = "Sample Sheet constructed from cancer matched samples compact TSV file"
 
 #: Cancer body TSV header
 CANCER_BODY_HEADER = ("patientName", "sampleName", "isTumor", "libraryType", "folderName")
@@ -99,7 +96,7 @@ class CancerTSVReader(BaseTSVReader):
         # Check "isTumor" field, convert to bool
         if mapping["isTumor"] not in BOOL_VALUES.keys():
             raise CancerTSVSheetException(  # pragma: no cover
-                ("Invalid boolean value {} in line {} " "of data section of {}").format(
+                ("Invalid boolean value {} in line {} of data section of {}").format(
                     mapping["isTumor"], lineno + 2, self.fname
                 )
             )

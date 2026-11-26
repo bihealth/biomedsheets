@@ -1,0 +1,88 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "biomedsheets"
+version = "0.11.7"
+description = "Python 3 library for accessing and managing BioMedical sheets"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Manuel Holtgrewe", email = "manuel.holtgrewe@bihealth.de" }]
+requires-python = ">=3.11"
+keywords = ["biomedsheets"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+dependencies = [
+    # JSON path lookup for "$ref" fragments
+    "jsonpath-ng>=1.6",
+    # YAML parsing (JSON is loaded as YAML to keep key order)
+    "ruamel.yaml>=0.18",
+    # HTTP client plus file:// adapter used by the $ref resolver
+    "requests>=2.32.4",
+    "requests-file>=2.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/bihealth/biomedsheets"
+Documentation = "https://biomedsheets.readthedocs.io"
+Changelog = "https://github.com/bihealth/biomedsheets/blob/main/CHANGELOG.md"
+
+[project.scripts]
+biomedsheets = "biomedsheets.__main__:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=6",
+    "ruff>=0.14",
+    { include-group = "docs" },
+]
+docs = [
+    "sphinx>=8",
+    "sphinx-rtd-theme>=3",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["biomedsheets"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [".github"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "C90", "I"]
+# Line length is left to the formatter, as before with black + flake8.
+ignore = ["E501"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 18
+
+[tool.ruff.lint.isort]
+force-sort-within-sections = true
+known-first-party = ["biomedsheets"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+omit = ["biomedsheets/version.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+]

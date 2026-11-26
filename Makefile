@@ -1,48 +1,33 @@
-.PHONY:
+.PHONY: default
 default: help
 
 .PHONY: help
 help:
 	@echo help      -- display this help
-	@echo black     -- apply black code formatter
-	@echo lint      -- run linters
+	@echo format    -- apply ruff import sorting and formatting
+	@echo lint      -- check with ruff (lint and formatting)
 	@echo test      -- run tests through pytest
-	@echo isort     -- run isort
+	@echo coverage  -- run tests with coverage report
+	@echo docs      -- build the Sphinx HTML documentation
 
-.PHONY: black
-black:
-	black -l 100 .
-
-.PHONY: snakefmt
-snakefmt:
-	snakefmt -l 100 . --include '(\.smk$$|\.rules$$|^Snakefile)'
+.PHONY: format
+format:
+	uv run ruff check --fix .
+	uv run ruff format .
 
 .PHONY: lint
-lint: flake8 lint-black lint-isort
+lint:
+	uv run ruff check .
+	uv run ruff format --check .
 
-.PHONY: isort
-isort:
-	isort --force-sort-within-sections --profile=black .
-
-.PHONY: flake8
-flake8:
-	flake8
-
-.PHONY: lint-black
-lint-black:
-	black -l 100 --check .
-
-.PHONY: lint-snakefmt
-lint-snakefmt:
-	snakefmt -l 100 . --include '(\.smk$$|\.rules$$|^Snakefile)' --check
-
-.PHONY: lint-isort
-lint-isort:
-	isort --force-sort-within-sections --profile=black --check .
-
+.PHONY: test
 test:
-	py.test
+	uv run pytest
 
+.PHONY: coverage
 coverage:
-	coverage report
-	coverage html
+	uv run pytest --cov=biomedsheets --cov-report=term-missing --cov-report=html
+
+.PHONY: docs
+docs:
+	uv run $(MAKE) -C docs html

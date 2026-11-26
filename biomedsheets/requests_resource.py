@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 """Extensions for requests module"""
 
+import importlib.resources
 import io
 import locale
 
-import importlib_resources
 from requests import Response, codes
 from requests.adapters import BaseAdapter
 from requests.compat import urlparse
 
 
 class ResourceAdapter(BaseAdapter):
-    """Adapter to importlib_resources replacement for pkg_resources.resource_stream()"""
+    """Adapter serving package data via ``importlib.resources``"""
 
     def send(self, request, **kwargs):
-        """Wraps a pkg_resource.resource_stream
+        """Serve a file from a package's data
 
         The host name is interpreted as the package name
         """
@@ -38,7 +38,7 @@ class ResourceAdapter(BaseAdapter):
             url_path = url_parts.path
             while url_path.startswith("/"):
                 url_path = url_path[1:]
-            ref = importlib_resources.files(pkg_name).joinpath(url_path)
+            ref = importlib.resources.files(pkg_name).joinpath(url_path)
             with ref.open("rb") as inputf:
                 resp.raw = io.BytesIO(inputf.read())
         except FileNotFoundError as e:

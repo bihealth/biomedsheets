@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Shortcuts for generic sample sheets
-"""
+"""Shortcuts for generic sample sheets"""
 
 from collections import OrderedDict
 
