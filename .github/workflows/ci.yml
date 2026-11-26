@@ -5,103 +5,46 @@ on:
     branches:
       - main
   pull_request:
-    branches_ignore: []
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
 
 jobs:
-  cancel-previous:
-    runs-on: ubuntu-latest
-    if: github.ref != 'refs/heads/main'
-    steps:
-      - uses: khan/pull-request-workflow-cancel@1.0.0
-        with:
-          workflows: "main.yml"
-        env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-
-  linting:
+  lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
 
-      - name: Install Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
-
-      - name: Install dependencies
-        run: |
-            pip install -r requirements/test.txt
-            pip freeze
-
-      - name: Run linting tools
-        run: |
-          make lint
-
-      - name: Comment PR
-        if: github.event_name == 'pull_request' && failure()
-        uses: marocchino/sticky-pull-request-comment@v1.1.0
-        with:
-          message: |
-            - Please format your Python code with [black](https://black.readthedocs.io): `make black`
-            - Please organize your imports [isorts](https://isort.readthedocs.io): `make isort`
-            - Please ensure that your code passes [flake8](https://flake8.pycqa.org/en/latest/): `make flake8`
-
-            You can trigger all lints locally by running `make lint`
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  sphinx-docs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v1
-
-      - name: Install Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: "3.8"
-
-      - name: Install dependencies
-        run: |
-            pip install -r requirements/dev.txt
-            pip freeze
-
-      - name: Build documentation
-        run: |
-          cd docs
-          make html
-
-  testing:
+  test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
-          - "3.8"
-          - "3.9"
-          - "3.10"
           - "3.11"
-    needs: linting
+          - "3.12"
+          - "3.13"
+          - "3.14"
     steps:
-      - name: Install Python
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
         with:
           python-version: ${{ matrix.python-version }}
+      - run: uv sync --locked
+      - run: uv run pytest --cov=biomedsheets --cov-report=term --cov-report=xml
 
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          lfs: true
-          fetch-depth: 0
-
-      - name: Install dependencies
-        run: pip install -r requirements/test.txt; pip install --ignore-installed py
-
-      - name: Run tests
-        run: pytest
-        env:
-          DIFF_MAIN: ${{ github.event_name == 'pull_request' }}
-          DIFF_LAST_COMMIT: ${{ github.ref == 'refs/heads/main' }}
-
-      - name: Create text report
-        run: coverage report
-
-      - name: Coveralls
-        uses: AndreMiras/coveralls-python-action@develop
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@1db35dd8eee11c5894872e0b383ae6c406cf738d # v10.4.0
+      - run: uv sync --locked
+      - run: uv run make -C docs html

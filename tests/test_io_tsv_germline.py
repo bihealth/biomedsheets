@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for loading the compressed germline TSV file
-"""
+"""Tests for loading the compressed germline TSV file"""
 
 import io
 import json

@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Python code for the validation of BioMed Schemas
-"""
+"""Python code for the validation of BioMed Schemas"""
 
 __author__ = "Manuel Holtgrewe <manuel.holtgrewe@bihealth.de>"
 

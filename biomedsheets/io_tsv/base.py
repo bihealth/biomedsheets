@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Base code for reading compact TSV format
-"""
+"""Base code for reading compact TSV format"""
 
 from collections import OrderedDict
 import re
@@ -101,7 +100,7 @@ class TSVSheetException(SheetIOException):
 
 def std_field(name):
     """Return data structure for returning JSON pointer data structure"""
-    tpl = "resource://biomedsheets/data/std_fields.json#" "/extraInfoDefs/template/{}"
+    tpl = "resource://biomedsheets/data/std_fields.json#/extraInfoDefs/template/{}"
     return (name, OrderedDict([("$ref", tpl.format(name))]))
 
 
@@ -215,9 +214,7 @@ class TSVHeader:
 
 
 #: Header with custom fields
-CUSTOM_FIELDS_HEADER = (
-    "key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\t" "choices\tpattern"
-)
+CUSTOM_FIELDS_HEADER = "key\tannotatedEntity\tdocs\ttype\tminimum\tmaximum\tunit\tchoices\tpattern"
 
 
 class TSVHeaderParser:
@@ -261,7 +258,7 @@ class TSVHeaderParser:
                     custom_fields_header = line.strip()
                     if custom_fields_header != CUSTOM_FIELDS_HEADER:
                         raise TSVSheetException(
-                            ("Invalid custom fields header: {}, " "expected {}").format(
+                            ("Invalid custom fields header: {}, expected {}").format(
                                 repr(custom_fields_header), repr(CUSTOM_FIELDS_HEADER)
                             )
                         )
@@ -274,7 +271,7 @@ class TSVHeaderParser:
     def _process_custom_fields(cls, arr):
         if len(arr) != 9:
             raise TSVSheetException(
-                ("Invalid number of entries in [Custom Fields] line: {}, " "should be 9").format(
+                ("Invalid number of entries in [Custom Fields] line: {}, should be 9").format(
                     len(arr)
                 )
             )
@@ -389,7 +386,7 @@ class BaseTSVReader:
             arr = [(x if x not in (".", "") else None) for x in arr]
             # Check number of entries in line
             if len(arr) != len(names):
-                msg = "Invalid number of entries in line {} of data " "section of {}: {} vs {}"
+                msg = "Invalid number of entries in line {} of data section of {}: {} vs {}"
                 raise TSVSheetException(
                     msg.format(lineno + 2, self.fname, arr, names)
                 )  # pragma: no cover
@@ -537,7 +534,7 @@ class BaseTSVReader:
         counters_ext = dict((x, 1) for x in EXTRACTION_TYPES)
         counters_lib = {}
         for record in records:
-            if not record["libraryType"] in LIBRARY_TO_EXTRACTION:
+            if record["libraryType"] not in LIBRARY_TO_EXTRACTION:
                 continue
             extraction_type = LIBRARY_TO_EXTRACTION[record["libraryType"]]
             if (

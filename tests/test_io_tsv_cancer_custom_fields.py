@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for loading succing cancer TSV files with custom fields
-"""
+"""Tests for loading succing cancer TSV files with custom fields"""
 
 import io
 import json

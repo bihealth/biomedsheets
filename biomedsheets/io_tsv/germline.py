@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Code for reading and writing the compact germline TSV format
-"""
+"""Code for reading and writing the compact germline TSV format"""
 
 from collections import OrderedDict
 
@@ -146,7 +145,7 @@ class GermlineTSVReader(BaseTSVReader):
         # Check "sex" field
         if mapping["sex"] not in SEX_VALUES.keys():
             raise GermlineTSVSheetException(  # pragma: no cover
-                ('Invalid "sex" value {} in line {} of data section of ' "{}").format(
+                ('Invalid "sex" value {} in line {} of data section of {}').format(
                     mapping["sex"], lineno + 2, self.fname
                 )
             )
@@ -154,7 +153,7 @@ class GermlineTSVReader(BaseTSVReader):
         # Check "affected"
         if mapping["isAffected"] not in AFFECTED_VALUES.keys():
             raise GermlineTSVSheetException(  # pragma: no cover
-                ('Invalid "isAffected" value {} in line {} of data section of ' "{}").format(
+                ('Invalid "isAffected" value {} in line {} of data section of {}').format(
                     mapping["isAffected"], lineno + 2, self.fname
                 )
             )

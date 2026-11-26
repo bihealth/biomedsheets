@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Code for reading and writing the compact generic TSV format.
-"""
+"""Code for reading and writing the compact generic TSV format."""
 
 from collections import OrderedDict
 

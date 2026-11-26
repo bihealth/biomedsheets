@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Tests for loading the compressed generic TSV file with custom fields
-"""
+"""Tests for loading the compressed generic TSV file with custom fields"""
 
 import io
 import json

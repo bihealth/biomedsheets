@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """Tests for base module"""
 
-
 import pytest
 
 from biomedsheets.shortcuts.base import InvalidSelector, MissingDataEntity

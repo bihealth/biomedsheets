@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*
-"""Shortcuts for rare germline sample sheets
-"""
+"""Shortcuts for rare germline sample sheets"""
 
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
@@ -300,7 +299,7 @@ class Cohort:
         """
         overlap = set(dest.keys()) & set(other.keys())
         if overlap:
-            tpl = "Duplicate {}s when building " "cohort shortcuts: {}"  # pramga: no cover
+            tpl = "Duplicate {}s when building cohort shortcuts: {}"  # pramga: no cover
             raise ValueError(tpl.format(msg_token, list(sorted(overlap))))  # pramga: no cover
         dest.update(other)
         return dest
