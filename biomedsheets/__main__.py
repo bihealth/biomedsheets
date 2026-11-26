@@ -87,7 +87,7 @@ class JsonSheetAppBase(AppBase):
 
     def resolve_refs(self, sheet_json):
         """Resolve "$ref" JSON pointers in sheet_json"""
-        print('Resolving {{ "$ref": "..." }} in JSON...')
+        print('Resolving { "$ref": "..." } in JSON...', file=sys.stderr)
         resolver = RefResolver(lookup_paths=self.get_lib_dirs(), dict_class=collections.OrderedDict)
         return resolver.resolve("file://" + self.args.input, sheet_json)
 
