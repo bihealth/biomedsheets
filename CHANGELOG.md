@@ -1,5 +1,12 @@
 # BioMed Sheets Changelog
 
+## [1.0.1](https://github.com/bihealth/biomedsheets/compare/v1.0.0...v1.0.1) (2026-11-26)
+
+
+### Bug Fixes
+
+* read the version from version.py so uv.lock stays valid ([#45](https://github.com/bihealth/biomedsheets/issues/45)) ([460b074](https://github.com/bihealth/biomedsheets/commit/460b074b870a7b5f5ed2d655767dc79043b05007))
+
 ## [1.0.0](https://github.com/bihealth/biomedsheets/compare/v0.11.7...v1.0.0) (2026-11-26)
 
 
