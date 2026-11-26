@@ -27,7 +27,6 @@ wheels = [
 
 [[package]]
 name = "biomedsheets"
-version = "0.11.7"
 source = { editable = "." }
 dependencies = [
     { name = "jsonpath-ng" },
